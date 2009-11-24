@@ -1,0 +1,59 @@
+#!/bin/bash
+#
+# This is an example script that install and configure grub after installation.
+# To use it put it in your CUSTOMIZE_DIR, make it executable, and edit EXTRAPKGS
+# of your $sysconfdir/default/ganeti-instance-debootstrap.
+#
+# Xen, for etch/lenny i386:
+#   EXTRA_PKGS="linux-image-xen-686,libc6-xen"
+# Xen, for etch/lenny amd64:
+#   EXTRA_PKGS="linux-image-xen-amd64"
+# KVM:
+#   no extra packages needed besides the normal suggested ones
+#
+# Do not include grub in EXTRA_PKGS because it will cause error of debootstrap.
+
+set -e
+
+. common.sh
+
+CLEANUP=( )
+
+trap cleanup EXIT
+
+if [ -z "$TARGET" -o ! -d "$TARGET" ]; then
+  echo "Missing target directory"
+  exit 1
+fi
+
+# install grub
+LANG=C
+chroot "$TARGET" apt-get -y --force-yes install grub grub-common
+
+# make /dev/sda
+mknod $TARGET/dev/sda b $(stat -L -c "0x%t 0x%T" $BLOCKDEV)
+CLEANUP+=("rm -f $TARGET/dev/sda")
+
+# make /dev/sda1
+mknod $TARGET/dev/sda1 b $(stat -L -c "0x%t 0x%T" $FSYSDEV)
+CLEANUP+=("rm -f $TARGET/dev/sda1")
+
+# create grub directory
+mkdir -p "$TARGET/boot/grub"
+
+# create device.map
+cat > "$TARGET/boot/grub/device.map" <<EOF
+(hd0) /dev/sda
+EOF
+
+# execute update-grub
+chroot "$TARGET" update-grub
+
+# install grub to the block device
+grub-install --no-floppy --root-directory="$TARGET" "$BLOCKDEV"
+
+# execute cleanups
+cleanup
+trap - EXIT
+
+exit 0

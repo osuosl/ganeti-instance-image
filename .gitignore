@@ -1,0 +1,16 @@
+# gitignore rules
+# autotools results
+/Makefile
+/Makefile.in
+/aclocal.m4
+/autom4te.cache
+/autotools
+/config.log
+/config.status
+/configure
+
+# built scripts
+/common.sh
+
+# archives
+/ganeti-instance-debootstrap-*.tar.gz
