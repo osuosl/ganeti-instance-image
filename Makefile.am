@@ -1,7 +1,7 @@
 osname=$(subst ganeti-instance-,,$(PACKAGE))
 
 osdir=$(OS_DIR)/$(osname)
-variantsdir="$(DESTDIR)${sysconfdir}/ganeti/instance-debootstrap/variants"
+variantsdir="$(DESTDIR)${sysconfdir}/ganeti/instance-image/variants"
 
 dist_os_SCRIPTS = create import export rename
 dist_os_DATA = ganeti_api_version variants.list

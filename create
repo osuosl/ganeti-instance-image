@@ -22,7 +22,7 @@ set -e
 . common.sh
 
 if [ "$GENERATE_CACHE" = "yes" -a ! -d "$CACHE_DIR" ]; then
-  mkdir -p "$CACHE_DIR"
+  $MKDIR "$CACHE_DIR"
 fi
 
 DPKG_ARCH=${ARCH:-`dpkg --print-architecture`}
@@ -32,8 +32,8 @@ CACHE_FILE="$CACHE_DIR/cache-${SUITE}-${DPKG_ARCH}.tar"
 # This is needed for file disks.
 if [ ! -b $blockdev ]; then
   ORIGINAL_BLOCKDEV=$blockdev
-  blockdev=$(losetup -sf $blockdev)
-  CLEANUP+=("losetup -d $blockdev")
+  blockdev=$($LOSETUP -sf $blockdev)
+  CLEANUP+=("$LOSETUP -d $blockdev")
 fi
 
 if [ "$PARTITION_STYLE" = "none" ]; then

@@ -25,8 +25,8 @@ set -e
 # This is needed for file disks.
 if [ ! -b $blockdev ]; then
   ORIGINAL_BLOCKDEV=$blockdev
-  blockdev=$(losetup -sf $blockdev)
-  CLEANUP+=("losetup -d $blockdev")
+  blockdev=$($LOSETUP -sf $blockdev)
+  CLEANUP+=("$LOSETUP -d $blockdev")
 fi
 
 if [ "$PARTITION_STYLE" = "none" ]; then
@@ -42,7 +42,7 @@ fi
 vol_type=$($VOL_TYPE $filesystem_dev)
 
 if [ "$vol_type" = "ext3" -o "$vol_type" = "ext2" ]; then
-  dump -0 -q -f - "$filesystem_dev"
+  $DUMP -0 -q -f - "$filesystem_dev"
 fi
 
 # execute cleanups
