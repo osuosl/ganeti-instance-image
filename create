@@ -21,12 +21,7 @@ set -e
 
 . common.sh
 
-if [ "$GENERATE_CACHE" = "yes" -a ! -d "$CACHE_DIR" ]; then
-  $MKDIR "$CACHE_DIR"
-fi
-
 DPKG_ARCH=${ARCH:-`dpkg --print-architecture`}
-CACHE_FILE="$CACHE_DIR/cache-${SUITE}-${DPKG_ARCH}.tar"
 
 # If the target device is not a real block device we'll first losetup it.
 # This is needed for file disks.
@@ -61,43 +56,6 @@ CLEANUP+=("rmdir $TMPDIR")
 
 mount $filesystem_dev $TMPDIR
 CLEANUP+=("umount $TMPDIR")
-
-# remove the cache file if it's old (> 2 weeks) and writable by the owner (the
-# default due to the standard umask)
-if [ "$CLEAN_CACHE" -a -d "$CACHE_DIR" ]; then
-  find "$CACHE_DIR" -name 'cache-*.tar' -type f \
-    -daystart -mtime "+${CLEAN_CACHE}" -print0 | \
-    xargs -r0 rm -f
-fi
-
-if [ -f "$CACHE_FILE" ]; then
-  tar xf "$CACHE_FILE" -C $TMPDIR
-else
-  if [ "$PROXY" ]; then
-    export http_proxy="$PROXY"
-  fi
-  # INCLUDE will be empty if EXTRA_PKGS is null/empty, otherwise we
-  # build the full parameter format from it
-  INCLUDE=${EXTRA_PKGS:+"--include=$EXTRA_PKGS"}
-  debootstrap \
-    --arch "$DPKG_ARCH" \
-    $INCLUDE \
-    "$SUITE" $TMPDIR $MIRROR
-
-  # remove the downloaded debs, as they are no longer needed
-  find "$TMPDIR/var/cache/apt/archives" -type f -name '*.deb' -print0 | \
-    xargs -r0 rm -f
-
-  # remove the persistent-net rules, otherwise it will remember the node's
-  # interfaces as eth0, eth1, ...
-  rm -f "$TMPDIR/etc/udev/rules.d/z25_persistent-net.rules"
-
-  if [ "$GENERATE_CACHE" = "yes" ]; then
-    TMP_CACHE=`mktemp "${CACHE_FILE}.XXXXXX"`
-    tar cf "$TMP_CACHE" -C $TMPDIR .
-    mv -f "$TMP_CACHE" "$CACHE_FILE"
-  fi
-fi
 
 cp -p /etc/hosts $TMPDIR/etc/hosts
 cp -p /etc/resolv.conf $TMPDIR/etc/resolv.conf

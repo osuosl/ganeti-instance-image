@@ -42,16 +42,6 @@
 # By default /etc/ganeti/instance-debootstrap.d
 # CUSTOMIZE_DIR="/etc/ganeti/instance-debootstrap.d"
 
-# GENERATE_CACHE: if set to yes (the default), create new cache files;
-# any other value will disable the generation of cache files (but they
-# will still be used if they exist)
-GENERATE_CACHE="yes"
-
-# CLEAN_CACHE: should be set to the number of days after which to
-# clean the cache; the default is 14 (two weeks); to disable cache
-# cleaning, set it to an empty value ("")
-CLEAN_CACHE="14"
-
 # PARTITION_STYLE: whether and how the target device should be partitioned.
 # Allowed values:
 # 'none': just format the device, but don't partition it

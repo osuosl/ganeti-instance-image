@@ -147,23 +147,17 @@ fi
 
 # only if the user want to specify a mirror in the defaults file we
 # will use it, this declaration is to make sure the variable is set
-: ${MIRROR:=""}
-: ${PROXY:=""}
-: ${SUITE:="lenny"}
+: ${BARE:="no"}
+: ${IMAGE:=""}
 : ${ARCH:=""}
-: ${EXTRA_PKGS:=""}
 : ${CUSTOMIZE_DIR:="@sysconfdir@/ganeti/instance-debootstrap.d"}
 : ${VARIANTS_DIR:="@sysconfdir@/ganeti/instance-debootstrap/variants"}
-: ${GENERATE_CACHE:="yes"}
-: ${CLEAN_CACHE:="14"} # number of days to keep a cache file
 if [ -z "$OS_API_VERSION" -o "$OS_API_VERSION" = "5" ]; then
   DEFAULT_PARTITION_STYLE="none"
 else
   DEFAULT_PARTITION_STYLE="msdos"
 fi
 : ${PARTITION_STYLE:=$DEFAULT_PARTITION_STYLE} # disk partition style
-
-CACHE_DIR="@localstatedir@/cache/ganeti-instance-debootstrap"
 
 SCRIPT_NAME=$(basename $0)
 
