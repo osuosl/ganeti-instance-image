@@ -21,82 +21,54 @@ set -e
 
 . common.sh
 
-DPKG_ARCH=${ARCH:-`dpkg --print-architecture`}
+if [ "$CDINSTALL" = "no" ] ; then
+    # If the target device is not a real block device we'll first losetup it.
+    # This is needed for file disks.
+    if [ ! -b $blockdev ]; then
+      ORIGINAL_BLOCKDEV=$blockdev
+      blockdev=$($LOSETUP -sf $blockdev)
+      CLEANUP+=("$LOSETUP -d $blockdev")
+    fi
 
-# If the target device is not a real block device we'll first losetup it.
-# This is needed for file disks.
-if [ ! -b $blockdev ]; then
-  ORIGINAL_BLOCKDEV=$blockdev
-  blockdev=$($LOSETUP -sf $blockdev)
-  CLEANUP+=("$LOSETUP -d $blockdev")
-fi
+    if [ "$PARTITION_STYLE" = "none" ]; then
+      filesystem_dev=$blockdev
+    elif [ "$PARTITION_STYLE" = "msdos" ]; then
+      # Create one big partition, and make it bootable
+      format_disk0 $blockdev
+      filesystem_dev=$(map_disk0 $blockdev)
+      CLEANUP+=("unmap_disk0 $blockdev")
+    else
+      echo "Unknown partition style $PARTITION_STYLE"
+      exit 1
+    fi
 
-if [ "$PARTITION_STYLE" = "none" ]; then
-  filesystem_dev=$blockdev
-elif [ "$PARTITION_STYLE" = "msdos" ]; then
-  # Create one big partition, and make it bootable
-  format_disk0 $blockdev
-  filesystem_dev=$(map_disk0 $blockdev)
-  CLEANUP+=("unmap_disk0 $blockdev")
-else
-  echo "Unknown partition style $PARTITION_STYLE"
-  exit 1
-fi
+    mke2fs -Fjq $filesystem_dev
+    root_uuid=$($VOL_ID $filesystem_dev )
 
-mke2fs -Fjq $filesystem_dev
-root_uuid=$($VOL_ID $filesystem_dev )
+    if [ -n "$swapdev" ]; then
+      mkswap $swapdev
+      swap_uuid=$($VOL_ID $swapdev || true )
+    fi
 
-if [ -n "$swapdev" ]; then
-  mkswap $swapdev
-  swap_uuid=$($VOL_ID $swapdev || true )
-fi
+    ##
+    # Do magical restore action for fast installs here
+    ##
 
-TMPDIR=`mktemp -d` || exit 1
-CLEANUP+=("rmdir $TMPDIR")
+    TMPDIR=`mktemp -d` || exit 1
+    CLEANUP+=("rmdir $TMPDIR")
 
-mount $filesystem_dev $TMPDIR
-CLEANUP+=("umount $TMPDIR")
+    mount $filesystem_dev $TMPDIR
+    CLEANUP+=("umount $TMPDIR")
 
-cp -p /etc/hosts $TMPDIR/etc/hosts
-cp -p /etc/resolv.conf $TMPDIR/etc/resolv.conf
-echo $instance > $TMPDIR/etc/hostname
-echo $instance > $TMPDIR/etc/mailname
+    RUN_PARTS=`which run-parts`
 
-cat > $TMPDIR/etc/fstab <<EOF
-# /etc/fstab: static file system information.
-#
-# <file system>   <mount point>   <type>  <options>       <dump>  <pass>
-UUID=$root_uuid   /               ext3    defaults        0       1
-proc              /proc           proc    defaults        0       0
-EOF
-
-[ -n "$swapdev" -a -n "$swap_uuid" ] && cat >> $TMPDIR/etc/fstab <<EOF
-UUID=$swap_uuid   swap            swap    defaults        0       0
-EOF
-
-cat > $TMPDIR/etc/network/interfaces <<EOF
-auto lo
-iface lo inet loopback
-EOF
-
-if [ -e $TMPDIR/etc/inittab ]; then
-  cat $TMPDIR/etc/inittab | sed -re 's/\stty1$/ console/' \
-    > $TMPDIR/etc/inittab.new
-  mv $TMPDIR/etc/inittab.new $TMPDIR/etc/inittab
-elif [ -e $TMPDIR/etc/event.d/tty1 ]; then
-  cat $TMPDIR/etc/event.d/tty1 | sed -re 's/tty1/console/' \
-    > $TMPDIR/etc/event.d/console
-  rm $TMPDIR/etc/event.d/tty1
-fi
-
-RUN_PARTS=`which run-parts`
-
-if [ -n "$RUN_PARTS" -a -n "$CUSTOMIZE_DIR" -a -d "$CUSTOMIZE_DIR" ]; then
-  TARGET=$TMPDIR
-  BLOCKDEV=$blockdev
-  FSYSDEV=$filesystem_dev
-  export TARGET SUITE ARCH PARTITION_STYLE EXTRA_PKGS BLOCKDEV FSYSDEV
-  $RUN_PARTS $CUSTOMIZE_DIR
+    if [ -n "$RUN_PARTS" -a -n "$CUSTOMIZE_DIR" -a -d "$CUSTOMIZE_DIR" ]; then
+      TARGET=$TMPDIR
+      BLOCKDEV=$blockdev
+      FSYSDEV=$filesystem_dev
+      export TARGET SUITE ARCH PARTITION_STYLE EXTRA_PKGS BLOCKDEV FSYSDEV
+      $RUN_PARTS $CUSTOMIZE_DIR
+    fi
 fi
 
 # execute cleanups

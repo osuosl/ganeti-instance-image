@@ -147,7 +147,7 @@ fi
 
 # only if the user want to specify a mirror in the defaults file we
 # will use it, this declaration is to make sure the variable is set
-: ${BARE:="no"}
+: ${CDINSTALL:="yes"}
 : ${IMAGE:=""}
 : ${ARCH:=""}
 : ${CUSTOMIZE_DIR:="@sysconfdir@/ganeti/instance-debootstrap.d"}
