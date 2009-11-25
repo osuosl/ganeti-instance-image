@@ -11,13 +11,7 @@ dist_doc_DATA = COPYING NEWS README
 
 EXTRA_DIST = common.sh.in defaults
 
-do_subst = sed \
-	-e 's,[@]sysconfdir[@],$(sysconfdir),g' \
-	-e 's,[@]localstatedir[@],$(localstatedir),g'
-
-common.sh: common.sh.in Makefile
-	$(do_subst) < $< > $@
-	chmod +x $@
+common.sh: common.sh.in 
 
 install-exec-local:
 	@mkdir_p@ "$(variantsdir)"
