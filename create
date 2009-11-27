@@ -30,35 +30,33 @@ if [ "$CDINSTALL" = "no" ] ; then
       CLEANUP+=("$LOSETUP -d $blockdev")
     fi
 
-    if [ "$PARTITION_STYLE" = "none" ]; then
-      filesystem_dev=$blockdev
-    elif [ "$PARTITION_STYLE" = "msdos" ]; then
-      # Create one big partition, and make it bootable
-      format_disk0 $blockdev
-      filesystem_dev=$(map_disk0 $blockdev)
-      CLEANUP+=("unmap_disk0 $blockdev")
-    else
-      echo "Unknown partition style $PARTITION_STYLE"
-      exit 1
-    fi
+    # Create 3 partitions, /boot, swap, & /
+    format_disk0 $blockdev
+    filesystem_base_dev=$(map_disk0 $blockdev)
+    root_dev="${filesystem_base_dev}-3"
+    boot_dev="${filesystem_base_dev}-1"
+    swap_dev="${filesystem_base_dev}-2"
+    CLEANUP+=("unmap_disk0 $blockdev")
 
-    mke2fs -Fjq $filesystem_dev
-    root_uuid=$($VOL_ID $filesystem_dev )
-
-    if [ -n "$swapdev" ]; then
-      mkswap $swapdev
-      swap_uuid=$($VOL_ID $swapdev || true )
-    fi
-
-    ##
-    # Do magical restore action for fast installs here
-    ##
+    # Format /boot
+    mke2fs -Fjq $boot_dev
+    # Format /
+    mke2fs -Fjq $root_dev
+    # Format swap
+    mkswap $swap_dev
 
     TMPDIR=`mktemp -d` || exit 1
     CLEANUP+=("rmdir $TMPDIR")
 
-    mount $filesystem_dev $TMPDIR
+    # mount filesystems
+    mount $root_dev $TMPDIR
+    mount $boot_dev $TMPDIR/boot
+    CLEANUP+=("umount $TMPDIR/boot")
     CLEANUP+=("umount $TMPDIR")
+
+    ##
+    # Do magical restore action for fast installs here
+    ##
 
     RUN_PARTS=`which run-parts`
 
