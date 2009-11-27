@@ -94,12 +94,14 @@ get_api10_arguments() {
 }
 
 format_disk0() {
-  # Create one big partition, and make it bootable
-  # some versions of sfdisk need manual specification of 
-  # head/sectors for devices such as drbd which don't 
-  # report geometry
-  $SFDISK -H 255 -S 63 --quiet --Linux "$1" <<EOF
-0,,L,*
+  # Create three partitions:
+  # 1 - 100MB /boot, bootable
+  # 2 - Size of Memory, swap
+  # 3 - Rest
+  $SFDISK -uM -H 255 -S 63 --quiet --Linux "$1" <<EOF
+,100,L,*
+,$INSTANCE_MEMORY,S
+,,L
 EOF
 }
 
