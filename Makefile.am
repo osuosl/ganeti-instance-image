@@ -15,6 +15,7 @@ common.sh: common.sh.in
 
 install-exec-local:
 	@mkdir_p@ "$(variantsdir)"
+	@mkdir_p@ "$(DESTDIR)$(localstatedir)/cache/ganeti-instance-image"
 	touch "$(variantsdir)/default.conf"
 
 CLEANFILES = common.sh
