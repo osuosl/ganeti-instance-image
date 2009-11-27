@@ -21,6 +21,8 @@ set -e
 
 . common.sh
 
+IMAGE_FILE="$IMAGE_DIR/image-$IMAGE_NAME-$ARCH.tar.gz"
+
 if [ "$CDINSTALL" = "no" ] ; then
     # If the target device is not a real block device we'll first losetup it.
     # This is needed for file disks.
@@ -54,9 +56,13 @@ if [ "$CDINSTALL" = "no" ] ; then
     CLEANUP+=("umount $TMPDIR/boot")
     CLEANUP+=("umount $TMPDIR")
 
-    ##
-    # Do magical restore action for fast installs here
-    ##
+    if [ ! -f "$IMAGE_FILE" ] ; then
+      log_error "Can't find image file: $IMAGE_FILE"
+      exit 1
+    fi
+
+    # unpack image
+    tar pzxf $IMAGE_FILE -C $TMPDIR
 
     RUN_PARTS=`which run-parts`
 

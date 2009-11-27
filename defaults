@@ -5,6 +5,16 @@
 # new image
 # CDINSTALL="yes"
 
+# IMAGE_NAME: Name of the image to use
+# Generally you use the name of the image with the version of the OS included.
+# Examples include:
+#   centos-5.4 debian-4.0 fedora-12
+# IMAGE_NAME=""
+
+# ARCH: Define the ARCH of the image to use
+# Use either x86 or x86_64
+# ARCH=""
+
 # CUSTOMIZE_DIR: a directory containing scripts to customize the installation.
 # The scripts are executed using run-parts
 # By default /etc/ganeti/instance-image.d

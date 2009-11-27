@@ -150,7 +150,7 @@ fi
 # only if the user want to specify a mirror in the defaults file we
 # will use it, this declaration is to make sure the variable is set
 : ${CDINSTALL:="yes"}
-: ${IMAGE:=""}
+: ${IMAGE_NAME:=""}
 : ${ARCH:=""}
 : ${CUSTOMIZE_DIR:="@sysconfdir@/ganeti/instance-debootstrap.d"}
 : ${VARIANTS_DIR:="@sysconfdir@/ganeti/instance-debootstrap/variants"}
@@ -160,6 +160,8 @@ else
   DEFAULT_PARTITION_STYLE="msdos"
 fi
 : ${PARTITION_STYLE:=$DEFAULT_PARTITION_STYLE} # disk partition style
+
+IMAGE_DIR="@localstatedir@/cache/ganeti-instance-image"
 
 SCRIPT_NAME=$(basename $0)
 
