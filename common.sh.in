@@ -100,7 +100,7 @@ format_disk0() {
   # 3 - Rest
   $SFDISK -uM -H 255 -S 63 --quiet --Linux "$1" <<EOF
 ,100,L,*
-,$INSTANCE_MEMORY,S
+,$INSTANCE_BE_memory,S
 ,,L
 EOF
 }
