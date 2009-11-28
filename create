@@ -65,6 +65,33 @@ if [ "$CDINSTALL" = "no" ] ; then
     # unpack image
     tar pzxf $IMAGE_FILE -C $TMPDIR
 
+    # Set disk based on type of hypervisor
+    if [ "$HYPERVISOR" = "kvm" ] ; then
+      disk="vda"
+    else
+      disk="xda"
+    fi
+
+    # make /dev/$disk
+    mknod $TMPDIR/dev/$disk b $(stat -L -c "0x%t 0x%T" $blockdev)
+    CLEANUP+=("rm -f $TMPDIR/dev/$disk")
+
+    # make /dev/${disk}1
+    mknod $TMPDIR/dev/${disk}1 b $(stat -L -c "0x%t 0x%T" $boot_dev)
+    CLEANUP+=("rm -f $TMPDIR/dev/${disk}1")
+
+    # make /dev/${disk}1
+    mknod $TMPDIR/dev/${disk}3 b $(stat -L -c "0x%t 0x%T" $root_dev)
+    CLEANUP+=("rm -f $TMPDIR/dev/${disk}3")
+
+    # create device.map
+cat > "$TMPDIR/boot/grub/device.map" <<EOF
+(hd0) /dev/$disk
+EOF
+
+    # install grub to the block device
+    grub-install --no-floppy --root-directory="$TMPDIR" "$blockdev"
+
     RUN_PARTS=`which run-parts`
 
     if [ -n "$RUN_PARTS" -a -n "$CUSTOMIZE_DIR" -a -d "$CUSTOMIZE_DIR" ]; then
