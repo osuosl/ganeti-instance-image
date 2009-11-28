@@ -52,6 +52,7 @@ if [ "$CDINSTALL" = "no" ] ; then
 
     # mount filesystems
     mount $root_dev $TMPDIR
+    $MKDIR_P $TMPDIR/boot
     mount $boot_dev $TMPDIR/boot
     CLEANUP+=("umount $TMPDIR/boot")
     CLEANUP+=("umount $TMPDIR")
