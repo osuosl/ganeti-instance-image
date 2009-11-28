@@ -16,6 +16,16 @@ AC_ARG_WITH([os-dir],
   [os_dir="$datadir/ganeti/os"])
 AC_SUBST(OS_DIR, $os_dir)
 
+# --with-defaults-dir=...
+AC_ARG_WITH([defaults-dir],
+  [AS_HELP_STRING([--with-defaults-dir=DIR],
+    [top-level defaults config directory under which to install]
+    [ (default is $sysconfdif/defaults)]
+  )],
+  [defaults_dir="$withval"],
+  [defaults_dir="$sysconfdir/defaults"])
+AC_SUBST(DEFAULTS_DIR, $defaults_dir)
+
 # Check common programs
 AC_PROG_INSTALL
 AC_PROG_LN_S
