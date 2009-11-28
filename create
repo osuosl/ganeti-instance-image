@@ -52,10 +52,10 @@ if [ "$CDINSTALL" = "no" ] ; then
 
     # mount filesystems
     mount $root_dev $TMPDIR
+    CLEANUP+=("umount $TMPDIR")
     $MKDIR_P $TMPDIR/boot
     mount $boot_dev $TMPDIR/boot
     CLEANUP+=("umount $TMPDIR/boot")
-    CLEANUP+=("umount $TMPDIR")
 
     if [ ! -f "$IMAGE_FILE" ] ; then
       log_error "Can't find image file: $IMAGE_FILE"
