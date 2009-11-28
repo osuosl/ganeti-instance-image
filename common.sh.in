@@ -116,8 +116,8 @@ map_disk0() {
   fi
   $KPARTX -a -p- $blockdev > /dev/null
   filesystem_dev="/dev/mapper/${filesystem_dev_base/-1/}"
-  if [ ! -b "$filesystem_dev" ]; then
-    log_error "Can't find kpartx mapped partition: $filesystem_dev"
+  if [ ! -b "/dev/mapper/$filesystem_dev_base" ]; then
+    log_error "Can't find kpartx mapped partition: /dev/mapper/$filesystem_dev_base"
     exit 1
   fi
   echo "$filesystem_dev"
