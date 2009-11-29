@@ -94,7 +94,7 @@ EOF
 root (hd0,0)
 setup (hd0)
 quit
-EOF 
+EOF
 
     RUN_PARTS=`which run-parts`
 
