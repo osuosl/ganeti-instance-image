@@ -41,9 +41,9 @@ if [ "$CDINSTALL" = "no" ] ; then
     CLEANUP+=("unmap_disk0 $blockdev")
 
     # Format /boot
-    mke2fs -Fjq $boot_dev
+    mke2fs -Fjq -L /boot $boot_dev
     # Format /
-    mke2fs -Fjq $root_dev
+    mke2fs -Fjq -L / $root_dev
     # Format swap
     mkswap $swap_dev
 
