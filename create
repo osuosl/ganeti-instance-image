@@ -66,6 +66,7 @@ if [ "$CDINSTALL" = "no" ] ; then
     tar pzxf $IMAGE_FILE -C $TMPDIR
 
     # Set disk based on type of hypervisor
+    disk=""
     if [ "$HYPERVISOR" = "kvm" ] ; then
       disk="vda"
     else
