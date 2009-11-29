@@ -90,7 +90,11 @@ cat > "$TMPDIR/boot/grub/device.map" <<EOF
 EOF
 
     # install grub to the block device
-    grub-install --no-floppy --root-directory="$TMPDIR" "$blockdev"
+    chroot $TMPDIR grub --batch --no-floppy --device-map=/boot/grub/device.map <<EOF
+root (hd0,0)
+setup (hd0)
+quit
+EOF 
 
     RUN_PARTS=`which run-parts`
 
