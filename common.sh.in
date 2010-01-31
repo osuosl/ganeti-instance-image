@@ -154,6 +154,7 @@ fi
 : ${ARCH:=""}
 : ${CUSTOMIZE_DIR:="@sysconfdir@/ganeti/instance-image.d"}
 : ${VARIANTS_DIR:="@sysconfdir@/ganeti/instance-image/variants"}
+: ${IMAGE_DIR:="@localstatedir@/cache/ganeti-instance-image"}
 if [ -z "$OS_API_VERSION" -o "$OS_API_VERSION" = "5" ]; then
   DEFAULT_PARTITION_STYLE="none"
 else
@@ -161,7 +162,6 @@ else
 fi
 : ${PARTITION_STYLE:=$DEFAULT_PARTITION_STYLE} # disk partition style
 
-IMAGE_DIR="@localstatedir@/cache/ganeti-instance-image"
 
 SCRIPT_NAME=$(basename $0)
 
