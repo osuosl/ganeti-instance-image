@@ -152,8 +152,8 @@ fi
 : ${CDINSTALL:="yes"}
 : ${IMAGE_NAME:=""}
 : ${ARCH:=""}
-: ${CUSTOMIZE_DIR:="@sysconfdir@/ganeti/instance-debootstrap.d"}
-: ${VARIANTS_DIR:="@sysconfdir@/ganeti/instance-debootstrap/variants"}
+: ${CUSTOMIZE_DIR:="@sysconfdir@/ganeti/instance-image.d"}
+: ${VARIANTS_DIR:="@sysconfdir@/ganeti/instance-image/variants"}
 if [ -z "$OS_API_VERSION" -o "$OS_API_VERSION" = "5" ]; then
   DEFAULT_PARTITION_STYLE="none"
 else
@@ -204,7 +204,7 @@ if [ -n "$OS_VARIANT" ]; then
     . "$VARIANT_CONFIG"
   else
     if grep -qxF "$OS_VARIANT" variants.list; then
-      log_error "ERROR: instance-debootstrap configuration error"
+      log_error "ERROR: instance-image configuration error"
       log_error "  Published variant $OS_VARIANT is missing its config file"
       log_error "  Please create $VARIANT_CONFIG or unpublish the variant"
       log_error "  (by removing $OS_VARIANT from variants.list)"
