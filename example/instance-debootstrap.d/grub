@@ -1,17 +1,10 @@
 #!/bin/bash
+# This is an example script that configures, grub after installation. This
+# script assumes that grub has been installed onto the image already and a
+# working grub.conf exists. To use, make it executable and edit your settings
+# to the following:
 #
-# This is an example script that install and configure grub after installation.
-# To use it put it in your CUSTOMIZE_DIR, make it executable, and edit EXTRAPKGS
-# of your $sysconfdir/default/ganeti-instance-debootstrap.
-#
-# Xen, for etch/lenny i386:
-#   EXTRA_PKGS="linux-image-xen-686,libc6-xen"
-# Xen, for etch/lenny amd64:
-#   EXTRA_PKGS="linux-image-xen-amd64"
-# KVM:
-#   no extra packages needed besides the normal suggested ones
-#
-# Do not include grub in EXTRA_PKGS because it will cause error of debootstrap.
+# GRUB_SETUP="yes"
 
 set -e
 
@@ -21,36 +14,42 @@ CLEANUP=( )
 
 trap cleanup EXIT
 
-if [ -z "$TARGET" -o ! -d "$TARGET" ]; then
-  echo "Missing target directory"
-  exit 1
+if [ -z "${TARGET}" -o -d "${TARGET}" ] ; then
+    echo "Missing target directory"
+    exit 1
 fi
 
-# install grub
-LANG=C
-chroot "$TARGET" apt-get -y --force-yes install grub grub-common
+# Set disk based on type of hypervisor
+disk=""
+if [ "${HYPERVISOR}" = "kvm" ] ; then
+  disk="vda"
+else
+  disk="xda"
+fi
 
-# make /dev/sda
-mknod $TARGET/dev/sda b $(stat -L -c "0x%t 0x%T" $BLOCKDEV)
-CLEANUP+=("rm -f $TARGET/dev/sda")
+# make /dev/$disk
+mknod ${TARGET}/dev/${disk} b $(stat -L -c "0x%t 0x%T" $BLOCKDEV)
+CLEANUP+=("rm -f ${TARGET}/dev/$disk")
 
-# make /dev/sda1
-mknod $TARGET/dev/sda1 b $(stat -L -c "0x%t 0x%T" $FSYSDEV)
-CLEANUP+=("rm -f $TARGET/dev/sda1")
+# make /dev/${disk}1
+mknod ${TARGET}/dev/${disk}1 b $(stat -L -c "0x%t 0x%T" $BOOT_DEV)
+CLEANUP+=("rm -f ${TARGET}/dev/${disk}1")
 
-# create grub directory
-mkdir -p "$TARGET/boot/grub"
+# make /dev/${disk}1
+mknod ${TARGET}/dev/${disk}3 b $(stat -L -c "0x%t 0x%T" $ROOT_DEV)
+CLEANUP+=("rm -f ${TARGET}/dev/${disk}3")
 
 # create device.map
-cat > "$TARGET/boot/grub/device.map" <<EOF
-(hd0) /dev/sda
+cat > "${TARGET}/boot/grub/device.map" <<EOF
+(hd0) /dev/${disk}
 EOF
 
-# execute update-grub
-chroot "$TARGET" update-grub
-
 # install grub to the block device
-grub-install --no-floppy --root-directory="$TARGET" "$BLOCKDEV"
+chroot ${TARGET} grub --batch --no-floppy --device-map=/boot/grub/device.map <<EOF
+root (hd0,0)
+setup (hd0)
+quit
+EOF
 
 # execute cleanups
 cleanup
