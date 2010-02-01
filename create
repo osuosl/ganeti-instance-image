@@ -32,70 +32,78 @@ if [ "$CDINSTALL" = "no" ] ; then
       CLEANUP+=("$LOSETUP -d $blockdev")
     fi
 
-    # Create 3 partitions, /boot, swap, & /
-    format_disk0 $blockdev
+    if [ ! -f "$IMAGE_FILE" ] ; then
+      log_error "Can't find image file: $IMAGE_FILE"
+      exit 1
+    fi
+
+    # If the image is tarball based, then we need to manually create the
+    # volumes, filesystems, etc
+    if [ "${IMAGE_TYPE}" = "tarball" ] ; then
+        # Create 3 partitions, /boot, swap, & /
+        format_disk0 $blockdev
+    elif [ "${IMAGE_TYPE}" = "qemu" ] ; then
+        # need a recent version of qemu for this
+        qemu-img convert ${IMAGE_FILE} -O host_device ${blockdev}
+    fi
+
     filesystem_base_dev=$(map_disk0 $blockdev)
     root_dev="${filesystem_base_dev}-3"
     boot_dev="${filesystem_base_dev}-1"
     swap_dev="${filesystem_base_dev}-2"
     CLEANUP+=("unmap_disk0 $blockdev")
 
-    # Format /boot
-    mke2fs -Fjq -L /boot $boot_dev
-    # Format /
-    mke2fs -Fjq -L / $root_dev
-    # Format swap
-    mkswap $swap_dev
+    if [ "${IMAGE_TYPE}" = "tarball" ] ; then
+        # Format /boot
+        mke2fs -Fjq -L /boot $boot_dev
+        # Format /
+        mke2fs -Fjq -L / $root_dev
+        # Format swap
+        mkswap $swap_dev
+    fi
 
     TMPDIR=`mktemp -d` || exit 1
     CLEANUP+=("rmdir $TMPDIR")
 
     # mount filesystems
-    mount $root_dev $TMPDIR
-    CLEANUP+=("umount $TMPDIR")
-    $MKDIR_P $TMPDIR/boot
-    mount $boot_dev $TMPDIR/boot
-    CLEANUP+=("umount $TMPDIR/boot")
+    mount_disk0 $TMPDIR $root_dev $boot_dev
 
-    if [ ! -f "$IMAGE_FILE" ] ; then
-      log_error "Can't find image file: $IMAGE_FILE"
-      exit 1
-    fi
+    if [ "${IMAGE_TYPE}" = "tarball" ] ; then
+        # unpack image
+        tar pzxf $IMAGE_FILE -C $TMPDIR
 
-    # unpack image
-    tar pzxf $IMAGE_FILE -C $TMPDIR
+        # Set disk based on type of hypervisor
+        disk=""
+        if [ "$HYPERVISOR" = "kvm" ] ; then
+          disk="vda"
+        else
+          disk="xda"
+        fi
 
-    # Set disk based on type of hypervisor
-    disk=""
-    if [ "$HYPERVISOR" = "kvm" ] ; then
-      disk="vda"
-    else
-      disk="xda"
-    fi
+        # make /dev/$disk
+        mknod $TMPDIR/dev/$disk b $(stat -L -c "0x%t 0x%T" $blockdev)
+        CLEANUP+=("rm -f $TMPDIR/dev/$disk")
 
-    # make /dev/$disk
-    mknod $TMPDIR/dev/$disk b $(stat -L -c "0x%t 0x%T" $blockdev)
-    CLEANUP+=("rm -f $TMPDIR/dev/$disk")
+        # make /dev/${disk}1
+        mknod $TMPDIR/dev/${disk}1 b $(stat -L -c "0x%t 0x%T" $boot_dev)
+        CLEANUP+=("rm -f $TMPDIR/dev/${disk}1")
 
-    # make /dev/${disk}1
-    mknod $TMPDIR/dev/${disk}1 b $(stat -L -c "0x%t 0x%T" $boot_dev)
-    CLEANUP+=("rm -f $TMPDIR/dev/${disk}1")
+        # make /dev/${disk}1
+        mknod $TMPDIR/dev/${disk}3 b $(stat -L -c "0x%t 0x%T" $root_dev)
+        CLEANUP+=("rm -f $TMPDIR/dev/${disk}3")
 
-    # make /dev/${disk}1
-    mknod $TMPDIR/dev/${disk}3 b $(stat -L -c "0x%t 0x%T" $root_dev)
-    CLEANUP+=("rm -f $TMPDIR/dev/${disk}3")
-
-    # create device.map
-cat > "$TMPDIR/boot/grub/device.map" <<EOF
+        # create device.map
+    cat > "$TMPDIR/boot/grub/device.map" <<EOF
 (hd0) /dev/$disk
 EOF
 
-    # install grub to the block device
-    chroot $TMPDIR grub --batch --no-floppy --device-map=/boot/grub/device.map <<EOF
+        # install grub to the block device
+        chroot $TMPDIR grub --batch --no-floppy --device-map=/boot/grub/device.map <<EOF
 root (hd0,0)
 setup (hd0)
 quit
 EOF
+    fi
 
     RUN_PARTS=`which run-parts`
 

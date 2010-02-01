@@ -105,6 +105,15 @@ format_disk0() {
 EOF
 }
 
+mount_disk0() {
+    local tmpdir=$1 root_dev=$2 boot_dev=$3
+    mount $root_dev $tmpdir
+    CLEANUP+=("umount $tmpdir")
+    $MKDIR_P $tmpdir/boot
+    mount $boot_dev $tmpdir/boot
+    CLEANUP+=("umount $tmpdir/boot")
+}
+
 map_disk0() {
   blockdev="$1"
   filesystem_dev_base=`$KPARTX -l -p- $blockdev | \
@@ -151,6 +160,7 @@ fi
 # will use it, this declaration is to make sure the variable is set
 : ${CDINSTALL:="yes"}
 : ${IMAGE_NAME:=""}
+: ${IMAGE_TYPE:="qemu"}
 : ${ARCH:=""}
 : ${CUSTOMIZE_DIR:="@sysconfdir@/ganeti/instance-image.d"}
 : ${VARIANTS_DIR:="@sysconfdir@/ganeti/instance-image/variants"}

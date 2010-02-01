@@ -11,6 +11,10 @@
 #   centos-5.4 debian-4.0 fedora-12
 # IMAGE_NAME=""
 
+# IMAGE_TYPE: Either qemu disk images or tarball based images.
+# Use either qemu or tarball (default is qemu)
+# IMAGE_TYPE=qemu
+
 # IMAGE_DIR: directory location for disk images
 # IMAGE_DIR=""
 
