@@ -17,8 +17,8 @@ EXTRA_DIST = common.sh.in defaults
 common.sh: common.sh.in 
 
 install-exec-local:
-	@mkdir_p@ "$(variantsdir)"
-	@mkdir_p@ "$(localstatedir)/cache/ganeti-instance-image"
-	touch "$(variantsdir)/default.conf"
+	@mkdir_p@ "$(DESTDIR)$(variantsdir)"
+	@mkdir_p@ "$(DESTDIR)$(localstatedir)/cache/ganeti-instance-image"
+	touch "$(DESTDIR)$(variantsdir)/default.conf"
 
 CLEANFILES = common.sh
