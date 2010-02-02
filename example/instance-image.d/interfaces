@@ -24,13 +24,13 @@ if [ -z "${NIC_COUNT}" ] ; then
     exit 1
 fi
 
-if [ -e /etc/redhat-release ] ; then
+if [ -e ${TARGET}/etc/redhat-release ] ; then
     OS_TYPE="redhat"
-elif [ -e /etc/debian_version ] ; then
+elif [ -e ${TARGET}/etc/debian_version ] ; then
     OS_TYPE="debian"
-elif [ -e /etc/gentoo-release ] ; then
+elif [ -e ${TARGET}/etc/gentoo-release ] ; then
     OS_TYPE="gentoo"
-elif [ -e /etc/SuSE-release ] ; then
+elif [ -e ${TARGET}/etc/SuSE-release ] ; then
     OS_TYPE="suse"
 fi
 
