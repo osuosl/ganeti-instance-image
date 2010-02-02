@@ -29,7 +29,3 @@
 # The scripts are executed using run-parts
 # By default /etc/ganeti/instance-image.d
 # CUSTOMIZE_DIR="/etc/ganeti/instance-image.d"
-
-# GRUB_SETUP: Setup grub to work on a tarball based image. You need to set the
-# executable bit for gurb in the custom directory first.
-# GRUB_SETUP=no

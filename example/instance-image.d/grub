@@ -1,10 +1,8 @@
 #!/bin/bash
 # This is an example script that configures, grub after installation. This
 # script assumes that grub has been installed onto the image already and a
-# working grub.conf exists. To use, make it executable and edit your settings
-# to the following:
-#
-# GRUB_SETUP="yes"
+# working grub.conf exists. This is only enabled if using the tarball image
+# type. 
 
 set -e
 
@@ -13,6 +11,11 @@ set -e
 CLEANUP=( )
 
 trap cleanup EXIT
+
+if [ "${IMAGE_TYPE}" != "tarball" ] ; then
+    echo "Image type not \'tarball\', skipping setting up grub..."
+    exit 0
+fi
 
 if [ -z "${TARGET}" -o -d "${TARGET}" ] ; then
     echo "Missing target directory"
