@@ -69,21 +69,21 @@ if [ "$CDINSTALL" = "no" ] ; then
         fi
     fi
 
-    TMPDIR=`mktemp -d` || exit 1
-    CLEANUP+=("rmdir $TMPDIR")
+    TARGET=`mktemp -d` || exit 1
+    CLEANUP+=("rmdir $TARGET")
 
     # mount filesystems
-    mount_disk0 $TMPDIR $root_dev $boot_dev
+    mount_disk0 $TARGET $root_dev $boot_dev
 
     if [ "${IMAGE_TYPE}" = "tarball" ] ; then
         # unpack image
-        tar pzxf $IMAGE_FILE -C $TMPDIR
+        tar pzxf $IMAGE_FILE -C $TARGET
     fi
 
     RUN_PARTS=`which run-parts`
 
     if [ -n "$RUN_PARTS" -a -n "$CUSTOMIZE_DIR" -a -d "$CUSTOMIZE_DIR" ]; then
-      TARGET=$TMPDIR
+      TARGET=$TARGET
       BLOCKDEV=$blockdev
       ROOT_DEV=$root_dev
       BOOT_DEV=$boot_dev
