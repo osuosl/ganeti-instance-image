@@ -86,7 +86,7 @@ if [ "$CDINSTALL" = "no" ] ; then
       TARGET=$TMPDIR
       BLOCKDEV=$blockdev
       ROOT_DEV=$root_dev
-      BOOT_DEV=$root_dev
+      BOOT_DEV=$boot_dev
       export TARGET SUITE ARCH PARTITION_STYLE EXTRA_PKGS BLOCKDEV ROOT_DEV BOOT_DEV
       $RUN_PARTS $CUSTOMIZE_DIR
     fi
