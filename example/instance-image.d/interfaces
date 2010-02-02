@@ -3,6 +3,8 @@
 # This is an example script that configures your network settings after
 # installation. By default it sets it up to use dhcp.
 
+. common.sh
+
 DIG="$(which dig)"
 OS_TYPE=""
 FQDN=""
@@ -132,3 +134,4 @@ if [ "${NIC_COUNT}" -gt 0 ] ; then
     esac
 fi
 
+exit 0
