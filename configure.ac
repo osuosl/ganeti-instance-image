@@ -52,6 +52,11 @@ if test -z "$SFDISK" ; then
   AC_MSG_ERROR([sfdisk not found in $PATH])
 fi
 
+AC_PATH_PROG(QEMU_IMG, [qemu-img])
+if test -z "$QEMU_IMG" ; then
+  AC_MSG_ERROR([qemu-img not found in $PATH])
+fi
+
 AC_CONFIG_FILES([
     Makefile
     common.sh

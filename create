@@ -44,7 +44,7 @@ if [ "$CDINSTALL" = "no" ] ; then
         format_disk0 $blockdev
     elif [ "${IMAGE_TYPE}" = "qemu" ] ; then
         # need a recent version of qemu for this
-        qemu-img convert ${IMAGE_FILE} -O host_device ${blockdev}
+        ${QEMU_IMG} convert ${IMAGE_FILE} -O host_device ${blockdev}
     fi
 
     filesystem_base_dev=$(map_disk0 $blockdev)
