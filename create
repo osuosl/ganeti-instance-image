@@ -19,6 +19,10 @@
 
 set -e
 
+if [ "${DEBUG_LEVEL} " = 1 ] ; then
+    set -x
+fi
+
 . common.sh
 
 IMAGE_FILE=""

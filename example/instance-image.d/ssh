@@ -4,6 +4,10 @@
 
 . common.sh
 
+if [ "${DEBUG_LEVEL} " = 1 ] ; then
+    set -x
+fi
+
 HOST_KEY="/etc/ssh/ssh_host_key"
 RSA_KEY="/etc/ssh/ssh_host_rsa_key"
 DSA_KEY="/etc/ssh/ssh_host_dsa_key"

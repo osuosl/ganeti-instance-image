@@ -8,6 +8,10 @@ set -e
 
 . common.sh
 
+if [ "${DEBUG_LEVEL} " = 1 ] ; then
+    set -x
+fi
+
 CLEANUP=( )
 
 trap cleanup EXIT
