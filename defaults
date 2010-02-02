@@ -5,6 +5,9 @@
 # new image
 # CDINSTALL="yes"
 
+# SWAP: Create a swap partition
+# SWAP=yes
+
 # IMAGE_NAME: Name of the image to use
 # Generally you use the name of the image with the version of the OS included.
 # Examples include:

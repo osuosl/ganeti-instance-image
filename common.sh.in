@@ -94,15 +94,25 @@ get_api10_arguments() {
 }
 
 format_disk0() {
-  # Create three partitions:
-  # 1 - 100MB /boot, bootable
-  # 2 - Size of Memory, swap
-  # 3 - Rest
-  $SFDISK -uM -H 255 -S 63 --quiet --Linux "$1" <<EOF
+    if [ "${SWAP}" = "yes" ] ; then
+        # Create three partitions:
+        # 1 - 100MB /boot, bootable
+        # 2 - Size of Memory, swap
+        # 3 - Rest
+        $SFDISK -uM -H 255 -S 63 --quiet --Linux "$1" <<EOF
 ,100,L,*
 ,$INSTANCE_BE_memory,S
 ,,L
 EOF
+    else
+        # Create two partitions:
+        # 1 - 100MB /boot, bootable
+        # 2 - Rest
+        $SFDISK -uM -H 255 -S 63 --quiet --Linux "$1" <<EOF
+,100,L,*
+,,L
+EOF
+    fi
 }
 
 mount_disk0() {
@@ -159,6 +169,7 @@ fi
 # only if the user want to specify a mirror in the defaults file we
 # will use it, this declaration is to make sure the variable is set
 : ${CDINSTALL:="yes"}
+: ${SWAP:="yes"}
 : ${IMAGE_NAME:=""}
 : ${IMAGE_TYPE:="qemu"}
 : ${ARCH:=""}
