@@ -106,12 +106,12 @@ EOF
 }
 
 mount_disk0() {
-    local tmpdir=$1 root_dev=$2 boot_dev=$3
-    mount $root_dev $tmpdir
-    CLEANUP+=("umount $tmpdir")
-    $MKDIR_P $tmpdir/boot
-    mount $boot_dev $tmpdir/boot
-    CLEANUP+=("umount $tmpdir/boot")
+    local target=$1 root_dev=$2 boot_dev=$3
+    mount $root_dev $target
+    CLEANUP+=("umount $target")
+    $MKDIR_P $target/boot
+    mount $boot_dev $target/boot
+    CLEANUP+=("umount $target/boot")
 }
 
 map_disk0() {
