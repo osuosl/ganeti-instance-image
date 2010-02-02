@@ -21,7 +21,12 @@ set -e
 
 . common.sh
 
-IMAGE_FILE="$IMAGE_DIR/image-$IMAGE_NAME-$ARCH.tar.gz"
+IMAGE_FILE=""
+if [ "$IMAGE_TYPE" = "tarball" ] ; then
+    IMAGE_FILE="${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}.tar.gz"
+elif [ "$IMAGE_TYPE" = "qemu" ] ; then
+    IMAGE_FILE="${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}.img"
+fi
 
 if [ "$CDINSTALL" = "no" ] ; then
     # If the target device is not a real block device we'll first losetup it.
