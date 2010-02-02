@@ -8,7 +8,7 @@ dist_os_SCRIPTS = create import export rename
 dist_os_DATA = ganeti_api_version variants.list
 os_DATA = common.sh
 
-dist_custom_DATA = example/instance-debootstrap.d/*
+dist_custom_DATA = example/instance-image.d/*
 
 dist_doc_DATA = COPYING NEWS README
 
