@@ -1,44 +1,43 @@
 #!/bin/bash
 
-# Copyright (C) 2009 Google Inc.
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-# 02110-1301, USA.
+# This is an example script that configures your network settings after
+# installation. By default it sets it up to use dhcp.
 
-# This is an example script that configures you /etc/network/interfaces after
-# installation.  By default its sets up the system to use dhcp. To use it just
-# put it in your CUSTOMIZE_DIR and make it executable.
+DIG="$(which dig)"
+OS_TYPE=""
+FQDN=""
 
-if [ -z "$TARGET" -o ! -d "$TARGET" ]; then
-  echo "Missing target directory"
-  exit 1
+# discover fqdn name using dig
+if [ -n "$NIC_0_IP" -a -n "${DIG}" ] ; then
+    FQDN="$(${DIG} -x ${NIC_0_IP} +short | sed -e 's/\.$//')"
 fi
 
-if [ ! -d "$TARGET/etc/network" ]; then
-  echo "Missing target network directory"
-  exit 1
+if [ -z "${TARGET}" -o ! -d "${TARGET}" ] ; then
+    echo "Missing target directory"
+    exit 1
 fi
 
-if [ -z "$NIC_COUNT" ]; then
-  echo "Missing NIC COUNT"
-  exit 1
+if [ -z "${NIC_COUNT}" ] ; then
+    echo "Missing NIC_COUNT"
+    exit 1
 fi
 
-if [ "$NIC_COUNT" -gt 0 ]; then
+if [ -e /etc/redhat-release ] ; then
+    OS_TYPE="redhat"
+elif [ -e /etc/debian_version ] ; then
+    OS_TYPE="debian"
+elif [ -e /etc/gentoo-release ] ; then
+    OS_TYPE="gentoo"
+elif [ -e /etc/SuSE-release ] ; then
+    OS_TYPE="suse"
+fi
 
-  cat > $TARGET/etc/network/interfaces <<EOF
+debian_setup() {
+    if [ ! -d "${TARGET}/etc/network" ] ; then
+        echo "Missing target network directory"
+        exit 1
+    fi
+    cat > ${TARGET}/etc/network/interfaces << EOF
 # This file describes the network interfaces available on your system
 # and how to activate them. For more information, see interfaces(5).
 
@@ -50,4 +49,85 @@ iface eth0 inet dhcp
 
 EOF
 
+    if [ -n "${FQDN}" ] ; then
+        echo "${FQDN}" > ${TARGET}/etc/hostname
+    fi
+}
+
+redhat_setup() {
+    if [ ! -d "${TARGET}/etc/sysconfig/network-scripts" ] ; then
+        echo "Missing target network directory"
+        exit 1
+    fi
+    cat > ${TARGET}/etc/sysconfig/network-scripts/ifcfg-eth0 << EOF
+DEVICE=eth0
+BOOTPROTO=dhcp
+HWADDR=${NIC_0_MAC}
+ONBOOT=yes
+EOF
+
+    if [ -n "${FQDN}" ] ; then
+        cat > ${TARGET}/etc/sysconfig/network << EOF
+NETWORKING=yes
+HOSTNAME=${FQDN}
+EOF
+    else
+        cat > ${TARGET}/etc/sysconfig/network << EOF
+NETWORKING=yes
+EOF
+    fi
+}
+
+gentoo_setup() {
+    if [ ! -f "${TARGET}/etc/conf.d/net" ] ; then
+        echo "Missing target network file"
+        exit 1
+    fi
+    cat > ${TARGET}/etc/conf.d/net << EOF
+config_eth0=( "dhcp" )
+EOF
+
+    if [ -n "${FQDN}" ] ; then
+        cat > ${TARGET}/etc/conf.d/hostname << EOF
+HOSTNAME=\"${FQDN}\"
+EOF
+    fi
+}
+
+suse_setup() {
+    if [ ! -d ${TARGET}/etc/sysconfig/network ] ; then
+        echo "Missing target network directory"
+        exit 1
+    fi
+    cat > ${TARGET}/etc/sysconfig/network/ifcfg-eth0 << EOF
+BOOTPROTO=\'dhcp4\'
+LLADDR=\'${NIC_0_MAC}\'
+STARTMODE=\'auto\'
+NAME=\'Ethernet Card 0\'
+EOF
+    if [ -n "${FQDN}" ] ; then
+        echo "${FQDN}" > ${TARGET}/etc/HOSTNAME
+    fi
+}
+
+if [ "${NIC_COUNT}" -gt 0 ] ; then
+    case "${OS_TYPE}" in
+        debian)
+            debian_setup
+            ;;
+        redhat)
+            redhat_setup
+            ;;
+        gentoo)
+            gentoo_setup
+            ;;
+        suse)
+            suse_setup
+            ;;
+        *)
+            echo "Unsupported OS_TYPE"
+            exit 1
+            ;;
+    esac
 fi
+
