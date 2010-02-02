@@ -1,8 +1,8 @@
 osname=$(subst ganeti-instance-,,$(PACKAGE))
 
 osdir=$(OS_DIR)/$(osname)
-customdir="$(DESTDIR)${sysconfdir}/ganeti/instance-image.d"
-variantsdir="$(DESTDIR)${sysconfdir}/ganeti/instance-image/variants"
+customdir="${sysconfdir}/ganeti/instance-image.d"
+variantsdir="${sysconfdir}/ganeti/instance-image/variants"
 
 dist_os_SCRIPTS = create import export rename
 dist_os_DATA = ganeti_api_version variants.list
@@ -18,7 +18,7 @@ common.sh: common.sh.in
 
 install-exec-local:
 	@mkdir_p@ "$(variantsdir)"
-	@mkdir_p@ "$(DESTDIR)$(localstatedir)/cache/ganeti-instance-image"
+	@mkdir_p@ "$(localstatedir)/cache/ganeti-instance-image"
 	touch "$(variantsdir)/default.conf"
 
 CLEANFILES = common.sh
