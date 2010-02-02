@@ -86,6 +86,7 @@ gentoo_setup() {
     cat > ${TARGET}/etc/conf.d/net << EOF
 config_eth0=( "dhcp" )
 EOF
+    chroot ${TARGET} rc-update add net.eth0 default
 
     if [ -n "${FQDN}" ] ; then
         cat > ${TARGET}/etc/conf.d/hostname << EOF
