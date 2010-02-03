@@ -3,6 +3,8 @@
 # This is an example script that configures your network settings after
 # installation. By default it sets it up to use dhcp.
 
+set -e
+
 . common.sh
 
 if [ "${IMAGE_DEBUG} " = 1 ] ; then

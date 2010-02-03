@@ -2,6 +2,8 @@
 
 # Remove all generated keys so that each instance has unique keys for ssh
 
+set -e
+
 . common.sh
 
 if [ "${IMAGE_DEBUG} " = 1 ] ; then
