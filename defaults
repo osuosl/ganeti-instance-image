@@ -29,3 +29,6 @@
 # The scripts are executed using run-parts
 # By default /etc/ganeti/instance-image.d
 # CUSTOMIZE_DIR="/etc/ganeti/instance-image.d"
+
+# IMAGE_DEBUG: turn on debugging output for the scripts
+# IMAGE_DEBUG=0

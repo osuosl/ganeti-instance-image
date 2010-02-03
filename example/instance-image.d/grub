@@ -8,7 +8,7 @@ set -e
 
 . common.sh
 
-if [ "${DEBUG_LEVEL} " = 1 ] ; then
+if [ "${IMAGE_DEBUG} " = 1 ] ; then
     set -x
 fi
 

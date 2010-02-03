@@ -177,8 +177,7 @@ fi
 : ${CUSTOMIZE_DIR:="@sysconfdir@/ganeti/instance-image.d"}
 : ${VARIANTS_DIR:="@sysconfdir@/ganeti/instance-image/variants"}
 : ${IMAGE_DIR:="@localstatedir@/cache/ganeti-instance-image"}
-# Custom script variables
-: ${GRUB_SETUP:="no"}
+: ${IMAGE_DEBUG:="0"}
 
 if [ -z "$OS_API_VERSION" -o "$OS_API_VERSION" = "5" ]; then
   DEFAULT_PARTITION_STYLE="none"
