@@ -29,8 +29,6 @@ if [ "${IMAGE_DEBUG} " = 1 ] ; then
 fi
 
 DIG="$(which dig)"
-OS_TYPE=""
-FQDN=""
 
 # discover fqdn name using dig
 if [ -n "$NIC_0_IP" -a -n "${DIG}" ] ; then
@@ -47,15 +45,15 @@ if [ -z "${NIC_COUNT}" ] ; then
     exit 1
 fi
 
-if [ -e ${TARGET}/etc/redhat-release ] ; then
-    OS_TYPE="redhat"
-elif [ -e ${TARGET}/etc/debian_version ] ; then
-    OS_TYPE="debian"
-elif [ -e ${TARGET}/etc/gentoo-release ] ; then
-    OS_TYPE="gentoo"
-elif [ -e ${TARGET}/etc/SuSE-release ] ; then
-    OS_TYPE="suse"
+get_os_type
+
+if [ "${NIC_COUNT}" -gt 0 -a -n "${OS_TYPE}" ] ; then
+    ${OS_TYPE}_setup
+else
+    log_error "Unsupported OS_TYPE"
 fi
+
+# Functions
 
 debian_setup() {
     if [ ! -d "${TARGET}/etc/network" ] ; then
@@ -135,26 +133,5 @@ EOF
         echo "${FQDN}" > ${TARGET}/etc/HOSTNAME
     fi
 }
-
-if [ "${NIC_COUNT}" -gt 0 ] ; then
-    case "${OS_TYPE}" in
-        debian)
-            debian_setup
-            ;;
-        redhat)
-            redhat_setup
-            ;;
-        gentoo)
-            gentoo_setup
-            ;;
-        suse)
-            suse_setup
-            ;;
-        *)
-            log_error "Unsupported OS_TYPE"
-            exit 1
-            ;;
-    esac
-fi
 
 exit 0

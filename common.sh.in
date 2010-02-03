@@ -94,6 +94,18 @@ get_api10_arguments() {
   old_name=$OLD_INSTANCE_NAME
 }
 
+get_os_type() {
+    if [ -e ${TARGET}/etc/redhat-release ] ; then
+        OS_TYPE="redhat"
+    elif [ -e ${TARGET}/etc/debian_version ] ; then
+        OS_TYPE="debian"
+    elif [ -e ${TARGET}/etc/gentoo-release ] ; then
+        OS_TYPE="gentoo"
+    elif [ -e ${TARGET}/etc/SuSE-release ] ; then
+        OS_TYPE="suse"
+    fi
+}
+
 format_disk0() {
     if [ "${SWAP}" = "yes" ] ; then
         # Create three partitions:
