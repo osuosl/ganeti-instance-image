@@ -179,32 +179,7 @@ fi
 : ${IMAGE_DIR:="@localstatedir@/cache/ganeti-instance-image"}
 : ${IMAGE_DEBUG:="0"}
 
-if [ -z "$OS_API_VERSION" -o "$OS_API_VERSION" = "5" ]; then
-  DEFAULT_PARTITION_STYLE="none"
-else
-  DEFAULT_PARTITION_STYLE="msdos"
-fi
-: ${PARTITION_STYLE:=$DEFAULT_PARTITION_STYLE} # disk partition style
-
-
 SCRIPT_NAME=$(basename $0)
-
-if [ -f /sbin/blkid -a -x /sbin/blkid ]; then
-  VOL_ID="/sbin/blkid -o value -s UUID"
-  VOL_TYPE="/sbin/blkid -o value -s TYPE"
-else
-  for dir in /lib/udev /sbin; do
-    if [ -f $dir/vol_id -a -x $dir/vol_id ]; then
-      VOL_ID="$dir/vol_id -u"
-      VOL_TYPE="$dir/vol_id -t"
-    fi
-  done
-fi
-
-if [ -z "$VOL_ID" ]; then
-  log_error "vol_id or blkid not found, please install udev or util-linux"
-  exit 1
-fi
 
 if [ -z "$OS_API_VERSION" -o "$OS_API_VERSION" = "5" ]; then
   OS_API_VERSION=5

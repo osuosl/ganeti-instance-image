@@ -35,12 +35,12 @@ CLEANUP=( )
 trap cleanup EXIT
 
 if [ "${IMAGE_TYPE}" != "tarball" ] ; then
-    echo "Image type not \'tarball\', skipping setting up grub..."
+    log_error "Image type not \'tarball\', skipping setting up grub..."
     exit 0
 fi
 
 if [ -z "${TARGET}" -o -d "${TARGET}" ] ; then
-    echo "Missing target directory"
+    log_error "Missing target directory"
     exit 1
 fi
 

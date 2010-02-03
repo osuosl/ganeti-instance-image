@@ -38,12 +38,12 @@ if [ -n "$NIC_0_IP" -a -n "${DIG}" ] ; then
 fi
 
 if [ -z "${TARGET}" -o ! -d "${TARGET}" ] ; then
-    echo "Missing target directory"
+    log_error "Missing target directory"
     exit 1
 fi
 
 if [ -z "${NIC_COUNT}" ] ; then
-    echo "Missing NIC_COUNT"
+    log_error "Missing NIC_COUNT"
     exit 1
 fi
 
@@ -59,7 +59,7 @@ fi
 
 debian_setup() {
     if [ ! -d "${TARGET}/etc/network" ] ; then
-        echo "Missing target network directory"
+        log_error "Missing target network directory"
         exit 1
     fi
     cat > ${TARGET}/etc/network/interfaces << EOF
@@ -81,7 +81,7 @@ EOF
 
 redhat_setup() {
     if [ ! -d "${TARGET}/etc/sysconfig/network-scripts" ] ; then
-        echo "Missing target network directory"
+        log_error "Missing target network directory"
         exit 1
     fi
     cat > ${TARGET}/etc/sysconfig/network-scripts/ifcfg-eth0 << EOF
@@ -105,7 +105,7 @@ EOF
 
 gentoo_setup() {
     if [ ! -f "${TARGET}/etc/conf.d/net" ] ; then
-        echo "Missing target network file"
+        log_error "Missing target network file"
         exit 1
     fi
     cat > ${TARGET}/etc/conf.d/net << EOF
@@ -122,7 +122,7 @@ EOF
 
 suse_setup() {
     if [ ! -d ${TARGET}/etc/sysconfig/network ] ; then
-        echo "Missing target network directory"
+        log_error "Missing target network directory"
         exit 1
     fi
     cat > ${TARGET}/etc/sysconfig/network/ifcfg-eth0 << EOF
@@ -151,7 +151,7 @@ if [ "${NIC_COUNT}" -gt 0 ] ; then
             suse_setup
             ;;
         *)
-            echo "Unsupported OS_TYPE"
+            log_error "Unsupported OS_TYPE"
             exit 1
             ;;
     esac
