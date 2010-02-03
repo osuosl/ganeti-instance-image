@@ -10,6 +10,11 @@ if [ "${IMAGE_DEBUG} " = 1 ] ; then
     set -x
 fi
 
+if [ -e ${TARGET}/etc/debian_version ] ; then
+    echo "Debian/Ubuntu create keys at install time, skipping"
+    exit 0
+fi
+
 HOST_KEY="/etc/ssh/ssh_host_key"
 RSA_KEY="/etc/ssh/ssh_host_rsa_key"
 DSA_KEY="/etc/ssh/ssh_host_dsa_key"
