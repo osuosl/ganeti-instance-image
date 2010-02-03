@@ -96,7 +96,7 @@ EOF
 
     if [ -n "${FQDN}" ] ; then
         cat > ${TARGET}/etc/conf.d/hostname << EOF
-HOSTNAME=\"${FQDN}\"
+HOSTNAME="${FQDN}"
 EOF
     fi
 }
@@ -107,10 +107,10 @@ suse_setup() {
         exit 1
     fi
     cat > ${TARGET}/etc/sysconfig/network/ifcfg-eth0 << EOF
-BOOTPROTO=\'dhcp4\'
-LLADDR=\'${NIC_0_MAC^^[a-z]}\'
-STARTMODE=\'auto\'
-NAME=\'Ethernet Card 0\'
+BOOTPROTO='dhcp4'
+LLADDR='${NIC_0_MAC^^[a-z]}'
+STARTMODE='auto'
+NAME='Ethernet Card 0'
 EOF
     if [ -n "${FQDN}" ] ; then
         echo "${FQDN}" > ${TARGET}/etc/HOSTNAME
