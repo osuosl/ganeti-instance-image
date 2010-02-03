@@ -68,14 +68,7 @@ if [ "$CDINSTALL" = "no" ] ; then
     CLEANUP+=("unmap_disk0 $blockdev")
 
     if [ "${IMAGE_TYPE}" = "tarball" ] ; then
-        # Format /boot
-        mke2fs -Fjq -L /boot $boot_dev
-        # Format /
-        mke2fs -Fjq -L / $root_dev
-        if [ "${SWAP}" = "yes" ] ; then
-            # Format swap
-            mkswap $swap_dev
-        fi
+        mkfs_disk0 $boot_dev $root_dev $swap_dev
     fi
 
     TARGET=`mktemp -d` || exit 1
