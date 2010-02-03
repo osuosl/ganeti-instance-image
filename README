@@ -115,6 +115,23 @@ the amount of disk space used.
 Note: Older versions of qemu-img may not support the 'host_device' format so use
 'raw' instead which should work in theory.
 
+Partition Layout
+~~~~~~~~~~~~~~~~
+
+Currently the partition layout is locked into a specific way in order to make it
+work more elegantly with ganeti. We might change this to be more flexible in the
+future, however you *must* use the following layout otherwise ganeti will not
+install the VM correctly. Currently the following partition layout is assumed:
+
+With swap:
+ /dev/$disk1    /boot
+ /dev/$disk2    swap
+ /dev/$disk3    /
+
+Without swap:
+ /dev/$disk1    /boot
+ /dev/$disk2    /
+
 Image Naming
 ~~~~~~~~~~~~
 
