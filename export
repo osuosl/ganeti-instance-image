@@ -48,13 +48,13 @@ CLEANUP+=("unmap_disk0 $blockdev")
 vol_type_boot=$($VOL_TYPE $boot_dev)
 vol_type_root=$($VOL_TYPE $root_dev)
 
-# dump has support for ext4 in 0.4b42 but lets assume most people don't have
-# support for it yet
-if [ "$vol_type_boot" = "ext3" -o "$vol_type_boot" = "ext2" ]; then
+if [ "$vol_type_boot" = "ext3" -o "$vol_type_boot" = "ext2" \
+        -o "$vol_type_boot" = "ext4" ] ; then
     $DUMP -0 -q -f - "$boot_dev"
 fi
 
-if [ "$vol_type_root" = "ext3" -o "$vol_type_root" = "ext2" ]; then
+if [ "$vol_type_root" = "ext3" -o "$vol_type_root" = "ext2" \
+        -o "$vol_type_boot" = "ext4" ] ; then
     $DUMP -0 -q -f - "$boot_dev"
 fi
 
