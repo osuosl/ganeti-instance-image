@@ -21,11 +21,8 @@ set -e
 
 . common.sh
 
-if [ "${IMAGE_DEBUG} " = 1 ] ; then
-    set -x
-fi
+debug set -x
 
-IMAGE_FILE=""
 if [ "$IMAGE_TYPE" = "tarball" ] ; then
     IMAGE_FILE="${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}.tar.gz"
 elif [ "$IMAGE_TYPE" = "qemu" ] ; then

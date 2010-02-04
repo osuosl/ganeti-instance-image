@@ -23,9 +23,7 @@ set -e
 
 . common.sh
 
-if [ "${IMAGE_DEBUG} " = 1 ] ; then
-    set -x
-fi
+debug set -x
 
 if [ -e ${TARGET}/etc/debian_version ] ; then
     echo "Debian/Ubuntu create keys at install time, skipping"

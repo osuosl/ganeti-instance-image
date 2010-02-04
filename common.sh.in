@@ -31,6 +31,10 @@ log_error() {
   echo "$@" >&2
 }
 
+debug() {
+    [ "$IMAGE_DEBUG" == "1" ] &&  $@ || :
+}
+
 get_api5_arguments() {
   GETOPT_RESULT=$*
   # Note the quotes around `$TEMP': they are essential!

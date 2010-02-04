@@ -19,11 +19,9 @@
 
 set -e
 
-if [ "${IMAGE_DEBUG}" = "1" ] ; then
-    set -x
-fi
-
 . common.sh
+
+debug set -x
 
 TARGET=`mktemp -d` || exit 1
 CLEANUP+=("rmdir $TARGET")

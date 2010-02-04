@@ -26,9 +26,7 @@ set -e
 
 . common.sh
 
-if [ "${IMAGE_DEBUG} " = 1 ] ; then
-    set -x
-fi
+debug set -x
 
 CLEANUP=( )
 
