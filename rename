@@ -49,24 +49,42 @@ CLEANUP+=("unmap_disk0 $blockdev")
 
 mount_disk0 $TARGET $root_dev $boot_dev
 
-HNAME="$TARGET/etc/hostname"
-MNAME="$TARGET/etc/mailname"
+get_os_type
 
-# for hostname, we raise and error if the old hostname is not what we
-# expect
-OLD_HNAME="`cat $HNAME`"
+case "${OS_TYPE}" in
+    debian)
+        HNAME="${TARGET}/etc/hostname"
+        OLD_HNAME="$(cat $HNAME)"
+        ;;
+    redhat)
+        HNAME="${TARGET}/etc/sysconfig/network"
+        OLD_HNAME="$(grep HOSTNAME ${HNAME} | \
+            sed -e 's/HOSTNAME=//' | cut -d \".\" -f 1)"
+        ;;
+    gentoo)
+        HNAME="${TARGET}/etc/conf.d/hostname"
+        OLD_HNAME="$(grep HOSTNAME ${HNAME} | \
+            sed -e 's/HOSTNAME=//' | cut -d \".\" -f 1)"
+        ;;
+    suse)
+        HNAME="${TARGET}/etc/HOSTNAME"
+        OLD_HNAME="$(cat $HNAME)"
+        ;;
+esac
+
 if [ "$OLD_HNAME" = "$old_name" ]; then
-	echo $instance > $HNAME
+    case "${OS_TYPE}" in
+        debian|suse)
+            echo $instance > $HNAME
+            ;;
+        redhat|gentoo)
+            sed -ei "s/HOSTNAME=${OLD_HNAME}/HOSTNAME=${instance}/" $HNAME
+            ;;
+    esac
 else
-	log_error "Cannot rename from $old_name to $instance:"
-	log_error "Instance has a different hostname ($OLD_HNAME)"
-	exit 1
-fi
-
-# for mailname, we rename only if it has the old name, otherwise we
-# ignore it (and assumme that it's a customized name)
-if [ "`cat $MNAME`" = "$old_name" ]; then
-	echo $instance > $MNAME
+    log_error "Cannot rename from $old_name to $instance:"
+    log_error "Instance has a different hostname ($OLD_HNAME)"
+    exit 1
 fi
 
 # execute cleanups
