@@ -45,16 +45,7 @@ if [ -z "${NIC_COUNT}" ] ; then
     exit 1
 fi
 
-get_os_type
-
-if [ "${NIC_COUNT}" -gt 0 -a -n "${OS_TYPE}" ] ; then
-    ${OS_TYPE}_setup
-else
-    log_error "Unsupported OS_TYPE"
-fi
-
 # Functions
-
 debian_setup() {
     if [ ! -d "${TARGET}/etc/network" ] ; then
         log_error "Missing target network directory"
@@ -133,5 +124,15 @@ EOF
         echo "${FQDN}" > ${TARGET}/etc/HOSTNAME
     fi
 }
+
+# Main
+get_os_type
+
+if [ "${NIC_COUNT}" -gt 0 -a -n "${OS_TYPE}" ] ; then
+    ${OS_TYPE}_setup
+else
+    log_error "Unsupported OS_TYPE"
+fi
+
 
 exit 0
