@@ -34,7 +34,7 @@ CLEANUP=( )
 
 trap cleanup EXIT
 
-if [ "${IMAGE_TYPE}" != "tarball" ] ; then
+if [ "${IMAGE_TYPE}" != "tarball" -a "${SCRIPT_NAME}" != "import" ] ; then
     log_error "Image type not \'tarball\', skipping setting up grub..."
     exit 0
 fi
