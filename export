@@ -19,11 +19,11 @@
 
 set -e
 
+. common.sh
+
 if [ "${IMAGE_DEBUG}" = "1" ] ; then
     set -x
 fi
-
-. common.sh
 
 # If the target device is not a real block device we'll first losetup it.
 # This is needed for file disks.

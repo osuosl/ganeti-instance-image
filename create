@@ -19,11 +19,11 @@
 
 set -e
 
+. common.sh
+
 if [ "${IMAGE_DEBUG} " = 1 ] ; then
     set -x
 fi
-
-. common.sh
 
 IMAGE_FILE=""
 if [ "$IMAGE_TYPE" = "tarball" ] ; then
