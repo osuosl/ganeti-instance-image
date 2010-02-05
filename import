@@ -53,9 +53,9 @@ CLEANUP+=("rm -rf $DUMPDIR")
 mount_disk0 $TARGET $root_dev $boot_dev
 
 # import dumps from tar file
-( cd $DUMPDIR; tar -zxf - )
-( cd $TARGET ; gunzip -c ${DUMPDIR}/root.dump.gz | restore -r -y -f - )
-( cd ${TARGET}/boot ; gunzip -c ${DUMPDIR}/boot.dump.gz | restore -r -y -f - )
+( cd $DUMPDIR; tar -xf - )
+( cd $TARGET ; restore -r -y -f ${DUMPDIR}/root.dump )
+( cd ${TARGET}/boot ; restore -r -y -f ${DUMPDIR}/boot.dump )
 
 rm -f $TARGET/etc/udev/rules.d/z*_persistent-net.rules
 

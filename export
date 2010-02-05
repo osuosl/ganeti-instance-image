@@ -55,8 +55,8 @@ for fs in boot root ; do
     fi
     if [ "$vol_type" = "ext3" -o "$vol_type" = "ext2" \
             -o "$vol_type" = "ext4" ] ; then
-        $DUMP -0 -q -f - $dev | gzip ${TARGET}/${fs}.dump.gz
-        CLEANUP+=("rm ${TARGET}/${fs}.dump.gz")
+        $DUMP -0 -q -z9 -f ${TARGET}/${fs}.dump $dev
+        CLEANUP+=("rm ${TARGET}/${fs}.dump")
     else
         log_error "${fs} is not a supported filesystem. Please use ext{2,3,4}"
         exit 1
