@@ -31,7 +31,6 @@ if [ ! -b $blockdev ]; then
     CLEANUP+=("$LOSETUP -d $blockdev")
 fi
 
-format_disk0 $blockdev
 filesystem_base_dev=$(map_disk0 $blockdev)
 if [ "${SWAP}" = "yes" ] ; then
     boot_dev="${filesystem_base_dev}-1"
