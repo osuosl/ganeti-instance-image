@@ -64,7 +64,8 @@ if [ -n "$CUSTOMIZE_DIR" -a -d "$CUSTOMIZE_DIR" -a -x "$CUSTOMIZE_DIR/grub" ] ; 
     BLOCKDEV=$blockdev
     ROOT_DEV=$root_dev
     BOOT_DEV=$boot_dev
-    export TARGET SUITE BLOCKDEV ROOT_DEV BOOT_DEV
+    IMPORT_SCRIPT="1"
+    export TARGET SUITE BLOCKDEV ROOT_DEV BOOT_DEV IMPORT_SCRIPT
     # Install grub since we're not deploying via qemu-img
     ${CUSTOMIZE_DIR}/grub
 fi
