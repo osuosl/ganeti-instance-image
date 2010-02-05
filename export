@@ -42,6 +42,9 @@ else
 fi
 CLEANUP+=("unmap_disk0 $blockdev")
 
+TARGET=`mktemp -d` || exit 1
+CLEANUP+=("rmdir $TARGET")
+
 vol_type_boot="$($VOL_TYPE $boot_dev)"
 vol_type_root="$($VOL_TYPE $root_dev)"
 
