@@ -46,6 +46,16 @@ CLEANUP+=("unmap_disk0 $blockdev")
 vol_type_boot=$($VOL_TYPE $boot_dev)
 vol_type_root=$($VOL_TYPE $root_dev)
 
+if [ -z "$vol_type_boot" ] ;
+    log_error "Unable to find /boot filesystem type at $boot_dev"
+    exit 1
+fi
+
+if [ -z "$vol_type_root" ] ;
+    log_error "Unable to find / filesystem type at $root_dev"
+    exit 1
+fi
+
 if [ "$vol_type_boot" = "ext3" -o "$vol_type_boot" = "ext2" \
         -o "$vol_type_boot" = "ext4" ] ; then
     $DUMP -0 -q -f - "$boot_dev"
