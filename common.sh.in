@@ -163,7 +163,7 @@ map_disk0() {
     exit 1
   fi
   $KPARTX -a -p- $blockdev > /dev/null
-  filesystem_dev="/dev/mapper/${filesystem_dev_base/-1/}"
+  filesystem_dev="/dev/mapper/${filesystem_dev_base/%-1/}"
   if [ ! -b "/dev/mapper/$filesystem_dev_base" ]; then
     log_error "Can't find kpartx mapped partition: /dev/mapper/$filesystem_dev_base"
     exit 1
