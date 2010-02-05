@@ -47,10 +47,16 @@ mkfs_disk0 $boot_dev $root_dev $swap_dev
 
 TARGET=`mktemp -d` || exit 1
 CLEANUP+=("rmdir $TARGET")
+DUMPDIR=`mktemp -d` || exit 1
+CLEANUP+=("rm -rf $DUMPDIR")
 
 mount_disk0 $TARGET $root_dev $boot_dev
 
-( cd $TARGET; restore -r -y -f - )
+# import dumps from tar file
+( cd $DUMPDIR; tar -zxf - )
+( cd $TARGET ; gunzip -c ${DUMPDIR}/root.dump.gz | restore -r -y -f - )
+( cd ${TARGET}/boot ; gunzip -c ${DUMPDIR}/boot.dump.gz | restore -r -y -f - )
+
 rm -f $TARGET/etc/udev/rules.d/z*_persistent-net.rules
 
 if [ -n "$CUSTOMIZE_DIR" -a -d "$CUSTOMIZE_DIR" -a -x "$CUSTOMIZE_DIR/grub" ] ; then

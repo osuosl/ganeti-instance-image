@@ -42,28 +42,28 @@ else
 fi
 CLEANUP+=("unmap_disk0 $blockdev")
 
-vol_type_boot=$($VOL_TYPE $boot_dev)
-vol_type_root=$($VOL_TYPE $root_dev)
+vol_type_boot="$($VOL_TYPE $boot_dev)"
+vol_type_root="$($VOL_TYPE $root_dev)"
 
-if [ -z "$vol_type_boot" ] ;
-    log_error "Unable to find /boot filesystem type at $boot_dev"
-    exit 1
-fi
+for fs in boot root ; do
+    # use indirect reference to make the variables dynamic
+    dev="$(eval "echo \${$(echo ${fs}_dev)"})"
+    vol_type="$(eval echo \$vol_type_${fs})"
+    if [ -z "$vol_type" ] ; then
+        log_error "Unable to find ${fs} filesystem type at ${dev}"
+        exit 1
+    fi
+    if [ "$vol_type" = "ext3" -o "$vol_type" = "ext2" \
+            -o "$vol_type" = "ext4" ] ; then
+        $DUMP -0 -q -f - $dev | gzip ${TARGET}/${fs}.dump.gz
+        CLEANUP+=("rm ${TARGET}/${fs}.dump.gz")
+    else
+        log_error "${fs} is not a supported filesystem. Please use ext{2,3,4}"
+        exit 1
+    fi
+done
 
-if [ -z "$vol_type_root" ] ;
-    log_error "Unable to find / filesystem type at $root_dev"
-    exit 1
-fi
-
-if [ "$vol_type_boot" = "ext3" -o "$vol_type_boot" = "ext2" \
-        -o "$vol_type_boot" = "ext4" ] ; then
-    $DUMP -0 -q -f - "$boot_dev"
-fi
-
-if [ "$vol_type_root" = "ext3" -o "$vol_type_root" = "ext2" \
-        -o "$vol_type_boot" = "ext4" ] ; then
-    $DUMP -0 -q -f - "$boot_dev"
-fi
+( cd $TARGET ; tar -cf - . )
 
 # execute cleanups
 cleanup
