@@ -47,10 +47,16 @@ mkfs_disk0 $boot_dev $root_dev $swap_dev
 
 TARGET=`mktemp -d` || exit 1
 CLEANUP+=("rmdir $TARGET")
+DUMPDIR=`mktemp -d` || exit 1
+CLEANUP+=("rm -rf $DUMPDIR")
 
 mount_disk0 $TARGET $root_dev $boot_dev
 
-( cd $TARGET; restore -r -y -f - )
+# import dumps from tar file
+( cd $DUMPDIR; tar -xf - )
+( cd $TARGET ; restore -r -y -f ${DUMPDIR}/root.dump )
+( cd ${TARGET}/boot ; restore -r -y -f ${DUMPDIR}/boot.dump )
+
 rm -f $TARGET/etc/udev/rules.d/z*_persistent-net.rules
 
 if [ -n "$CUSTOMIZE_DIR" -a -d "$CUSTOMIZE_DIR" -a -x "$CUSTOMIZE_DIR/grub" ] ; then
@@ -58,7 +64,8 @@ if [ -n "$CUSTOMIZE_DIR" -a -d "$CUSTOMIZE_DIR" -a -x "$CUSTOMIZE_DIR/grub" ] ; 
     BLOCKDEV=$blockdev
     ROOT_DEV=$root_dev
     BOOT_DEV=$boot_dev
-    export TARGET SUITE BLOCKDEV ROOT_DEV BOOT_DEV
+    IMPORT_SCRIPT="1"
+    export TARGET SUITE BLOCKDEV ROOT_DEV BOOT_DEV IMPORT_SCRIPT
     # Install grub since we're not deploying via qemu-img
     ${CUSTOMIZE_DIR}/grub
 fi

@@ -140,7 +140,7 @@ mkfs_disk0() {
     mke2fs -Fjq -L / $root_dev
     if [ "${SWAP}" = "yes" ] ; then
         # Format swap
-        mkswap $swap_dev
+        mkswap -f $swap_dev
     fi
 }
 
