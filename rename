@@ -57,12 +57,14 @@ case "${OS_TYPE}" in
     redhat)
         HNAME="${TARGET}/etc/sysconfig/network"
         OLD_HNAME="$(grep HOSTNAME ${HNAME} | \
-            sed -e 's/HOSTNAME=//' | cut -d \".\" -f 1)"
+            sed -e 's/HOSTNAME=//' | \
+            sed -e s/\"//g)"
         ;;
     gentoo)
         HNAME="${TARGET}/etc/conf.d/hostname"
         OLD_HNAME="$(grep HOSTNAME ${HNAME} | \
-            sed -e 's/HOSTNAME=//' | cut -d \".\" -f 1)"
+            sed -e 's/HOSTNAME=//' | \
+            sed -e s/\"//g)"
         ;;
     suse)
         HNAME="${TARGET}/etc/HOSTNAME"
@@ -76,7 +78,7 @@ if [ "$OLD_HNAME" = "$old_name" ]; then
             echo $instance > $HNAME
             ;;
         redhat|gentoo)
-            sed -ei "s/HOSTNAME=${OLD_HNAME}/HOSTNAME=${instance}/" $HNAME
+            sed -ie "s/HOSTNAME=${OLD_HNAME}/HOSTNAME=${instance}/" $HNAME
             ;;
     esac
 else
