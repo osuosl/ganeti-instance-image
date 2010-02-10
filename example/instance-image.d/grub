@@ -32,8 +32,11 @@ CLEANUP=( )
 
 trap cleanup EXIT
 
-if [ "${IMAGE_TYPE}" != "tarball" -a "${IMPORT_SCRIPT}" != "1" ] ; then
-    log_error "Image type not \'tarball\', skipping setting up grub..."
+if [ "${IMAGE_TYPE}" != "tarball" \
+        -a "${IMPORT_SCRIPT}" != "1" \
+        -a "${IMAGE_TYPE}" != "dump" \
+        -a -z "${INSTANCE_HV_kernel_path}" ] ; then
+    log_error "Image doesn't require grub setup, skipping ..."
     exit 0
 fi
 
