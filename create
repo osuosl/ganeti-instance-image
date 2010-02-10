@@ -56,38 +56,33 @@ if [ "$CDINSTALL" = "no" ] ; then
     fi
 
     filesystem_base_dev=$(map_disk0 $blockdev)
-    if [ "${SWAP}" = "yes" ] ; then
-        boot_dev="${filesystem_base_dev}-1"
-        swap_dev="${filesystem_base_dev}-2"
-        root_dev="${filesystem_base_dev}-3"
-    else
-        boot_dev="${filesystem_base_dev}-1"
-        root_dev="${filesystem_base_dev}-2"
-    fi
     CLEANUP+=("unmap_disk0 $blockdev")
 
     if [ "${IMAGE_TYPE}" = "tarball" -o "${IMAGE_TYPE}" = "dump" ] ; then
-        mkfs_disk0 $boot_dev $root_dev $swap_dev
+        mkfs_disk0
     fi
 
     TARGET=`mktemp -d` || exit 1
     CLEANUP+=("rmdir $TARGET")
 
     # mount filesystems
-    mount_disk0 $TARGET $root_dev $boot_dev
+    mount_disk0 $TARGET
 
     if [ "${IMAGE_TYPE}" = "tarball" ] ; then
         # unpack image
         tar pzxf $IMAGE_FILE -C $TARGET
     elif [ "${IMAGE_TYPE}" = "dump" ] ; then
-        boot_dump="${IMAGE_FILE/root.dump/boot.dump}" 
-        root_dump="${IMAGE_FILE}"
-        if [ ! -f "$boot_dump" ] ; then
-          log_error "Can't find image file: $boot_dump"
-          exit 1
-        fi
+        local root_dump="${IMAGE_FILE}"
         ( cd ${TARGET}; restore -r -y -f ${root_dump} )
-        ( cd ${TARGET}/boot; restore -r -y -f ${boot_dump} )
+
+        if [ -n "${boot_dev}" ] ; then
+            boot_dump="${IMAGE_FILE/root.dump/boot.dump}"
+            if [ ! -f "$boot_dump" ] ; then
+              log_error "Can't find image file: $boot_dump"
+              exit 1
+            fi
+            ( cd ${TARGET}/boot; restore -r -y -f ${boot_dump} )
+        fi
     fi
 
     RUN_PARTS=`which run-parts`

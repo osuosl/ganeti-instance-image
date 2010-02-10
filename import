@@ -33,29 +33,23 @@ fi
 
 format_disk0 $blockdev
 filesystem_base_dev=$(map_disk0 $blockdev)
-if [ "${SWAP}" = "yes" ] ; then
-    boot_dev="${filesystem_base_dev}-1"
-    swap_dev="${filesystem_base_dev}-2"
-    root_dev="${filesystem_base_dev}-3"
-else
-    boot_dev="${filesystem_base_dev}-1"
-    root_dev="${filesystem_base_dev}-2"
-fi
 CLEANUP+=("unmap_disk0 $blockdev")
 
-mkfs_disk0 $boot_dev $root_dev $swap_dev
+mkfs_disk0
 
 TARGET=`mktemp -d` || exit 1
 CLEANUP+=("rmdir $TARGET")
 DUMPDIR=`mktemp -d` || exit 1
 CLEANUP+=("rm -rf $DUMPDIR")
 
-mount_disk0 $TARGET $root_dev $boot_dev
+mount_disk0 $TARGET
 
 # import dumps from tar file
 ( cd $DUMPDIR; tar -xf - )
 ( cd $TARGET ; restore -r -y -f ${DUMPDIR}/root.dump )
-( cd ${TARGET}/boot ; restore -r -y -f ${DUMPDIR}/boot.dump )
+if [ -n "${boot_dev}" ] ; then
+    ( cd ${TARGET}/boot ; restore -r -y -f ${DUMPDIR}/boot.dump )
+fi
 
 rm -f $TARGET/etc/udev/rules.d/z*_persistent-net.rules
 

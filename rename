@@ -35,18 +35,9 @@ if [ ! -b $blockdev ]; then
 fi
 
 filesystem_base_dev=$(map_disk0 $blockdev)
-if [ "${SWAP}" = "yes" ] ; then
-    boot_dev="${filesystem_base_dev}-1"
-    swap_dev="${filesystem_base_dev}-2"
-    root_dev="${filesystem_base_dev}-3"
-else
-    boot_dev="${filesystem_base_dev}-1"
-    root_dev="${filesystem_base_dev}-2"
-fi
 CLEANUP+=("unmap_disk0 $blockdev")
 
-mount_disk0 $TARGET $root_dev $boot_dev
-
+mount_disk0 $TARGET
 get_os_type
 
 case "${OS_TYPE}" in
