@@ -111,7 +111,7 @@ get_os_type() {
 }
 
 format_disk0() {
-    local sfdisk_cmd="$SFDISK -uM -H 255 -S 63 --quiet --Linux \"$1\""
+    local sfdisk_cmd="$SFDISK -uM -H 255 -S 63 --quiet --Linux $1"
     if [  "${SWAP}" = "yes" -a -z "${KERNEL_PATH}" ] ; then
         # Create three partitions:
         # 1 - 100MB /boot, bootable
