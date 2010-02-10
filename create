@@ -78,7 +78,7 @@ if [ "$CDINSTALL" = "no" ] ; then
         # unpack image
         tar pzxf $IMAGE_FILE -C $TARGET
     elif [ "${IMAGE_TYPE}" = "dump" ] ; then
-        local root_dump="${IMAGE_FILE}"
+        root_dump="${IMAGE_FILE}"
         ( cd ${TARGET}; restore -r -y -f ${root_dump} )
 
         if [ -n "${boot_dev}" ] ; then
