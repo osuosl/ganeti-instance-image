@@ -213,6 +213,37 @@ unmap_disk0() {
   $KPARTX -d -p- $1
 }
 
+setup_fstab() {
+    local target=$1
+    get_os_type
+    cat > $target/etc/fstab <<EOF
+# /etc/fstab: static file system information.
+#
+# <file system>   <mount point>   <type>  <options>       <dump>  <pass>
+UUID=$root_uuid   /               ext3    defaults        0       1
+proc              /proc           proc    defaults        0       0
+EOF
+
+[ -n "$boot_dev" -a -n "$boot_uuid" ] && cat >> $target/etc/fstab <<EOF
+UUID=$boot_uuid   /boot           ext3    defaults        1       2
+EOF
+
+[ -n "$swap_dev" -a -n "$swap_uuid" ] && cat >> $target/etc/fstab <<EOF
+UUID=$swap_uuid   swap            swap    defaults        0       0
+EOF
+
+# OS Specific fstabs
+[ "$OS_TYPE" = "redhat" ] && cat >> $target/etc/fstab <<EOF
+tmpfs             /dev/shm        tmpfs   defaults        0       0
+devpts            /dev/pts        devpts  gid=5,mode=620  0       0
+sysfs             /sys            sysfs   defaults        0       0
+EOF
+
+[ "$OS_TYPE" = "gentoo" ] && cat >> $target/etc/fstab <<EOF
+shm               /dev/shm        tmpfs   nodev,nosuid,noexec 0   0
+EOF
+}
+
 cleanup() {
   if [ ${#CLEANUP[*]} -gt 0 ]; then
     LAST_ELEMENT=$((${#CLEANUP[*]}-1))
