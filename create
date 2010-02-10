@@ -55,8 +55,11 @@ if [ "$CDINSTALL" = "no" ] ; then
         ${QEMU_IMG} convert ${IMAGE_FILE} -O host_device ${blockdev}
     fi
 
-    filesystem_base_dev=$(map_disk0 $blockdev)
+    filesystem_dev=$(map_disk0 $blockdev)
     CLEANUP+=("unmap_disk0 $blockdev")
+    root_dev=$(map_partition $filesystem_dev root)
+    boot_dev=$(map_partition $filesystem_dev boot)
+    swap_dev=$(map_partition $filesystem_dev swap)
 
     if [ "${IMAGE_TYPE}" = "tarball" -o "${IMAGE_TYPE}" = "dump" ] ; then
         mkfs_disk0

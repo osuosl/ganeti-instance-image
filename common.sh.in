@@ -187,20 +187,26 @@ map_disk0() {
         log_error "Can't find kpartx mapped partition: /dev/mapper/$filesystem_dev_base"
         exit 1
     fi
-    if [ "${SWAP}" = "yes" -a -z "${KERNEL_PATH}" ] ; then
-        boot_dev="${filesystem_base_dev}-1"
-        swap_dev="${filesystem_base_dev}-2"
-        root_dev="${filesystem_base_dev}-3"
-    elif [ "${SWAP}" = "no" -a -z "${KERNEL_PATH}" ] ; then
-        boot_dev="${filesystem_base_dev}-1"
-        root_dev="${filesystem_base_dev}-2"
-    elif [ "${SWAP}" = "yes" -a -n "${KERNEL_PATH}" ] ; then
-        swap_dev="${filesystem_base_dev}-1"
-        root_dev="${filesystem_base_dev}-2"
-    elif [ "${SWAP}" = "no" -a -n "${KERNEL_PATH}" ] ; then
-        root_dev="${filesystem_base_dev}-1"
-    fi
     echo "$filesystem_dev"
+}
+
+map_partition() {
+    filesystem_dev="$1"
+    partition="$2"
+    if [ "${SWAP}" = "yes" -a -z "${KERNEL_PATH}" ] ; then
+        boot_dev="${filesystem_dev}-1"
+        swap_dev="${filesystem_dev}-2"
+        root_dev="${filesystem_dev}-3"
+    elif [ "${SWAP}" = "no" -a -z "${KERNEL_PATH}" ] ; then
+        boot_dev="${filesystem_dev}-1"
+        root_dev="${filesystem_dev}-2"
+    elif [ "${SWAP}" = "yes" -a -n "${KERNEL_PATH}" ] ; then
+        swap_dev="${filesystem_dev}-1"
+        root_dev="${filesystem_dev}-2"
+    elif [ "${SWAP}" = "no" -a -n "${KERNEL_PATH}" ] ; then
+        root_dev="${filesystem_dev}-1"
+    fi
+    echo "$(eval "echo \${$(echo ${partition}_dev)"})"
 }
 
 unmap_disk0() {

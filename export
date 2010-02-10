@@ -31,8 +31,11 @@ if [ ! -b $blockdev ]; then
     CLEANUP+=("$LOSETUP -d $blockdev")
 fi
 
-filesystem_base_dev=$(map_disk0 $blockdev)
+filesystem_dev=$(map_disk0 $blockdev)
 CLEANUP+=("unmap_disk0 $blockdev")
+root_dev=$(map_partition $filesystem_dev root)
+boot_dev=$(map_partition $filesystem_dev boot)
+
 
 TARGET=`mktemp -d` || exit 1
 CLEANUP+=("rmdir $TARGET")

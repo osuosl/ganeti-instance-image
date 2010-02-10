@@ -32,8 +32,11 @@ if [ ! -b $blockdev ]; then
 fi
 
 format_disk0 $blockdev
-filesystem_base_dev=$(map_disk0 $blockdev)
+filesystem_dev=$(map_disk0 $blockdev)
 CLEANUP+=("unmap_disk0 $blockdev")
+root_dev=$(map_partition $filesystem_dev root)
+boot_dev=$(map_partition $filesystem_dev boot)
+swap_dev=$(map_partition $filesystem_dev swap)
 
 mkfs_disk0
 
