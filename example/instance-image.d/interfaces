@@ -118,7 +118,7 @@ EOF
 }
 
 # Main
-get_os_type
+get_os_type $TARGET
 
 if [ "${NIC_COUNT}" -gt 0 -a -n "${OS_TYPE}" ] ; then
     ${OS_TYPE}_setup

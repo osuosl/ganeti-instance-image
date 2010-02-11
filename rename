@@ -40,7 +40,7 @@ root_dev=$(map_partition $filesystem_dev root)
 boot_dev=$(map_partition $filesystem_dev boot)
 
 mount_disk0 $TARGET
-get_os_type
+get_os_type $TARGET
 
 case "${OS_TYPE}" in
     debian)

@@ -99,14 +99,61 @@ get_api10_arguments() {
 }
 
 get_os_type() {
-    if [ -e ${TARGET}/etc/redhat-release ] ; then
+    target=$1
+    if [ -z "${target}" ] ; then
+        log_error "target is not set in get_os_type"
+        exit 1
+    fi
+    if [ -e ${target}/etc/redhat-release ] ; then
         OS_TYPE="redhat"
-    elif [ -e ${TARGET}/etc/debian_version ] ; then
+    elif [ -e ${target}/etc/debian_version ] ; then
         OS_TYPE="debian"
-    elif [ -e ${TARGET}/etc/gentoo-release ] ; then
+    elif [ -e ${target}/etc/gentoo-release ] ; then
         OS_TYPE="gentoo"
-    elif [ -e ${TARGET}/etc/SuSE-release ] ; then
+    elif [ -e ${target}/etc/SuSE-release ] ; then
         OS_TYPE="suse"
+    fi
+}
+
+get_os() {
+    target=$1
+    if [ -z "${target}" ] ; then
+        log_error "target is not set in get_os"
+        exit 1
+    fi
+    lsb="$(which lsb_release)"
+    if [ -n "$lsb" ] ; then
+        OPERATING_SYSTEM="$(${lsb} -i -s | tr "[:upper:]" "[:lower:]")"
+    elif [ -e ${target}/etc/debian_version ] ; then
+        OPERATING_SYSTEM="debian"
+    elif [ -e ${target}/etc/gentoo-release ] ; then
+        OPERATING_SYSTEM="gentoo"
+    elif [ -e ${target}/etc/fedora-release ] ; then
+        OPERATING_SYSTEM="fedora"
+    elif [ -e ${$target}/etc/redhat-release ] ; then
+        if [ -n "$(grep -i centos ${target}/etc/redhat-release)" ] ; then
+            OPERATING_SYSTEM="centos"
+        else
+            OPERATING_SYSTEM="redhat"
+        fi
+    fi
+}
+
+get_os_release() {
+    target=$1
+    if [ -z "${target}" ] ; then
+        log_error "target is not set in get_os_release"
+        exit 1
+    fi
+    lsb="$(which lsb_release)"
+    if [ -n "$lsb" ] ; then
+        OS_RELEASE="$(${lsb} -r -s | tr "[:upper:]" "[:lower:]")"
+    elif [ -e ${target}/etc/debian_version ] ; then
+        OS_RELEASE="$(cat ${target}/etc/debian_version)"
+    elif [ -e ${target}/etc/fedora-release ] ; then
+        OS_RELEASE="$(cat ${target}/etc/fedora-release | awk '{print $3}')"
+    elif [ -e ${$target}/etc/redhat-release ] ; then
+        OS_RELEASE="$(cat ${target}/etc/redhat-release | awk '{print $3}')"
     fi
 }
 
