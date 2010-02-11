@@ -95,6 +95,10 @@ if [ "$CDINSTALL" = "no" ] ; then
         setup_fstab $TARGET
     fi
 
+    if [ "${INSTANCE_HV_serial_console}" = "True" ] ; then
+        setup_console $TARGET
+    fi
+
     RUN_PARTS=`which run-parts`
 
     if [ -n "$RUN_PARTS" -a -n "$CUSTOMIZE_DIR" -a -d "$CUSTOMIZE_DIR" ]; then

@@ -291,6 +291,38 @@ shm               /dev/shm        tmpfs   nodev,nosuid,noexec 0   0
 EOF
 }
 
+setup_console() {
+    local target=$1
+    if [ -z "$target" ] ; then
+        log_error "target not set for setup_console"
+        exit 1
+    fi
+    # Upstart is on this system, so do this instead
+    if [ -e ${target}/etc/event.d/tty1 ] ; then
+        cat ${target}/etc/event.d/tty1 | sed -re 's/tty1/ttyS0/' \
+            > ${target}/etc/event.d/ttyS0
+        return
+    fi
+    get_os $target
+    case $OPERATING_SYSTEM in
+        gentoo)
+            sed -i -e 's/.*ttyS0.*/s0:12345:respawn:\/sbin\/agetty 115200 ttyS0 vt100/' \
+                ${target}/etc/inittab
+            ;;
+        centos)
+            echo "s0:12345:respawn:/sbin/mingetty 115200 ttyS0 vt100" >> \
+                ${target}/etc/inittab
+            ;;
+        debian|ubuntu)
+            sed -i -e 's/.*T0.*/T0:23:respawn:/sbin/getty -L ttyS0 115200 vt100' \
+                ${target}/etc/inittab
+            ;;
+        *)
+            echo "No support for your OS in instance-image, skipping..."
+            ;;
+    esac
+}
+
 cleanup() {
   if [ ${#CLEANUP[*]} -gt 0 ]; then
     LAST_ELEMENT=$((${#CLEANUP[*]}-1))

@@ -59,6 +59,10 @@ fi
 
 setup_fstab $TARGET
 
+if [ "${INSTANCE_HV_serial_console}" = "True" ] ; then
+    setup_console $TARGET
+fi
+
 rm -f $TARGET/etc/udev/rules.d/z*_persistent-net.rules
 
 if [ -n "$CUSTOMIZE_DIR" -a -d "$CUSTOMIZE_DIR" -a -x "$CUSTOMIZE_DIR/grub" ] ; then
