@@ -74,6 +74,23 @@ setup (hd0)
 quit
 EOF
 
+# setup serial console
+if [ "${INSTANCE_HV_serial_console}" = "True" ] ; then
+    boot_dir="${TARGET}/boot/grub"
+    if [ -e "${boot_dir}/menu.lst" ] ; then
+    # Grub 0.x
+        sed -ie 's/^default.*/default 0\n\nserial --unit=0\nterminal --timeout=3 console serial/' \
+            ${boot_dir}/menu.lst
+    elif [ -e "${boot_dir}/grub.cfg" ] ; then
+    # Grub 2.x
+        sed -ie 's/.*GRUB_TERMINAL.*/GRUB_TERMINAL=serial/' ${boot_dir}/grub.cfg
+        echo "GRUB_SERIAL_COMMAND=\"serial --speed=115200 --unit=0 --word=8 --parity=no --stop=1\"" \
+            >> ${boot_dir}/grub.cfg
+    else
+        echo "No grub bootloader found, skipping..."
+    fi
+fi
+
 # execute cleanups
 cleanup
 trap - EXIT
