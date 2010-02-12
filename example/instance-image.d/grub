@@ -37,7 +37,7 @@ if [ -n "${INSTANCE_HV_kernel_path}" -a "${IMPORT_SCRIPT}" != "1" ] ; then
     exit 0
 fi
 
-if [ -z "${TARGET}" -o -d "${TARGET}" ] ; then
+if [ -z "${TARGET}" -o ! -d "${TARGET}" ] ; then
     log_error "Missing target directory"
     exit 1
 fi
