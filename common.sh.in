@@ -318,7 +318,7 @@ setup_console() {
                 ${target}/etc/inittab
             ;;
         centos)
-            echo "s0:12345:respawn:/sbin/mingetty 115200 ttyS0 vt100" >> \
+            echo "s0:12345:respawn:/sbin/agetty 115200 ttyS0 vt100" >> \
                 ${target}/etc/inittab
             ;;
         debian|ubuntu)
