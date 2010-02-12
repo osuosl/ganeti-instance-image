@@ -262,7 +262,7 @@ unmap_disk0() {
 
 setup_fstab() {
     local target=$1
-    get_os_type
+    get_os_type $target
     cat > $target/etc/fstab <<EOF
 # /etc/fstab: static file system information.
 #
