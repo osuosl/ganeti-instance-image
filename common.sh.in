@@ -322,7 +322,7 @@ setup_console() {
                 ${target}/etc/inittab
             ;;
         debian|ubuntu)
-            sed -i -e 's/.*T0.*/T0:23:respawn:/sbin/getty -L ttyS0 115200 vt100' \
+            sed -i -e 's/.*T0.*/T0:23:respawn:\/sbin\/getty -L ttyS0 115200 vt100/' \
                 ${target}/etc/inittab
             ;;
         *)
