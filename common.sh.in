@@ -271,24 +271,32 @@ UUID=$root_uuid   /               ext3    defaults        0       1
 proc              /proc           proc    defaults        0       0
 EOF
 
-[ -n "$boot_dev" -a -n "$boot_uuid" ] && cat >> $target/etc/fstab <<EOF
+if [ -n "$boot_dev" -a -n "$boot_uuid" ] ; then
+    cat >> $target/etc/fstab <<EOF
 UUID=$boot_uuid   /boot           ext3    defaults        1       2
 EOF
+fi
 
-[ -n "$swap_dev" -a -n "$swap_uuid" ] && cat >> $target/etc/fstab <<EOF
+if [ -n "$swap_dev" -a -n "$swap_uuid" ] ; then
+    cat >> $target/etc/fstab <<EOF
 UUID=$swap_uuid   swap            swap    defaults        0       0
 EOF
+fi
 
 # OS Specific fstabs
-[ "$OS_TYPE" = "redhat" ] && cat >> $target/etc/fstab <<EOF
+if [ "$OS_TYPE" = "redhat" ] ; then
+    cat >> $target/etc/fstab <<EOF
 tmpfs             /dev/shm        tmpfs   defaults        0       0
 devpts            /dev/pts        devpts  gid=5,mode=620  0       0
 sysfs             /sys            sysfs   defaults        0       0
 EOF
+fi
 
-[ "$OS_TYPE" = "gentoo" ] && cat >> $target/etc/fstab <<EOF
+if [ "$OS_TYPE" = "gentoo" ] ; then
+    cat >> $target/etc/fstab <<EOF
 shm               /dev/shm        tmpfs   nodev,nosuid,noexec 0   0
 EOF
+fi
 }
 
 setup_console() {
