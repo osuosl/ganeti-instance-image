@@ -121,9 +121,9 @@ get_os() {
         log_error "target is not set in get_os"
         exit 1
     fi
-    lsb="$(which lsb_release)"
-    if [ -n "$lsb" ] ; then
-        OPERATING_SYSTEM="$(${lsb} -i -s | tr "[:upper:]" "[:lower:]")"
+    lsb="${target}/usr/bin/lsb_release"
+    if [ -e $lsb ] ; then
+        OPERATING_SYSTEM="$(chroot ${target} ${lsb} -i -s | tr "[:upper:]" "[:lower:]")"
     elif [ -e ${target}/etc/debian_version ] ; then
         OPERATING_SYSTEM="debian"
     elif [ -e ${target}/etc/gentoo-release ] ; then
@@ -145,9 +145,9 @@ get_os_release() {
         log_error "target is not set in get_os_release"
         exit 1
     fi
-    lsb="$(which lsb_release)"
-    if [ -n "$lsb" ] ; then
-        OS_RELEASE="$(${lsb} -r -s | tr "[:upper:]" "[:lower:]")"
+    lsb="${target}/usr/bin/lsb_release"
+    if [ -e $lsb ] ; then
+        OS_RELEASE="$(chroot ${target} ${lsb} -r -s | tr "[:upper:]" "[:lower:]")"
     elif [ -e ${target}/etc/debian_version ] ; then
         OS_RELEASE="$(cat ${target}/etc/debian_version)"
     elif [ -e ${target}/etc/fedora-release ] ; then
