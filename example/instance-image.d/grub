@@ -79,9 +79,9 @@ if [ "${INSTANCE_HV_serial_console}" = "True" ] ; then
     boot_dir="${TARGET}/boot/grub"
     if [ -e "${boot_dir}/menu.lst" ] ; then
     # Grub 0.x
-        sed -ie 's/^default.*/default 0\n\nserial --unit=0\nterminal --timeout=3 console serial/' \
+        sed --follow-symlinks -ie 's/^default.*/default 0\n\nserial --unit=0\nterminal --timeout=3 console serial/' \
             ${boot_dir}/menu.lst
-        sed -ie 's/\(.*kernel.*\)/\1 console=ttyS0,115200n8/g' \
+        sed --follow-symlinks -ie 's/\(.*kernel.*\)/\1 console=ttyS0,115200n8/g' \
             ${boot_dir}/menu.lst
     elif [ -e "${boot_dir}/grub.cfg" -a -e "${target}/etc/default/grub" ] ; then
     # Grub 2.x
