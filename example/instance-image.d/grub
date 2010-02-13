@@ -47,25 +47,33 @@ fi
 
 boot_dir="${TARGET}/boot/grub"
 
-if [ -n "${INSTANCE_HV_kernel_path}" -o "${IMPORT_SCRIPT}" = "1" ] ; then
-    # make /dev/$disk
+setup_disk_devs() {
+    root_part="${ROOT_DEV/*-/}"
+    boot_part="${BOOT_DEV/*-/}"
+
     mknod ${TARGET}/dev/${disk} b $(stat -L -c "0x%t 0x%T" $BLOCKDEV)
     CLEANUP+=("rm -f ${TARGET}/dev/$disk")
 
-    # make /dev/${disk}1
-    mknod ${TARGET}/dev/${disk}1 b $(stat -L -c "0x%t 0x%T" $BOOT_DEV)
-    CLEANUP+=("rm -f ${TARGET}/dev/${disk}1")
+    mknod ${TARGET}/dev/${disk}${root_part} b $(stat -L -c "0x%t 0x%T" $ROOT_DEV)
+    CLEANUP+=("rm -f ${TARGET}/dev/${disk}${root_part}")
 
-    # make /dev/${disk}1
-    mknod ${TARGET}/dev/${disk}3 b $(stat -L -c "0x%t 0x%T" $ROOT_DEV)
-    CLEANUP+=("rm -f ${TARGET}/dev/${disk}3")
+    if [ -n "$BOOT_DEV" ] ; then
+        mknod ${TARGET}/dev/${disk}${boot_part} b $(stat -L -c "0x%t 0x%T" $BOOT_DEV)
+        CLEANUP+=("rm -f ${TARGET}/dev/${disk}${boot_part}")
+    fi
+}
 
-    if [ -e "${boot_dir}/menu.lst" ] ; then
-        # create device.map
-        cat > "${TARGET}/boot/grub/device.map" <<EOF
+add_devicemap() {
+    cat > "${TARGET}/boot/grub/device.map" <<EOF
 (hd0) /dev/${disk}
 EOF
+}
 
+if [ -n "${INSTANCE_HV_kernel_path}" -o "${IMPORT_SCRIPT}" = "1" ] ; then
+    setup_disk_devs
+
+    if [ -e "${boot_dir}/menu.lst" ] ; then
+        add_devicemap
         # install grub to the block device
         chroot ${TARGET} grub --batch --no-floppy \
             --device-map=/boot/grub/device.map <<EOF
@@ -73,14 +81,12 @@ root (hd0,0)
 setup (hd0)
 quit
 EOF
-
         # check to see if grub is using UUID's and replace if so
         if [ -n "$(grep 'root=UUID' ${boot_dir}/menu.lst)" ] ; then
             root_uuid="$($VOL_ID $ROOT_DEV)"
             sed --follow-symlinks -ie "s/\(root=UUID=\)\([a-z0-9-]*\)/\1${root_uuid}/g" \
                 ${boot_dir}/menu.lst
         fi
-
     elif [ -e "${boot_dir}/grub.cfg" -a -e "${TARGET}/etc/default/grub" ] ; then
         chroot ${TARGET} grub2-install /dev/${disk}
         # check to see if grub is using UUID's and replace if so
@@ -94,20 +100,24 @@ fi
 
 # setup serial console
 if [ "${INSTANCE_HV_serial_console}" = "True" ] ; then
+    if [ ! -e ${TARGET}/dev/${disk} ] ; then
+        setup_disk_devs
+    fi
     if [ -e "${boot_dir}/menu.lst" ] ; then
-    # Grub 0.x
+        # grub 0.x
         sed --follow-symlinks -ie 's/^default.*/default 0\n\nserial --unit=0\nterminal --timeout=3 console serial/' \
             ${boot_dir}/menu.lst
         sed --follow-symlinks -ie 's/\(.*kernel.*\)/\1 console=ttyS0,115200n8/g' \
             ${boot_dir}/menu.lst
     elif [ -e "${boot_dir}/grub.cfg" -a -e "${TARGET}/etc/default/grub" ] ; then
-    # Grub 2.x
+        # grub 2.x
+        add_devicemap
         sed -ie 's/.*GRUB_TERMINAL.*/GRUB_TERMINAL=serial/' ${TARGET}/etc/default/grub
         sed -ie 's/.*GRUB_CMDLINE_LINUX.*/GRUB_CMDLINE_LINUX=\"console=ttyS0,115200n8\"/' \
             ${TARGET}/etc/default/grub
         echo "GRUB_SERIAL_COMMAND=\"serial --speed=115200 --unit=0 --word=8 --parity=no --stop=1\"" \
             >> ${TARGET}/etc/default/grub
-        chroot ${TARGET} /usr/sbin/update-grub
+        chroot ${TARGET} update-grub
     else
         echo "No grub bootloader found, skipping..."
     fi
