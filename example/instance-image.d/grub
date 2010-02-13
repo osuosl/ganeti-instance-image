@@ -45,6 +45,8 @@ else
   disk="xda"
 fi
 
+boot_dir="${TARGET}/boot/grub"
+
 if [ -n "${INSTANCE_HV_kernel_path}" -o "${IMPORT_SCRIPT}" = "1" ] ; then
     # make /dev/$disk
     mknod ${TARGET}/dev/${disk} b $(stat -L -c "0x%t 0x%T" $BLOCKDEV)
@@ -57,8 +59,6 @@ if [ -n "${INSTANCE_HV_kernel_path}" -o "${IMPORT_SCRIPT}" = "1" ] ; then
     # make /dev/${disk}1
     mknod ${TARGET}/dev/${disk}3 b $(stat -L -c "0x%t 0x%T" $ROOT_DEV)
     CLEANUP+=("rm -f ${TARGET}/dev/${disk}3")
-
-    boot_dir="${TARGET}/boot/grub"
 
     if [ -e "${boot_dir}/menu.lst" ] ; then
         # create device.map
@@ -81,7 +81,7 @@ EOF
                 ${boot_dir}/menu.lst
         fi
 
-    elif [ -e "${boot_dir}/grub.cfg" -a -e "${target}/etc/default/grub" ] ; then
+    elif [ -e "${boot_dir}/grub.cfg" -a -e "${TARGET}/etc/default/grub" ] ; then
         chroot ${TARGET} grub2-install /dev/${disk}
         # check to see if grub is using UUID's and replace if so
         if [ -n "$(grep 'root=UUID' ${boot_dir}/grub.cfg)" ] ; then
@@ -100,14 +100,14 @@ if [ "${INSTANCE_HV_serial_console}" = "True" ] ; then
             ${boot_dir}/menu.lst
         sed --follow-symlinks -ie 's/\(.*kernel.*\)/\1 console=ttyS0,115200n8/g' \
             ${boot_dir}/menu.lst
-    elif [ -e "${boot_dir}/grub.cfg" -a -e "${target}/etc/default/grub" ] ; then
+    elif [ -e "${boot_dir}/grub.cfg" -a -e "${TARGET}/etc/default/grub" ] ; then
     # Grub 2.x
-        sed -ie 's/.*GRUB_TERMINAL.*/GRUB_TERMINAL=serial/' ${target}/etc/default/grub
+        sed -ie 's/.*GRUB_TERMINAL.*/GRUB_TERMINAL=serial/' ${TARGET}/etc/default/grub
         sed -ie 's/.*GRUB_CMDLINE_LINUX.*/GRUB_CMDLINE_LINUX=\"console=ttyS0,115200n8\"/' \
-            ${target}/etc/default/grub
+            ${TARGET}/etc/default/grub
         echo "GRUB_SERIAL_COMMAND=\"serial --speed=115200 --unit=0 --word=8 --parity=no --stop=1\"" \
-            >> ${target}/etc/default/grub
-        chroot ${target} /usr/sbin/update-grub
+            >> ${TARGET}/etc/default/grub
+        chroot ${TARGET} /usr/sbin/update-grub
     else
         echo "No grub bootloader found, skipping..."
     fi
