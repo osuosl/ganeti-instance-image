@@ -311,6 +311,13 @@ setup_console() {
             > ${target}/etc/event.d/ttyS0
         return
     fi
+    # upstart in karmic and newer
+    if [ -e ${target}/etc/init/tty1.conf ] ; then
+        cat ${target}/etc/init/tty1.conf | \
+        sed -re 's/.*tty1.*/exec \/sbin\/getty -L 115200 ttyS0 vt102/' \
+            > ${target}/etc/init/ttyS0.conf
+        return
+    fi
     get_os $target
     case $OPERATING_SYSTEM in
         gentoo)
