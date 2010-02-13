@@ -26,12 +26,8 @@ set -e
 
 debug set -x
 
-DIG="$(which dig)"
-
-# discover fqdn name using dig
-if [ -n "$NIC_0_IP" -a -n "${DIG}" ] ; then
-    FQDN="$(${DIG} -x ${NIC_0_IP} +short | sed -e 's/\.$//')"
-fi
+FQDN="${INSTANCE_NAME}"
+SHORT_NAME="$(echo ${INSTANCE_NAME} | cut -d . -f 1)"
 
 if [ -z "${TARGET}" -o ! -d "${TARGET}" ] ; then
     log_error "Missing target directory"
@@ -74,7 +70,6 @@ redhat_setup() {
     cat > ${TARGET}/etc/sysconfig/network-scripts/ifcfg-eth0 << EOF
 DEVICE=eth0
 BOOTPROTO=dhcp
-HWADDR=${NIC_0_MAC^^[a-z]}
 ONBOOT=yes
 EOF
 
@@ -102,7 +97,7 @@ EOF
 
     if [ -n "${FQDN}" ] ; then
         cat > ${TARGET}/etc/conf.d/hostname << EOF
-HOSTNAME="${FQDN}"
+HOSTNAME="${SHORT_NAME}"
 EOF
     fi
 }
@@ -114,7 +109,6 @@ suse_setup() {
     fi
     cat > ${TARGET}/etc/sysconfig/network/ifcfg-eth0 << EOF
 BOOTPROTO='dhcp4'
-LLADDR='${NIC_0_MAC^^[a-z]}'
 STARTMODE='auto'
 NAME='Ethernet Card 0'
 EOF
@@ -124,7 +118,7 @@ EOF
 }
 
 # Main
-get_os_type
+get_os_type $TARGET
 
 if [ "${NIC_COUNT}" -gt 0 -a -n "${OS_TYPE}" ] ; then
     ${OS_TYPE}_setup

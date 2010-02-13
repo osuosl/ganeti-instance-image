@@ -27,6 +27,8 @@ if [ "$IMAGE_TYPE" = "tarball" ] ; then
     IMAGE_FILE="${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}.tar.gz"
 elif [ "$IMAGE_TYPE" = "qemu" ] ; then
     IMAGE_FILE="${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}.img"
+elif [ "$IMAGE_TYPE" = "dump" ] ; then
+    IMAGE_FILE="${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}-root.dump"
 fi
 
 if [ "$CDINSTALL" = "no" ] ; then
@@ -45,7 +47,7 @@ if [ "$CDINSTALL" = "no" ] ; then
 
     # If the image is tarball based, then we need to manually create the
     # volumes, filesystems, etc
-    if [ "${IMAGE_TYPE}" = "tarball" ] ; then
+    if [ "${IMAGE_TYPE}" = "tarball" -o "${IMAGE_TYPE}" = "dump" ] ; then
         # Create 3 partitions, /boot, swap, & /
         format_disk0 $blockdev
     elif [ "${IMAGE_TYPE}" = "qemu" ] ; then
@@ -53,30 +55,48 @@ if [ "$CDINSTALL" = "no" ] ; then
         ${QEMU_IMG} convert ${IMAGE_FILE} -O host_device ${blockdev}
     fi
 
-    filesystem_base_dev=$(map_disk0 $blockdev)
-    if [ "${SWAP}" = "yes" ] ; then
-        boot_dev="${filesystem_base_dev}-1"
-        swap_dev="${filesystem_base_dev}-2"
-        root_dev="${filesystem_base_dev}-3"
-    else
-        boot_dev="${filesystem_base_dev}-1"
-        root_dev="${filesystem_base_dev}-2"
-    fi
+    filesystem_dev=$(map_disk0 $blockdev)
     CLEANUP+=("unmap_disk0 $blockdev")
+    root_dev=$(map_partition $filesystem_dev root)
+    boot_dev=$(map_partition $filesystem_dev boot)
+    swap_dev=$(map_partition $filesystem_dev swap)
 
-    if [ "${IMAGE_TYPE}" = "tarball" ] ; then
-        mkfs_disk0 $boot_dev $root_dev $swap_dev
+    if [ "${IMAGE_TYPE}" = "tarball" -o "${IMAGE_TYPE}" = "dump" ] ; then
+        mkfs_disk0
+        root_uuid="$($VOL_ID $root_dev)"
+        [ -n "$boot_dev" ] && boot_uuid="$($VOL_ID $boot_dev)"
+        [ -n "$swap_dev" ] && swap_uuid="$($VOL_ID $swap_dev)"
     fi
 
     TARGET=`mktemp -d` || exit 1
     CLEANUP+=("rmdir $TARGET")
 
     # mount filesystems
-    mount_disk0 $TARGET $root_dev $boot_dev
+    mount_disk0 $TARGET
 
     if [ "${IMAGE_TYPE}" = "tarball" ] ; then
         # unpack image
         tar pzxf $IMAGE_FILE -C $TARGET
+    elif [ "${IMAGE_TYPE}" = "dump" ] ; then
+        root_dump="${IMAGE_FILE}"
+        ( cd ${TARGET}; restore -r -y -f ${root_dump} )
+
+        if [ -n "${boot_dev}" ] ; then
+            boot_dump="${IMAGE_FILE/root.dump/boot.dump}"
+            if [ ! -f "$boot_dump" ] ; then
+              log_error "Can't find image file: $boot_dump"
+              exit 1
+            fi
+            ( cd ${TARGET}/boot; restore -r -y -f ${boot_dump} )
+        fi
+    fi
+
+    if [ "${IMAGE_TYPE}" = "tarball" -o "${IMAGE_TYPE}" = "dump" ] ; then
+        setup_fstab $TARGET
+    fi
+
+    if [ "${INSTANCE_HV_serial_console}" = "True" ] ; then
+        setup_console $TARGET
     fi
 
     RUN_PARTS=`which run-parts`

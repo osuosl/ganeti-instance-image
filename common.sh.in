@@ -99,80 +99,243 @@ get_api10_arguments() {
 }
 
 get_os_type() {
-    if [ -e ${TARGET}/etc/redhat-release ] ; then
+    target=$1
+    if [ -z "${target}" ] ; then
+        log_error "target is not set in get_os_type"
+        exit 1
+    fi
+    if [ -e ${target}/etc/redhat-release ] ; then
         OS_TYPE="redhat"
-    elif [ -e ${TARGET}/etc/debian_version ] ; then
+    elif [ -e ${target}/etc/debian_version ] ; then
         OS_TYPE="debian"
-    elif [ -e ${TARGET}/etc/gentoo-release ] ; then
+    elif [ -e ${target}/etc/gentoo-release ] ; then
         OS_TYPE="gentoo"
-    elif [ -e ${TARGET}/etc/SuSE-release ] ; then
+    elif [ -e ${target}/etc/SuSE-release ] ; then
         OS_TYPE="suse"
     fi
 }
 
+get_os() {
+    target=$1
+    if [ -z "${target}" ] ; then
+        log_error "target is not set in get_os"
+        exit 1
+    fi
+    lsb="/usr/bin/lsb_release"
+    if [ -e $lsb ] ; then
+        OPERATING_SYSTEM="$(chroot ${target} ${lsb} -i -s | tr "[:upper:]" "[:lower:]")"
+    elif [ -e ${target}/etc/debian_version ] ; then
+        OPERATING_SYSTEM="debian"
+    elif [ -e ${target}/etc/gentoo-release ] ; then
+        OPERATING_SYSTEM="gentoo"
+    elif [ -e ${target}/etc/fedora-release ] ; then
+        OPERATING_SYSTEM="fedora"
+    elif [ -e ${$target}/etc/redhat-release ] ; then
+        if [ -n "$(grep -i centos ${target}/etc/redhat-release)" ] ; then
+            OPERATING_SYSTEM="centos"
+        else
+            OPERATING_SYSTEM="redhat"
+        fi
+    fi
+}
+
+get_os_release() {
+    target=$1
+    if [ -z "${target}" ] ; then
+        log_error "target is not set in get_os_release"
+        exit 1
+    fi
+    lsb="/usr/bin/lsb_release"
+    if [ -e $lsb ] ; then
+        OS_RELEASE="$(chroot ${target} ${lsb} -r -s | tr "[:upper:]" "[:lower:]")"
+    elif [ -e ${target}/etc/debian_version ] ; then
+        OS_RELEASE="$(cat ${target}/etc/debian_version)"
+    elif [ -e ${target}/etc/fedora-release ] ; then
+        OS_RELEASE="$(cat ${target}/etc/fedora-release | awk '{print $3}')"
+    elif [ -e ${$target}/etc/redhat-release ] ; then
+        OS_RELEASE="$(cat ${target}/etc/redhat-release | awk '{print $3}')"
+    fi
+}
+
 format_disk0() {
-    if [ "${SWAP}" = "yes" ] ; then
+    local sfdisk_cmd="$SFDISK -uM -H 255 -S 63 --quiet --Linux $1"
+    if [  "${SWAP}" = "yes" -a -z "${KERNEL_PATH}" ] ; then
         # Create three partitions:
         # 1 - 100MB /boot, bootable
         # 2 - Size of Memory, swap
         # 3 - Rest
-        $SFDISK -uM -H 255 -S 63 --quiet --Linux "$1" <<EOF
+        $sfdisk_cmd <<EOF
 ,100,L,*
 ,$INSTANCE_BE_memory,S
 ,,L
 EOF
-    else
+    elif [  "${SWAP}" = "no" -a -z "${KERNEL_PATH}" ] ; then
         # Create two partitions:
         # 1 - 100MB /boot, bootable
         # 2 - Rest
-        $SFDISK -uM -H 255 -S 63 --quiet --Linux "$1" <<EOF
+        $sfdisk_cmd <<EOF
 ,100,L,*
+,,L
+EOF
+    elif [  "${SWAP}" = "yes" -a -n "${KERNEL_PATH}" ] ; then
+        # Create two partitions:
+        # 1 - Size of Memory, swap
+        # 2 - Rest
+        $sfdisk_cmd <<EOF
+,$INSTANCE_BE_memory,S
+,,L
+EOF
+    elif [  "${SWAP}" = "no" -a -n "${KERNEL_PATH}" ] ; then
+        # Create two partitions:
+        # 1 - Whole
+        $sfdisk_cmd <<EOF
 ,,L
 EOF
     fi
 }
 
 mkfs_disk0() {
-    local boot_dev=$1 root_dev=$2 swap_dev=$3
-    # Format /boot
-    mke2fs -Fjq -L /boot $boot_dev
     # Format /
-    mke2fs -Fjq -L / $root_dev
-    if [ "${SWAP}" = "yes" ] ; then
+    mkfs.ext3 -Fq -L / $root_dev
+    # Format /boot
+    if [ -n "${boot_dev}" ] ; then
+        mkfs.ext3 -Fq -L /boot $boot_dev
+    fi
+    # Format swap
+    if [ -n "${swap_dev}" ] ; then
         # Format swap
         mkswap -f $swap_dev
     fi
 }
 
 mount_disk0() {
-    local target=$1 root_dev=$2 boot_dev=$3
+    local target=$1
     mount $root_dev $target
     CLEANUP+=("umount $target")
-    $MKDIR_P $target/boot
-    mount $boot_dev $target/boot
-    CLEANUP+=("umount $target/boot")
+    if [ -n "${boot_dev}" ] ; then
+        $MKDIR_P $target/boot
+        mount $boot_dev $target/boot
+        CLEANUP+=("umount $target/boot")
+    fi
 }
 
 map_disk0() {
-  blockdev="$1"
-  filesystem_dev_base=`$KPARTX -l -p- $blockdev | \
-                       grep -m 1 -- "-1.*$blockdev" | \
-                       $AWK '{print $1}'`
-  if [ -z "$filesystem_dev_base" ]; then
-    log_error "Cannot interpret kpartx output and get partition mapping"
-    exit 1
-  fi
-  $KPARTX -a -p- $blockdev > /dev/null
-  filesystem_dev="/dev/mapper/${filesystem_dev_base/%-1/}"
-  if [ ! -b "/dev/mapper/$filesystem_dev_base" ]; then
-    log_error "Can't find kpartx mapped partition: /dev/mapper/$filesystem_dev_base"
-    exit 1
-  fi
-  echo "$filesystem_dev"
+    blockdev="$1"
+    filesystem_dev_base=`$KPARTX -l -p- $blockdev | \
+                            grep -m 1 -- "-1.*$blockdev" | \
+                            $AWK '{print $1}'`
+    if [ -z "$filesystem_dev_base" ]; then
+        log_error "Cannot interpret kpartx output and get partition mapping"
+        exit 1
+    fi
+    $KPARTX -a -p- $blockdev > /dev/null
+    filesystem_dev="/dev/mapper/${filesystem_dev_base/%-1/}"
+    if [ ! -b "/dev/mapper/$filesystem_dev_base" ]; then
+        log_error "Can't find kpartx mapped partition: /dev/mapper/$filesystem_dev_base"
+        exit 1
+    fi
+    echo "$filesystem_dev"
+}
+
+map_partition() {
+    filesystem_dev="$1"
+    partition="$2"
+    if [ "${SWAP}" = "yes" -a -z "${KERNEL_PATH}" ] ; then
+        boot_dev="${filesystem_dev}-1"
+        swap_dev="${filesystem_dev}-2"
+        root_dev="${filesystem_dev}-3"
+    elif [ "${SWAP}" = "no" -a -z "${KERNEL_PATH}" ] ; then
+        boot_dev="${filesystem_dev}-1"
+        root_dev="${filesystem_dev}-2"
+    elif [ "${SWAP}" = "yes" -a -n "${KERNEL_PATH}" ] ; then
+        swap_dev="${filesystem_dev}-1"
+        root_dev="${filesystem_dev}-2"
+    elif [ "${SWAP}" = "no" -a -n "${KERNEL_PATH}" ] ; then
+        root_dev="${filesystem_dev}-1"
+    fi
+    echo "$(eval "echo \${$(echo ${partition}_dev)"})"
 }
 
 unmap_disk0() {
   $KPARTX -d -p- $1
+}
+
+setup_fstab() {
+    local target=$1
+    get_os_type $target
+    cat > $target/etc/fstab <<EOF
+# /etc/fstab: static file system information.
+#
+# <file system>   <mount point>   <type>  <options>       <dump>  <pass>
+UUID=$root_uuid   /               ext3    defaults        0       1
+proc              /proc           proc    defaults        0       0
+EOF
+
+if [ -n "$boot_dev" -a -n "$boot_uuid" ] ; then
+    cat >> $target/etc/fstab <<EOF
+UUID=$boot_uuid   /boot           ext3    defaults        1       2
+EOF
+fi
+
+if [ -n "$swap_dev" -a -n "$swap_uuid" ] ; then
+    cat >> $target/etc/fstab <<EOF
+UUID=$swap_uuid   swap            swap    defaults        0       0
+EOF
+fi
+
+# OS Specific fstabs
+if [ "$OS_TYPE" = "redhat" ] ; then
+    cat >> $target/etc/fstab <<EOF
+tmpfs             /dev/shm        tmpfs   defaults        0       0
+devpts            /dev/pts        devpts  gid=5,mode=620  0       0
+sysfs             /sys            sysfs   defaults        0       0
+EOF
+fi
+
+if [ "$OS_TYPE" = "gentoo" ] ; then
+    cat >> $target/etc/fstab <<EOF
+shm               /dev/shm        tmpfs   nodev,nosuid,noexec 0   0
+EOF
+fi
+}
+
+setup_console() {
+    local target=$1
+    if [ -z "$target" ] ; then
+        log_error "target not set for setup_console"
+        exit 1
+    fi
+    # Upstart is on this system, so do this instead
+    if [ -e ${target}/etc/event.d/tty1 ] ; then
+        cat ${target}/etc/event.d/tty1 | sed -re 's/tty1/ttyS0/' \
+            > ${target}/etc/event.d/ttyS0
+        return
+    fi
+    # upstart in karmic and newer
+    if [ -e ${target}/etc/init/tty1.conf ] ; then
+        cat ${target}/etc/init/tty1.conf | \
+        sed -re 's/.*tty1.*/exec \/sbin\/getty -L 115200 ttyS0 vt102/' \
+            > ${target}/etc/init/ttyS0.conf
+        return
+    fi
+    get_os $target
+    case $OPERATING_SYSTEM in
+        gentoo)
+            sed -i -e 's/.*ttyS0.*/s0:12345:respawn:\/sbin\/agetty 115200 ttyS0 vt100/' \
+                ${target}/etc/inittab
+            ;;
+        centos)
+            echo "s0:12345:respawn:/sbin/agetty 115200 ttyS0 vt100" >> \
+                ${target}/etc/inittab
+            ;;
+        debian|ubuntu)
+            sed -i -e 's/.*T0.*/T0:23:respawn:\/sbin\/getty -L ttyS0 115200 vt100/' \
+                ${target}/etc/inittab
+            ;;
+        *)
+            echo "No support for your OS in instance-image, skipping..."
+            ;;
+    esac
 }
 
 cleanup() {
@@ -208,6 +371,7 @@ fi
 : ${IMAGE_DEBUG:="0"}
 
 SCRIPT_NAME=$(basename $0)
+KERNEL_PATH="$INSTANCE_HV_kernel_path"
 
 if [ -f /sbin/blkid -a -x /sbin/blkid ]; then
     VOL_ID="/sbin/blkid -o value -s UUID"

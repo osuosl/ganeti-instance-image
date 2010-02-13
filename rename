@@ -34,20 +34,13 @@ if [ ! -b $blockdev ]; then
   CLEANUP+=("$LOSETUP -d $blockdev")
 fi
 
-filesystem_base_dev=$(map_disk0 $blockdev)
-if [ "${SWAP}" = "yes" ] ; then
-    boot_dev="${filesystem_base_dev}-1"
-    swap_dev="${filesystem_base_dev}-2"
-    root_dev="${filesystem_base_dev}-3"
-else
-    boot_dev="${filesystem_base_dev}-1"
-    root_dev="${filesystem_base_dev}-2"
-fi
+filesystem_dev=$(map_disk0 $blockdev)
 CLEANUP+=("unmap_disk0 $blockdev")
+root_dev=$(map_partition $filesystem_dev root)
+boot_dev=$(map_partition $filesystem_dev boot)
 
-mount_disk0 $TARGET $root_dev $boot_dev
-
-get_os_type
+mount_disk0 $TARGET
+get_os_type $TARGET
 
 case "${OS_TYPE}" in
     debian)
@@ -57,12 +50,14 @@ case "${OS_TYPE}" in
     redhat)
         HNAME="${TARGET}/etc/sysconfig/network"
         OLD_HNAME="$(grep HOSTNAME ${HNAME} | \
-            sed -e 's/HOSTNAME=//' | cut -d \".\" -f 1)"
+            sed -e 's/HOSTNAME=//' | \
+            sed -e s/\"//g)"
         ;;
     gentoo)
         HNAME="${TARGET}/etc/conf.d/hostname"
         OLD_HNAME="$(grep HOSTNAME ${HNAME} | \
-            sed -e 's/HOSTNAME=//' | cut -d \".\" -f 1)"
+            sed -e 's/HOSTNAME=//' | \
+            sed -e s/\"//g)"
         ;;
     suse)
         HNAME="${TARGET}/etc/HOSTNAME"
@@ -70,13 +65,18 @@ case "${OS_TYPE}" in
         ;;
 esac
 
-if [ "$OLD_HNAME" = "$old_name" ]; then
+if [ "$OLD_HNAME" = "$old_name" \
+        -o "${OLD_HNAME}.$(echo $old_name | cut -d . -f 2,3)" \
+        = "$old_name"] ; then
     case "${OS_TYPE}" in
         debian|suse)
             echo $instance > $HNAME
             ;;
-        redhat|gentoo)
-            sed -ei "s/HOSTNAME=${OLD_HNAME}/HOSTNAME=${instance}/" $HNAME
+        redhat)
+            sed -ie "s/HOSTNAME=${OLD_HNAME}/HOSTNAME=${instance}/" $HNAME
+            ;;
+        gentoo)
+            sed -ie "s/HOSTNAME.*/HOSTNAME=\"${OLD_HNAME}}\"/" $HNAME
             ;;
     esac
 else
