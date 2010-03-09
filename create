@@ -106,7 +106,7 @@ if [ "$CDINSTALL" = "no" ] ; then
       BLOCKDEV=$blockdev
       ROOT_DEV=$root_dev
       BOOT_DEV=$boot_dev
-      export TARGET SUITE BLOCKDEV ROOT_DEV BOOT_DEV
+      export TARGET SUITE BLOCKDEV ROOT_DEV BOOT_DEV IMAGE_TYPE
       $RUN_PARTS $CUSTOMIZE_DIR
     fi
 fi

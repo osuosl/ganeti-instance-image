@@ -69,7 +69,8 @@ add_devicemap() {
 EOF
 }
 
-if [ -z "${INSTANCE_HV_kernel_path}" -o "${IMPORT_SCRIPT}" = "1" ] ; then
+if [ "${IMAGE_TYPE}" != "qemu" ] && \
+   [ -z "${INSTANCE_HV_kernel_path}" -o "${IMPORT_SCRIPT}" = "1" ] ; then
     setup_disk_devs
 
     if [ -e "${boot_dir}/menu.lst" ] ; then
