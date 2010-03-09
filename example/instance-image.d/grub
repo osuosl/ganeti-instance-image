@@ -88,13 +88,14 @@ EOF
                 ${boot_dir}/menu.lst
         fi
     elif [ -e "${boot_dir}/grub.cfg" -a -e "${TARGET}/etc/default/grub" ] ; then
-        chroot ${TARGET} grub2-install /dev/${disk}
+        echo "No support for grub 2 currently"
+        #chroot ${TARGET} grub2-install /dev/${disk}
         # check to see if grub is using UUID's and replace if so
-        if [ -n "$(grep 'root=UUID' ${boot_dir}/grub.cfg)" ] ; then
-            root_uuid="$($VOL_ID $ROOT_DEV)"
-            sed --follow-symlinks -ie "s/\(root=UUID=\)\([a-z0-9-]*\)/\1${root_uuid}/g" \
-                ${boot_dir}/grub.cfg
-        fi
+        #if [ -n "$(grep 'root=UUID' ${boot_dir}/grub.cfg)" ] ; then
+        #    root_uuid="$($VOL_ID $ROOT_DEV)"
+        #    sed --follow-symlinks -ie "s/\(root=UUID=\)\([a-z0-9-]*\)/\1${root_uuid}/g" \
+        #        ${boot_dir}/grub.cfg
+        #fi
     fi
 fi
 
