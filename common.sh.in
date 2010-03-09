@@ -314,8 +314,9 @@ setup_console() {
     # upstart in karmic and newer
     if [ -e ${target}/etc/init/tty1.conf ] ; then
         cat ${target}/etc/init/tty1.conf | \
-        sed -re 's/.*tty1.*/exec \/sbin\/getty -L 115200 ttyS0 vt102/' \
+        sed -re 's/^exec.*/exec \/sbin\/getty -L 115200 ttyS0 vt102/' \
             > ${target}/etc/init/ttyS0.conf
+        sed -ie 's/tty1/ttyS0/g' ${target}/etc/init/ttyS0.conf
         return
     fi
     get_os $target
