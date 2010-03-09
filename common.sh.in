@@ -130,7 +130,7 @@ get_os() {
         OPERATING_SYSTEM="gentoo"
     elif [ -e ${target}/etc/fedora-release ] ; then
         OPERATING_SYSTEM="fedora"
-    elif [ -e ${$target}/etc/redhat-release ] ; then
+    elif [ -e ${target}/etc/redhat-release ] ; then
         if [ -n "$(grep -i centos ${target}/etc/redhat-release)" ] ; then
             OPERATING_SYSTEM="centos"
         else
