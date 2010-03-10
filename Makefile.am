@@ -3,8 +3,10 @@ osname=$(subst ganeti-instance-,,$(PACKAGE))
 osdir=$(OS_DIR)/$(osname)
 customdir="${sysconfdir}/ganeti/instance-image.d"
 variantsdir="${sysconfdir}/ganeti/instance-image/variants"
+toolsdir="$(OS_DIR)/$(osname)/tools"
 
 dist_os_SCRIPTS = create import export rename
+dist_tools_SCRIPTS = tools/*
 dist_os_DATA = ganeti_api_version variants.list
 os_DATA = common.sh
 
