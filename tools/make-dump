@@ -1,0 +1,38 @@
+#!/bin/bash
+set -e
+INSTANCE_NAME="$1"
+
+if [ -z "$INSTANCE_NAME" ] ; then
+    echo "Must provide a node name!"
+    exit 1
+fi
+
+info=($(gnt-instance list -o os,hypervisor,disk.count --no-headers --separator=' ' $INSTANCE_NAME))
+OS_VARIANT="${info[0]/*+/}"
+HYPERVISOR="${info[1]}"
+DISK_COUNT="${info[2]}"
+OS_API_VERSION="15"
+
+# do stuff
+output="$(gnt-instance activate-disks $INSTANCE_NAME)"
+CLEANUP+=("gnt-instance deactivate-disks $INSTANCE_NAME")
+
+DISK_0_PATH="${output/*disk\/0\:/}"
+
+. /usr/share/ganeti/os/image/common.sh
+
+if [ -n "$2" ] ; then
+    IMAGE_DIR=$2
+fi
+
+filesystem_dev=$(map_disk0 $blockdev)
+root_dev=$(map_partition $filesystem_dev root)
+boot_dev=$(map_partition $filesystem_dev boot)
+
+if [ -n "$boot_dev" ] ; then
+    echo "Creating dump from $INSTANCE_NAME for boot at ${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}-boot.dump"
+    dump -0 -q -z9 -f ${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}-boot.dump $boot_dev
+fi
+
+echo "Creating dump from $INSTANCE_NAME for root at ${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}-root.dump"
+dump -0 -q -z9 -f ${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}-root.dump $root_dev
