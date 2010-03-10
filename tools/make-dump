@@ -26,6 +26,7 @@ if [ -n "$2" ] ; then
 fi
 
 filesystem_dev=$(map_disk0 $blockdev)
+CLEANUP+=("unmap_disk0 $blockdev")
 root_dev=$(map_partition $filesystem_dev root)
 boot_dev=$(map_partition $filesystem_dev boot)
 
