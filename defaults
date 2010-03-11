@@ -3,7 +3,7 @@
 # CDINSTALL: Only setup disks for a cd based install
 # Just setup the disks so that you can boot a machine up on a cd to create a
 # new image
-# CDINSTALL="yes"
+# CDINSTALL="no"
 
 # SWAP: Create a swap partition
 # SWAP=yes
@@ -14,11 +14,12 @@
 #   centos-5.4 debian-4.0 fedora-12
 # IMAGE_NAME=""
 
-# IMAGE_TYPE: Either qemu disk images or tarball based images.
-# Use either qemu or tarball (default is qemu)
-# IMAGE_TYPE=qemu
+# IMAGE_TYPE: Either qemu disk images, tarball, or dump based images.
+# Use either qemu, tarball, dump (default is qemu)
+# IMAGE_TYPE="qemu"
 
 # IMAGE_DIR: directory location for disk images
+# ( default is @localstatedir@/cache/ganeti-instance-image )
 # IMAGE_DIR=""
 
 # ARCH: Define the ARCH of the image to use

@@ -6,7 +6,7 @@ will install a Linux-based image using either a tarball or qemu-img disk image
 file. This definition also allows for manual creation of an instance by simply
 setting only the disks up and allowing you to boot via the install cd manually.
 The goal of this instance is to allow fast and flexible installation of
-instances without the need for external tools such as deboostrap.
+instances without the need for external tools such as debootstrap.
 
 Installation
 ------------
@@ -74,7 +74,11 @@ using this OS but currently the OS interface in ganeti is limiting.
 Creation of Deployment Images
 -----------------------------
 
-There are two types that are supported for deploying images.
+There are three types that are supported for deploying images.
+
+  * tarball
+  * qemu image
+  * dump
 
 Tarball
 ~~~~~~~
@@ -89,22 +93,22 @@ custom script to install the grub boot image during installation.
 Qemu Images
 ~~~~~~~~~~~
 
-To create a new qemu based disk image, you will need to able the 'CDINSTALL'
+To create a new qemu based disk image, you will need to able the ``CDINSTALL``
 option and install the VM using the distro's provided installation medium. It is
 not recommended to build images on systems outside of ganeti (such as libvirt)
 as we have encountered issues with systems segfaulting.
 
 Once the instance has been created, boot the instance and point it to the
-install medium:
+install medium::
 
- gnt-instance start -H cdrom_image_path=path/to/iso/ubuntu-9.10.iso, \
+  gnt-instance start -H cdrom_image_path=path/to/iso/ubuntu-9.10.iso, \
     boot_order=cdrom instance-name
 
 Once the base image has been installed, ensure you have the acpid package
 installed so that ganeti can shutdown the VM properly. Once you are happy with
 your base image, shutdown the VM, activate the disks,  and create the disk
 image using qemu-img. Its recommended you use qcow2 with compression to reduce
-the amount of disk space used.
+the amount of disk space used::
 
  # activate disks
  gnt-instance activate-disks instance-name
@@ -112,8 +116,31 @@ the amount of disk space used.
  qemu-img convert -c -f host_device /dev/drbd1 \
     -O qcow2 $IMAGE_DIR/ubuntu-9.10-x86_64.img
 
-Note: Older versions of qemu-img may not support the 'host_device' format so use
-'raw' instead which should work in theory.
+Note: Older versions of qemu-img may not support the ``host_device`` format so
+use ``raw`` instead which should work in theory.
+
+Dump
+~~~~
+
+The last, and most efficient type of disk image is creating filesystem dumps
+using the dump command. The advantage with using dumps is that its much faster
+to deploy using it, and it also has built-in compression. The disadvantage is
+that you need to install grub manually which might be an issue on some operating
+systems. We currently support grub 1, but anything using grub 2 will have issues
+that I haven't found a solution for yet.
+
+You will need to create images for both the boot and root partition (if you
+include a boot partition).
+
+Create a base image for an instance just like its described in Qemu Images. Make
+sure the instance is shutdown and then issue the following commands (assuming
+the activated disk is drbd1)::
+
+  dump -0 -q -z9 -f ${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}-boot.dump \
+    /dev/mapper/drbdq-1
+
+  dump -0 -q -z9 -f ${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}-root.dump \
+    /dev/mapper/drbdq-3
 
 Partition Layout
 ~~~~~~~~~~~~~~~~
@@ -123,14 +150,24 @@ work more elegantly with ganeti. We might change this to be more flexible in the
 future, however you *must* use the following layout otherwise ganeti will not
 install the VM correctly. Currently the following partition layout is assumed:
 
-With swap:
+With swap::
  /dev/$disk1    /boot
  /dev/$disk2    swap
  /dev/$disk3    /
 
-Without swap:
+Without swap::
  /dev/$disk1    /boot
  /dev/$disk2    /
+
+NOTE: If you have kernel_path set, /boot will not be created and all partition
+numbers will go up by one. For example:
+
+With swap::
+ /dev/$disk1    swap
+ /dev/$disk2    /
+
+Without swap::
+ /dev/$disk1    /
 
 Image Naming
 ~~~~~~~~~~~~
@@ -139,6 +176,29 @@ The naming convention that is used is the following:
 
 tarball:    $IMAGE_NAME-$ARCH.tar.gz
 qemu-img:   $IMAGE_NAME-$ARCH.img
+dump:       $IMAGE_NAME-$ARCH-boot.dump
+            $IMAGE_NAME-$ARCH-root.dump
+
+Useful Scripts
+~~~~~~~~~~~~~~
+
+There are a set of useful scripts located in /usr/share/ganeti/os/image/tools
+that you are welcome to use. These scripts are all intended to be run on the
+master node::
+
+  mount-disks $instance_name
+  umount-disks $instance_name
+
+This will mount or umount an instance to /tmp/${instance_name}_root
+
+  ``make-dump $instance_name [ $IMAGE_DIR ]``
+
+Create dump images for the given OS variant. You can override the default
+$IMAGE_DIR setting by giving it as a second argument.
+
+  ``make-qemu-img $instance_name [ $IMAGE_DIR ]``
+
+Create an qemu image for the given OS variant.
 
 Customization of the instance
 -----------------------------
@@ -157,6 +217,7 @@ BLOCKDEV:   ganeti block device
 ROOT_DEV:   device in which the root (/) filesystem resides (the one mounted in
             TARGET)
 BOOT_DEV:   device in which the boot (/boot) filesystem resides
+IMAGE_TYPE: type of image being used (tarball, qemu, dump)
 
 The scripts in CUSTOMIZE_DIR can exit with an error code to signal an error in
 the instance creation, should they fail.
@@ -165,5 +226,48 @@ The scripts in CUSTOMIZE_DIR should not start any long-term processes or daemons
 using this directory, otherwise the installation will fail because it won't be
 able to umount the filesystem from the directory, and hand the instance back to
 Ganeti.
+
+Included Custom Scripts
+-----------------------
+
+This OS definition includes three optional customization scripts that are
+disabled by default. They are not required but are useful.
+
+Grub
+~~~~
+
+When enabled, this can setup two things:
+
+- Install grub into the MBR
+- Setup serial access to grub
+
+In general, the MBR will only be installed if you're not using a qemu image
+type, or the ``kernel_path`` parameter is empty or initiating an import.  There
+is currently no support for install a grub2 MBR (which Ubuntu Karmic requires).
+Its recommended that you only use the qemu image type for Ubuntu Karmic until we
+fix this.
+
+If ``serial_console`` is ``True`` then this script will try to enable serial
+support for grub.
+
+Interfaces
+~~~~~~~~~~
+
+When enabled, it would try to setup networking for eth0 and enable DHCP. It
+assumes you already have a DHCP client installed on the guest OS. This currently
+supports the following operating systems:
+
+- Redhat (CentOS/Fedora)
+- Debian/Ubuntu
+- Gentoo
+- OpenSUSE
+
+SSH
+~~~
+
+When enabled, it will clear out any generated ssh keys that the image may have
+so that each instance have *unique* host keys. Currently its disabled for
+Debian/Ubuntu since the keys won't be regenerated via the init script. We plan
+to fix this manually at some point in the future.
 
 # vi: set tw=80 ft=rst :
