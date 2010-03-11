@@ -13,4 +13,7 @@
 /common.sh
 
 # archives
-/ganeti-instance-debootstrap-*.tar.gz
+/ganeti-instance-image-*.tar.gz
+
+# vim
+*.swp
