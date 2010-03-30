@@ -8,6 +8,11 @@
 # SWAP: Create a swap partition
 # SWAP=yes
 
+# SWAP_SIZE: Manually set the size of the swap partition (in MB)
+# If left empty, it will set the size equal to the memory for the instance.
+# Make sure you have enough disk space for the swap partition!
+# SWAP_SIZE=""
+
 # IMAGE_NAME: Name of the image to use
 # Generally you use the name of the image with the version of the OS included.
 # Examples include:
