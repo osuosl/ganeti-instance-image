@@ -195,11 +195,12 @@ EOF
 }
 
 mkfs_disk0() {
+    local mkfs="mkfs.${FILESYSTEM}"
     # Format /
-    mkfs.ext3 -Fq -L / $root_dev
+    $mkfs -Fq -L / $root_dev
     # Format /boot
     if [ -n "${boot_dev}" ] ; then
-        mkfs.ext3 -Fq -L /boot $boot_dev
+        $mkfs -Fq -L /boot $boot_dev
     fi
     # Format swap
     if [ -n "${swap_dev}" ] ; then
@@ -261,19 +262,19 @@ unmap_disk0() {
 }
 
 setup_fstab() {
-    local target=$1
+    local target=$1 fs=${FILESYSTEM}
     get_os_type $target
     cat > $target/etc/fstab <<EOF
 # /etc/fstab: static file system information.
 #
 # <file system>   <mount point>   <type>  <options>       <dump>  <pass>
-UUID=$root_uuid   /               ext3    defaults        0       1
+UUID=$root_uuid   /               $fs     defaults        0       1
 proc              /proc           proc    defaults        0       0
 EOF
 
 if [ -n "$boot_dev" -a -n "$boot_uuid" ] ; then
     cat >> $target/etc/fstab <<EOF
-UUID=$boot_uuid   /boot           ext3    defaults        1       2
+UUID=$boot_uuid   /boot           $fs     defaults        1       2
 EOF
 fi
 
@@ -364,6 +365,7 @@ fi
 : ${CDINSTALL:="yes"}
 : ${SWAP:="yes"}
 : ${SWAP_SIZE:="${INSTANCE_BE_memory}"}
+: ${FILESYSTEM:="ext3"}
 : ${IMAGE_NAME:=""}
 : ${IMAGE_TYPE:="qemu"}
 : ${ARCH:=""}

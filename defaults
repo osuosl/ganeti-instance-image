@@ -13,6 +13,10 @@
 # Make sure you have enough disk space for the swap partition!
 # SWAP_SIZE=""
 
+# FILESYSTEM: Set which filesystem to format the disks as. Currently only
+# supports ext3 or ext4. Default is ext3.
+# FILESYSTEM="ext3"
+
 # IMAGE_NAME: Name of the image to use
 # Generally you use the name of the image with the version of the OS included.
 # Examples include:
