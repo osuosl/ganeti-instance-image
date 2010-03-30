@@ -1,0 +1,7 @@
+2010-03-30	Lance Albertson <lance@osuosl.org>
+	* Released 0.2
+	* Added feature to set which filesystem to use (ext3 or ext4)
+	* Added feature to manually set the size of the swap partition
+
+2010-03-11	Lance Albertson <lance@osuosl.org>
+	* Initial release of 0.1
