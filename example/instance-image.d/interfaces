@@ -28,6 +28,7 @@ debug set -x
 
 FQDN="${INSTANCE_NAME}"
 SHORT_NAME="$(echo ${INSTANCE_NAME} | cut -d . -f 1)"
+STATIC=""
 
 if [ -z "${TARGET}" -o ! -d "${TARGET}" ] ; then
     log_error "Missing target directory"
@@ -39,13 +40,26 @@ if [ -z "${NIC_COUNT}" ] ; then
     exit 1
 fi
 
+if [ -f "${NETWORKS_DIR}/instances/${FQDN}" ] ; then
+    STATIC="yes"
+    source ${NETWORKS_DIR}/instances/${FQDN}
+    if [ -f "${NETWORKS_DIR}/networks/${SUBNET}" ] ; then
+        source ${NETWORKS_DIR}/instances/${FQDN}
+    else
+        echo "No subnet file for subnet ${SUBNET}!"
+        exit 1
+    fi
+fi
+
 # Functions
 debian_setup() {
     if [ ! -d "${TARGET}/etc/network" ] ; then
         log_error "Missing target network directory"
         exit 1
     fi
-    cat > ${TARGET}/etc/network/interfaces << EOF
+
+    if [ -z "${STATIC}" ] ; then
+        cat > ${TARGET}/etc/network/interfaces << EOF
 # This file describes the network interfaces available on your system
 # and how to activate them. For more information, see interfaces(5).
 
@@ -56,6 +70,22 @@ auto eth0
 iface eth0 inet dhcp
 
 EOF
+    else
+        cat > ${TARGET}/etc/network/interfaces << EOF
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+    address ${ADDRESS}
+    netmask ${NETMASK}
+    gateway ${GATEWAY}
+
+EOF
+    fi
 
     if [ -n "${FQDN}" ] ; then
         echo "${FQDN}" > ${TARGET}/etc/hostname
@@ -67,20 +97,32 @@ redhat_setup() {
         log_error "Missing target network directory"
         exit 1
     fi
-    cat > ${TARGET}/etc/sysconfig/network-scripts/ifcfg-eth0 << EOF
+    if [ -z "${STATIC}" ] ; then
+        cat > ${TARGET}/etc/sysconfig/network-scripts/ifcfg-eth0 << EOF
 DEVICE=eth0
 BOOTPROTO=dhcp
 ONBOOT=yes
 EOF
+    else
+        cat > ${TARGET}/etc/sysconfig/network-scripts/ifcfg-eth0 << EOF
+DEVICE=eth0
+BOOTPROTO=static
+IPADDR=${ADDRESS}
+NETMASK=${NETMASK}
+ONBOOT=yes
+EOF
+
 
     if [ -n "${FQDN}" ] ; then
         cat > ${TARGET}/etc/sysconfig/network << EOF
 NETWORKING=yes
 HOSTNAME=${FQDN}
+GATEWAY=${GATEWAY}
 EOF
     else
         cat > ${TARGET}/etc/sysconfig/network << EOF
 NETWORKING=yes
+GATEWAY=${GATEWAY}
 EOF
     fi
 }
@@ -90,9 +132,16 @@ gentoo_setup() {
         log_error "Missing target network file"
         exit 1
     fi
-    cat > ${TARGET}/etc/conf.d/net << EOF
+    if [ -z "${STATIC}" ] ; then
+        cat > ${TARGET}/etc/conf.d/net << EOF
 config_eth0=( "dhcp" )
 EOF
+    else
+        cat > ${TARGET}/etc/conf.d/net << EOF
+config_eth0=( "${ADRESS} netmask ${NETMASK}" )
+routes_eth0=( "default gw ${GATEWAY}" )
+EOF
+
     chroot ${TARGET} rc-update add net.eth0 default
 
     if [ -n "${FQDN}" ] ; then
