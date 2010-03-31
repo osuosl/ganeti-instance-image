@@ -43,8 +43,8 @@ fi
 if [ -f "${NETWORKS_DIR}/instances/${FQDN}" ] ; then
     STATIC="yes"
     source ${NETWORKS_DIR}/instances/${FQDN}
-    if [ -f "${NETWORKS_DIR}/networks/${SUBNET}" ] ; then
-        source ${NETWORKS_DIR}/instances/${FQDN}
+    if [ -f "${NETWORKS_DIR}/subnets/${SUBNET}" ] ; then
+        source ${NETWORKS_DIR}/subnets/${SUBNET}
     else
         echo "No subnet file for subnet ${SUBNET}!"
         exit 1
@@ -111,7 +111,7 @@ IPADDR=${ADDRESS}
 NETMASK=${NETMASK}
 ONBOOT=yes
 EOF
-
+    fi
 
     if [ -n "${FQDN}" ] ; then
         cat > ${TARGET}/etc/sysconfig/network << EOF
@@ -141,6 +141,7 @@ EOF
 config_eth0=( "${ADRESS} netmask ${NETMASK}" )
 routes_eth0=( "default gw ${GATEWAY}" )
 EOF
+    fi
 
     chroot ${TARGET} rc-update add net.eth0 default
 
