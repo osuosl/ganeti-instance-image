@@ -371,6 +371,7 @@ fi
 : ${ARCH:=""}
 : ${CUSTOMIZE_DIR:="@sysconfdir@/ganeti/instance-image.d"}
 : ${VARIANTS_DIR:="@sysconfdir@/ganeti/instance-image/variants"}
+: ${NETWORKS_DIR:="@sysconfdir@/ganeti/instance-image/networks"}
 : ${IMAGE_DIR:="@localstatedir@/cache/ganeti-instance-image"}
 : ${IMAGE_DEBUG:="0"}
 
