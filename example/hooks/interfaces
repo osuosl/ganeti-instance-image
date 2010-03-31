@@ -138,7 +138,7 @@ config_eth0=( "dhcp" )
 EOF
     else
         cat > ${TARGET}/etc/conf.d/net << EOF
-config_eth0=( "${ADRESS} netmask ${NETMASK}" )
+config_eth0=( "${ADDRESS} netmask ${NETMASK}" )
 routes_eth0=( "default gw ${GATEWAY}" )
 EOF
     fi
