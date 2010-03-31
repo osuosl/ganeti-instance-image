@@ -11,7 +11,7 @@ dist_tools_SCRIPTS = tools/*
 dist_os_DATA = ganeti_api_version variants.list
 os_DATA = common.sh
 
-dist_custom_DATA = example/instance-image.d/*
+dist_custom_DATA = example/hooks/*
 
 dist_doc_DATA = COPYING NEWS README
 
