@@ -262,6 +262,28 @@ supports the following operating systems:
 - Gentoo
 - OpenSUSE
 
+If you need to set a static ip for instances, you can do that by creating
+several files in a manner described below.
+
+Subnets:
+
+Create a file in ``/etc/ganeti/instance-image/networks/subnets`` that has a
+useful name such as ``vlan42``. This file will describe subnet routing
+information such as the netmask and gateway. The following is an example:
+
+  NETMASK=255.255.255.0
+  GATEWAY=192.168.1.1
+
+Instance:
+
+Create a file in ``/etc/ganeti/instance-image/networks/instances`` and name it
+the FQDN of the instance. The file will describe the IP address for the instance
+and which subnet it resides on. For example, we could create a file named
+``myinstance.osuosl.org`` and have the following in it:
+
+  ADDRESS=192.168.1.100
+  SUBNET=vlan42
+
 SSH
 ~~~
 
