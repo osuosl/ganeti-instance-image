@@ -49,7 +49,7 @@ for fs in boot root ; do
     # use indirect reference to make the variables dynamic
     dev="$(eval "echo \${$(echo ${fs}_dev)"})"
     vol_type="$(eval echo \$vol_type_${fs})"
-    if [ -z "$vol_type" ] ; then
+    if [ -z "$vol_type" -a -n "${dev}" ] ; then
         log_error "Unable to find ${fs} filesystem type at ${dev}"
         exit 1
     fi
