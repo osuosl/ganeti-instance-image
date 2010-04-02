@@ -1,3 +1,10 @@
+2010-04-02  Lance Albertson <lance@osuosl.org>
+	* Released 0.3
+	* Added feature to set static IPs for instances (see README)
+	* Moved variants.list to $sysconfigdir/instance-image/variants.list and
+	  created a symlink to the old location. See issue 92 on the Ganeti issue
+	  tracker for more background information.
+
 2010-03-30	Lance Albertson <lance@osuosl.org>
 	* Released 0.2
 	* Added feature to set which filesystem to use (ext3 or ext4)

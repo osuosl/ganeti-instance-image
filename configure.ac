@@ -1,5 +1,5 @@
 AC_PREREQ(2.59)
-AC_INIT(ganeti-instance-image, 0.2, lance@osuosl.org)
+AC_INIT(ganeti-instance-image, 0.3, lance@osuosl.org)
 
 AC_CONFIG_AUX_DIR(autotools)
 AC_CONFIG_SRCDIR(configure)
