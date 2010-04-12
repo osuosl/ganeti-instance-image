@@ -218,6 +218,9 @@ mount_disk0() {
         mount $boot_dev $target/boot
         CLEANUP+=("umount $target/boot")
     fi
+    # sync the file systems before unmounting to ensure everything is flushed
+    # out
+    CLEANUP+=("sync")
 }
 
 map_disk0() {
