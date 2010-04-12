@@ -1,3 +1,8 @@
+2010-04-12  Lance Albertson <lance@osuosl.org>
+    * Released 0.3.1 (bugfix)
+    * Fix logic for exports so that it works properly now
+	* Run sync prior to umounting to avoid nasty hanging ext4 bug
+
 2010-04-02  Lance Albertson <lance@osuosl.org>
 	* Released 0.3
 	* Added feature to set static IPs for instances (see README)
