@@ -28,8 +28,8 @@
 # IMAGE_NAME=""
 
 # IMAGE_TYPE: Either qemu disk images, tarball, or dump based images.
-# Use either qemu, tarball, dump (default is qemu)
-# IMAGE_TYPE="qemu"
+# Use either qemu, tarball, dump (default is dump)
+# IMAGE_TYPE="dump"
 
 # IMAGE_DIR: directory location for disk images
 # ( default is @localstatedir@/cache/ganeti-instance-image )

@@ -369,8 +369,9 @@ fi
 : ${SWAP:="yes"}
 : ${SWAP_SIZE:="${INSTANCE_BE_memory}"}
 : ${FILESYSTEM:="ext3"}
+: ${KERNEL_ARGS=""}
 : ${IMAGE_NAME:=""}
-: ${IMAGE_TYPE:="qemu"}
+: ${IMAGE_TYPE:="dump"}
 : ${ARCH:=""}
 : ${CUSTOMIZE_DIR:="@sysconfdir@/ganeti/instance-image.d"}
 : ${VARIANTS_DIR:="@sysconfdir@/ganeti/instance-image/variants"}
