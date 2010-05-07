@@ -2,11 +2,12 @@ ganeti-instance-image
 =====================
 
 This is a guest OS definition for Ganeti (http://code.google.com/p/ganeti). It
-will install a Linux-based image using either a tarball or qemu-img disk image
-file. This definition also allows for manual creation of an instance by simply
-setting only the disks up and allowing you to boot via the install cd manually.
-The goal of this instance is to allow fast and flexible installation of
-instances without the need for external tools such as debootstrap.
+will install a Linux-based image using either a tarball, filesystem dump, or a
+qemu-img disk image file. This definition also allows for manual creation of an
+instance by simply setting only the disks up and allowing you to boot via the
+install cd manually.  The goal of this instance is to allow fast and flexible
+installation of instances without the need for external tools such as
+debootstrap.
 
 Installation
 ------------
@@ -52,12 +53,18 @@ The following settings will be examined in this file:
               installation via other means. It will not deploy any images or
               create any partitions. (default: no)
 - SWAP:       Create a swap partition (tarball only) (default: yes)
+- SWAP_SIZE:  Manually set the default swap partition size in MB (default: size
+              of instance memory)
+- FILESYSTEM: Set which filesystem to format the disks as. Currently only
+              supports ext3 or ext4. (default: ext3)
+- KERNEL_ARGS: Add additional kernel boot parameters to an instance. This
+              currently only works on booting a kernel from inside.
 - IMAGE_NAME: Name for the image to use. Generally they will have names similar
               to: centos-5.4, debian-5.0, etc. The naming is free form depending
               on what you name the file itself.
-- IMAGE_TYPE: Create instance by either using a gzipped tarball or an image
-              created by qemu-img. Accepts either 'tarball' or 'qemu'.
-              (default: qemu).
+- IMAGE_TYPE: Create instance by either using a gzipped tarball, file system
+              dump, or an image created by qemu-img. Accepts either 'tarball',
+              'dump', or 'qemu'.  (default: dump).
 - IMAGE_DIR:  Override default location for images.
               (default: ``$localstatedir/cache/ganeti-instance-image``)
 - ARCH:       Define the architecture of the image to use. Accepts either 'x86'
@@ -77,8 +84,8 @@ Creation of Deployment Images
 There are three types that are supported for deploying images.
 
   * tarball
-  * qemu image
   * dump
+  * qemu image
 
 Tarball
 ~~~~~~~
@@ -92,6 +99,10 @@ custom script to install the grub boot image during installation.
 
 Qemu Images
 ~~~~~~~~~~~
+
+NOTE: qemu images will create a partition of the exact same size as it was
+originally created with. So if you create a 4GB image and created a new instance
+of 10G it will create a partition that is only 4GB and leave the rest as "free".
 
 To create a new qemu based disk image, you will need to able the ``CDINSTALL``
 option and install the VM using the distro's provided installation medium. It is
@@ -126,8 +137,10 @@ The last, and most efficient type of disk image is creating filesystem dumps
 using the dump command. The advantage with using dumps is that its much faster
 to deploy using it, and it also has built-in compression. The disadvantage is
 that you need to install grub manually which might be an issue on some operating
-systems. We currently support grub 1, but anything using grub 2 will have issues
-that I haven't found a solution for yet.
+systems. We currently fully support grub 1 and have partial support with grub2.
+After the new instance has booted, you will need to run ``update-grub`` and
+reboto the VM to get the new settings. We currently cannot run ``update-grub``
+during the install because of an upstream grub2 issue.
 
 You will need to create images for both the boot and root partition (if you
 include a boot partition).
@@ -175,9 +188,9 @@ Image Naming
 The naming convention that is used is the following:
 
 tarball:    $IMAGE_NAME-$ARCH.tar.gz
-qemu-img:   $IMAGE_NAME-$ARCH.img
 dump:       $IMAGE_NAME-$ARCH-boot.dump
             $IMAGE_NAME-$ARCH-root.dump
+qemu-img:   $IMAGE_NAME-$ARCH.img
 
 Useful Scripts
 ~~~~~~~~~~~~~~
@@ -236,16 +249,16 @@ disabled by default. They are not required but are useful.
 Grub
 ~~~~
 
-When enabled, this can setup two things:
+When enabled, this can setup three things:
 
 - Install grub into the MBR
 - Setup serial access to grub
+- Add optional kernel boot parameters
 
 In general, the MBR will only be installed if you're not using a qemu image
 type, or the ``kernel_path`` parameter is empty or initiating an import.  There
-is currently no support for install a grub2 MBR (which Ubuntu Karmic requires).
-Its recommended that you only use the qemu image type for Ubuntu Karmic until we
-fix this.
+is currently partial support for install a grub2 MBR (which Ubuntu Karmic and
+newer requires).
 
 If ``serial_console`` is ``True`` then this script will try to enable serial
 support for grub.
