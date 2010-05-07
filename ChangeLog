@@ -1,3 +1,9 @@
+2010-05-07  Lance Albertson <lance@osuosl.org>
+	* Released 0.4
+	* Add partial grub2 support
+	* Switch default image type to dump
+	* Added feature to add optional kernel parameters
+
 2010-04-12  Lance Albertson <lance@osuosl.org>
     * Released 0.3.1 (bugfix)
     * Fix logic for exports so that it works properly now
