@@ -91,9 +91,9 @@ EOF
 if [ "${IMAGE_TYPE}" != "qemu" ] && \
    [ -z "${INSTANCE_HV_kernel_path}" -o "${IMPORT_SCRIPT}" = "1" ] ; then
     setup_disk_devs
+    add_devicemap
 
     if [ -e "${boot_dir}/menu.lst" ] ; then
-        add_devicemap
         # install grub to the block device
         chroot ${TARGET} grub --batch --no-floppy \
             --device-map=/boot/grub/device.map <<EOF
@@ -107,6 +107,11 @@ EOF
             sed --follow-symlinks -ie "s/\(root=UUID=\)\([a-z0-9-]*\)/\1${root_uuid}/g" \
                 ${boot_dir}/menu.lst
         fi
+        # additional kernel arguments for the instance
+        if [ -n "${KERNEL_ARGS}" ] ; then
+            sed --follow-symlinks -ie "s/\(.*kernel.*\)/\1 ${KERNEL_ARGS}/g" \
+                ${boot_dir}/menu.lst
+        fi
     elif [ -e "${boot_dir}/grub.cfg" -a -e "${TARGET}/etc/default/grub" ] ; then
         echo "grub2 support is partially supported"
         echo "please run update-grub after the instance is online"
@@ -116,6 +121,14 @@ EOF
             sed --follow-symlinks -ie "s/\(root=UUID=\)\([a-z0-9-]*\)/\1${root_uuid}/g" \
                 ${boot_dir}/grub.cfg
         fi
+        # additional kernel arguments for the instance
+        if [ -n "${KERNEL_ARGS}" ] ; then
+            sed -ie "s/.*GRUB_CMDLINE_LINUX=\"\(.*\)\"/GRUB_CMDLINE_LINUX=\"\1 ${KERNEL_ARGS}\"/" \
+                ${TARGET}/etc/default/grub
+        fi
+        # show the menu countdown in case we want to boot to a different kernel
+        sed -ie 's/.*GRUB_HIDDEN_TIMEOUT=.*/GRUB_HIDDEN_TIMEOUT=5/' ${TARGET}/etc/default/grub
+        sed -ie 's/.*GRUB_HIDDEN_TIMEOUT_QUIET=.*/GRUB_HIDDEN_TIMEOUT_QUIET=false/' ${TARGET}/etc/default/grub
         # install grub2 MBR
         chroot ${TARGET} grub-setup --force --device-map=/boot/grub/device.map \
             --directory=/boot/grub --root-device="(hd0,1)" "(hd0)"
@@ -137,11 +150,10 @@ if [ "${INSTANCE_HV_serial_console}" = "True" ] ; then
         # grub 2.x
         add_devicemap
         sed -ie 's/.*GRUB_TERMINAL.*/GRUB_TERMINAL=serial/' ${TARGET}/etc/default/grub
-        sed -ie 's/.*GRUB_CMDLINE_LINUX.*/GRUB_CMDLINE_LINUX=\"console=ttyS0,115200n8\"/' \
+        sed -ie 's/.*GRUB_CMDLINE_LINUX=\"\(.*\)\"/GRUB_CMDLINE_LINUX=\"\1 console=ttyS0,115200n8\"/' \
             ${TARGET}/etc/default/grub
         echo "GRUB_SERIAL_COMMAND=\"serial --speed=115200 --unit=0 --word=8 --parity=no --stop=1\"" \
             >> ${TARGET}/etc/default/grub
-        chroot ${TARGET} update-grub
     else
         echo "No grub bootloader found, skipping..."
     fi
