@@ -139,7 +139,7 @@ to deploy using it, and it also has built-in compression. The disadvantage is
 that you need to install grub manually which might be an issue on some operating
 systems. We currently fully support grub 1 and have partial support with grub2.
 After the new instance has booted, you will need to run ``update-grub`` and
-reboto the VM to get the new settings. We currently cannot run ``update-grub``
+reboot the VM to get the new settings. We currently cannot run ``update-grub``
 during the install because of an upstream grub2 issue.
 
 You will need to create images for both the boot and root partition (if you
