@@ -1,0 +1,6 @@
+usr/share/ganeti/os/image
+usr/share/ganeti/os/image/tools
+var/cache/ganeti-instance-image
+etc/default
+etc/ganeti/instance-image/hooks
+

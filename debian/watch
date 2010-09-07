@@ -1,0 +1,4 @@
+# Compulsory line, this is a version 3 file
+version=3
+
+http://code.osuosl.org/attachments/download/3/ ganeti-instance-image-(\d+\.\d+[\d.]*)\.tar(?:\.gz)?

@@ -1,0 +1,23 @@
+Source: ganeti-instance-image
+Section: admin
+Priority: extra
+Maintainer: Ed Lim <Edward.Lim@oregonstate.edu>
+Build-Depends: debhelper (>= 7), autotools-dev
+Standards-Version: 3.7.3
+Homepage: http://code.osuosl.org/projects/ganeti-image
+Vcs-Browser: http://git.osuosl.org/?p=ganeti-instance-image.git
+Vcs-Git: git://git.osuosl.org/ganeti-instance-image.git
+
+Package: ganeti-instance-image
+Architecture: any
+Depends: ${misc:Depends}, dump, kpartx
+Conflicts: ganeti (<< 1.2.7)
+Enhances: ganeti
+Description: image based instance OS defintion for ganeti
+ Ganeti is a virtual server cluster management software tool built on
+ top of the Xen virtual machine monitor and other Open Source software.
+ After setting it up it will provide you with an automated environment
+ to manage highly available virtual machine instances.
+ .
+ This package provides an OS definition for ganeti that will allow
+ installation via OS images
