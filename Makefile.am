@@ -1,7 +1,7 @@
 osname=$(subst ganeti-instance-,,$(PACKAGE))
 
 osdir=$(OS_DIR)/$(osname)
-customdir=${sysconfdir}/ganeti/instance-image.d
+customdir=${sysconfdir}/ganeti/instance-image/hooks
 configdir=${sysconfdir}/ganeti/instance-image
 variantsdir=${sysconfdir}/ganeti/instance-image/variants
 networksdir=${sysconfdir}/ganeti/instance-image/networks

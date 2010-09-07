@@ -70,7 +70,7 @@ The following settings will be examined in this file:
 - ARCH:       Define the architecture of the image to use. Accepts either 'x86'
               or 'x86_64'.
 - CUSTOMIZE_DIR: A directory containing customization script for the instance.
-              (by default $sysconfdir/ganeti/instance-image.d) See
+              (by default $sysconfdir/ganeti/instance-image/hooks) See
               "Customization of the instance" below.
 - IMAGE_DEBUG: Enable verbose output for instance scripts.
 
@@ -217,7 +217,7 @@ Customization of the instance
 -----------------------------
 
 If run-parts is in the os create script, and the CUSTOMIZE_DIR (by default
-$sysconfdir/ganeti/instance-image.d, /etc/ganeti/instance-image.d if you
+$sysconfdir/ganeti/instance-image/hooks, /etc/ganeti/instance-image/hooks if you
 configured the os with --sysconfdir=/etc) directory exists any executable whose
 name matches the run-parts execution rules (quoting run-parts(8): the names must
 consist entirely of upper and lower case letters, digits, underscores, and

@@ -373,7 +373,7 @@ fi
 : ${IMAGE_NAME:=""}
 : ${IMAGE_TYPE:="dump"}
 : ${ARCH:=""}
-: ${CUSTOMIZE_DIR:="@sysconfdir@/ganeti/instance-image.d"}
+: ${CUSTOMIZE_DIR:="@sysconfdir@/ganeti/instance-image/hooks"}
 : ${VARIANTS_DIR:="@sysconfdir@/ganeti/instance-image/variants"}
 : ${NETWORKS_DIR:="@sysconfdir@/ganeti/instance-image/networks"}
 : ${IMAGE_DIR:="@localstatedir@/cache/ganeti-instance-image"}

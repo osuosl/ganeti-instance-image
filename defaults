@@ -41,8 +41,8 @@
 
 # CUSTOMIZE_DIR: a directory containing scripts to customize the installation.
 # The scripts are executed using run-parts
-# By default /etc/ganeti/instance-image.d
-# CUSTOMIZE_DIR="/etc/ganeti/instance-image.d"
+# By default /etc/ganeti/instance-image/hooks
+# CUSTOMIZE_DIR="/etc/ganeti/instance-image/hooks"
 
 # IMAGE_DEBUG: turn on debugging output for the scripts
 # IMAGE_DEBUG=0
