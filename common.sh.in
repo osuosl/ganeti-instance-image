@@ -355,7 +355,7 @@ cleanup() {
 
 trap cleanup EXIT
 
-DEFAULT_FILE="@DEFAULTS_DIR@/ganeti-instance-image"
+DEFAULT_FILE="@DEFAULT_DIR@/ganeti-instance-image"
 if [ -f "$DEFAULT_FILE" ]; then
     . "$DEFAULT_FILE"
 fi
