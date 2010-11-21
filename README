@@ -75,7 +75,8 @@ The following settings will be examined in this file:
 - CUSTOMIZE_DIR: A directory containing customization script for the instance.
               (by default $sysconfdir/ganeti/instance-image/hooks) See
               "Customization of the instance" below.
-- IMAGE_DEBUG: Enable verbose output for instance scripts.
+- IMAGE_DEBUG: Enable verbose output for instance scripts. Enable by either
+              using "1" or "yes"  (default: no )
 
 Note that the settings file is important on the node that the instance is
 installed on, not the cluster master. This is indeed not a very good model of

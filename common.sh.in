@@ -32,7 +32,7 @@ log_error() {
 }
 
 debug() {
-    [ "$IMAGE_DEBUG" == "1" ] &&  $@ || :
+    [ "$IMAGE_DEBUG" == "1" -o "$IMAGE_DEBUG" == "yes" ] &&  $@ || :
 }
 
 get_api5_arguments() {
@@ -379,7 +379,7 @@ fi
 : ${NETWORKS_DIR:="@sysconfdir@/ganeti/instance-image/networks"}
 : ${OVERLAYS_DIR:="@sysconfdir@/ganeti/instance-image/overlays"}
 : ${IMAGE_DIR:="@localstatedir@/cache/ganeti-instance-image"}
-: ${IMAGE_DEBUG:="0"}
+: ${IMAGE_DEBUG:="no"}
 
 SCRIPT_NAME=$(basename $0)
 KERNEL_PATH="$INSTANCE_HV_kernel_path"
