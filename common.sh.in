@@ -370,12 +370,14 @@ fi
 : ${SWAP_SIZE:="${INSTANCE_BE_memory}"}
 : ${FILESYSTEM:="ext3"}
 : ${KERNEL_ARGS=""}
+: ${OVERLAY=""}
 : ${IMAGE_NAME:=""}
 : ${IMAGE_TYPE:="dump"}
 : ${ARCH:=""}
 : ${CUSTOMIZE_DIR:="@sysconfdir@/ganeti/instance-image/hooks"}
 : ${VARIANTS_DIR:="@sysconfdir@/ganeti/instance-image/variants"}
 : ${NETWORKS_DIR:="@sysconfdir@/ganeti/instance-image/networks"}
+: ${OVERLAYS_DIR:="@sysconfdir@/ganeti/instance-image/overlays"}
 : ${IMAGE_DIR:="@localstatedir@/cache/ganeti-instance-image"}
 : ${IMAGE_DEBUG:="0"}
 

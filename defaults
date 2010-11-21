@@ -35,6 +35,11 @@
 # ( default is @localstatedir@/cache/ganeti-instance-image )
 # IMAGE_DIR=""
 
+# OVERLAY: overlay of files to be copied to the instance after OS installation.
+# This is useful for situations where you want to copy instance specific
+# configs such as resolv.conf.
+# OVERLAY=""
+
 # ARCH: Define the ARCH of the image to use
 # Use either x86 or x86_64
 # ARCH=""

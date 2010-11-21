@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# Copyright (C) 2010 Oregon State University
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301, USA.
+#
+# Copy files from an overlay directory into an instance. This assumes the same
+# filesystem structure as the system.
+
+set -e
+
+. common.sh
+
+debug set -x
+
+if [ -z "${TARGET}" -o ! -d "${TARGET}" ] ; then
+    log_error "Missing target directory"
+    exit 1
+fi
+
+if [ -n "${OVERLAY}" ] ; then
+    local overlay="${OVERLAYS_DIR}/${OVERLAY}"
+    if [ ! -d "${overlay}" ] ; then
+        log_error "${overlay} not found"
+    fi
+    # copy overlay files into target instance
+    cp -a ${overlay} ${TARGET}
+fi
+
+exit 0

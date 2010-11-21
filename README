@@ -67,6 +67,9 @@ The following settings will be examined in this file:
               'dump', or 'qemu'.  (default: dump).
 - IMAGE_DIR:  Override default location for images.
               (default: ``$localstatedir/cache/ganeti-instance-image``)
+- OVERLAY:    Overlay of files to be copied to the instance after OS
+              installation. This is useful for situations where you want to copy
+              instance specific configs such as resolv.conf.
 - ARCH:       Define the architecture of the image to use. Accepts either 'x86'
               or 'x86_64'.
 - CUSTOMIZE_DIR: A directory containing customization script for the instance.
@@ -304,5 +307,15 @@ When enabled, it will clear out any generated ssh keys that the image may have
 so that each instance have *unique* host keys. Currently its disabled for
 Debian/Ubuntu since the keys won't be regenerated via the init script. We plan
 to fix this manually at some point in the future.
+
+Overlays
+~~~~~~~~
+
+When enabled it will copy a directory of files recursively into the instance.
+This is quite useful for site specific configurations such as resolv.conf.
+Create a directory in ``/etc/ganeit/instance-image/overlays/`` and copy files as
+needed into it. Treat the directory as the root of the filesystem. Set
+``OVERLAY`` for the variant as the name of the directory. This directory needs
+to exist on all nodes in order to work.
 
 # vi: set tw=80 ft=rst :
