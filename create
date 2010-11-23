@@ -55,6 +55,12 @@ if [ "$CDINSTALL" = "no" ] ; then
         ${QEMU_IMG} convert ${IMAGE_FILE} -O host_device ${blockdev}
     fi
 
+    # deploying something like a windows image, skip the rest
+    if [ "${NOMOUNT}" = "yes" ] ; then
+      cleanup
+      exit 0
+    fi
+
     filesystem_dev=$(map_disk0 $blockdev)
     CLEANUP+=("unmap_disk0 $blockdev")
     root_dev=$(map_partition $filesystem_dev root)

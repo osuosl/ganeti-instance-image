@@ -23,6 +23,11 @@ set -e
 
 debug set -x
 
+if [ "${NOMOUNT}" = "yes" ] ; then
+    # do nothing if NOMOUNT is enabled
+    exit 0
+fi
+
 TARGET=`mktemp -d` || exit 1
 CLEANUP+=("rmdir $TARGET")
 

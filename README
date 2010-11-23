@@ -67,6 +67,9 @@ The following settings will be examined in this file:
               'dump', or 'qemu'.  (default: dump).
 - IMAGE_DIR:  Override default location for images.
               (default: ``$localstatedir/cache/ganeti-instance-image``)
+- NOMOUNT:    Do not try to mount volume (typically used if it is not a linux
+              partition).  Accepts either 'yes' or 'no'. This option is useful
+              for installing Windows images for example. (default: no)
 - OVERLAY:    Overlay of files to be copied to the instance after OS
               installation. This is useful for situations where you want to copy
               instance specific configs such as resolv.conf.
