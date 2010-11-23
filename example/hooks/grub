@@ -39,11 +39,21 @@ fi
 
 # Set disk based on type of hypervisor
 disk=""
-if [ "${HYPERVISOR}" = "kvm" ] ; then
-  disk="vda"
-else
-  disk="xda"
-fi
+case $INSTANCE_HV_disk_type in
+    paravirtual)
+        [ "${HYPERVISOR}" = "kvm" ] && disk="vda" || disk="xda"
+        ;;
+    scsi)
+        disk="sda"
+        ;;
+    ide)
+        disk="hda"
+        ;;
+    *)
+        log_error "unsupported disk type"
+        exit 1
+        ;;
+esac
 
 boot_dir="${TARGET}/boot/grub"
 
