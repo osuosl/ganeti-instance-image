@@ -373,6 +373,7 @@ fi
 : ${OVERLAY=""}
 : ${IMAGE_NAME:=""}
 : ${IMAGE_TYPE:="dump"}
+: ${NOMOUNT:="no"}
 : ${ARCH:=""}
 : ${CUSTOMIZE_DIR:="@sysconfdir@/ganeti/instance-image/hooks"}
 : ${VARIANTS_DIR:="@sysconfdir@/ganeti/instance-image/variants"}

@@ -31,50 +31,56 @@ if [ ! -b $blockdev ]; then
     CLEANUP+=("$LOSETUP -d $blockdev")
 fi
 
-format_disk0 $blockdev
-filesystem_dev=$(map_disk0 $blockdev)
-CLEANUP+=("unmap_disk0 $blockdev")
-root_dev=$(map_partition $filesystem_dev root)
-boot_dev=$(map_partition $filesystem_dev boot)
-swap_dev=$(map_partition $filesystem_dev swap)
-
-mkfs_disk0
-root_uuid="$($VOL_ID $root_dev)"
-[ -n "$boot_dev" ] && boot_uuid="$($VOL_ID $boot_dev)"
-[ -n "$swap_dev" ] && swap_uuid="$($VOL_ID $swap_dev)"
-
 TARGET=`mktemp -d` || exit 1
 CLEANUP+=("rmdir $TARGET")
 DUMPDIR=`mktemp -d` || exit 1
 CLEANUP+=("rm -rf $DUMPDIR")
 
-mount_disk0 $TARGET
+if [ ! "${NOMOUNT}" = "yes" ] ; then
+    format_disk0 $blockdev
+    filesystem_dev=$(map_disk0 $blockdev)
+    CLEANUP+=("unmap_disk0 $blockdev")
+    root_dev=$(map_partition $filesystem_dev root)
+    boot_dev=$(map_partition $filesystem_dev boot)
+    swap_dev=$(map_partition $filesystem_dev swap)
+
+    mkfs_disk0
+    root_uuid="$($VOL_ID $root_dev)"
+    [ -n "$boot_dev" ] && boot_uuid="$($VOL_ID $boot_dev)"
+    [ -n "$swap_dev" ] && swap_uuid="$($VOL_ID $swap_dev)"
+
+    mount_disk0 $TARGET
+fi
 
 # import dumps from tar file
 ( cd $DUMPDIR; tar -xf - )
-( cd $TARGET ; restore -r -y -f ${DUMPDIR}/root.dump )
-if [ -n "${boot_dev}" ] ; then
-    ( cd ${TARGET}/boot ; restore -r -y -f ${DUMPDIR}/boot.dump )
-fi
 
-setup_fstab $TARGET
+if [ "${NOMOUNT}" = "yes" ] ; then
+    ( $QEMU_IMG convert ${DUMPDIR}/disk.img -O host_device ${blockdev} )
+else
+    ( cd $TARGET ; restore -r -y -f ${DUMPDIR}/root.dump )
+    if [ -n "${boot_dev}" ] ; then
+        ( cd ${TARGET}/boot ; restore -r -y -f ${DUMPDIR}/boot.dump )
+    fi
 
-if [ "${INSTANCE_HV_serial_console}" = "True" ] ; then
-    setup_console $TARGET
-fi
+    setup_fstab $TARGET
 
-rm -f $TARGET/etc/udev/rules.d/z*_persistent-net.rules
+    if [ "${INSTANCE_HV_serial_console}" = "True" ] ; then
+        setup_console $TARGET
+    fi
 
-if [ -n "$CUSTOMIZE_DIR" -a -d "$CUSTOMIZE_DIR" -a -x "$CUSTOMIZE_DIR/grub" ] ; then
-    TARGET=$TARGET
-    BLOCKDEV=$blockdev
-    ROOT_DEV=$root_dev
-    BOOT_DEV=$boot_dev
-    IMPORT_SCRIPT="1"
-    export TARGET SUITE BLOCKDEV ROOT_DEV BOOT_DEV IMPORT_SCRIPT
-    # Install grub since we're not deploying via qemu-img
-    ${CUSTOMIZE_DIR}/grub
-fi
+    rm -f $TARGET/etc/udev/rules.d/z*_persistent-net.rules
+
+    if [ -n "$CUSTOMIZE_DIR" -a -d "$CUSTOMIZE_DIR" -a -x "$CUSTOMIZE_DIR/grub" ] ; then
+        TARGET=$TARGET
+        BLOCKDEV=$blockdev
+        ROOT_DEV=$root_dev
+        BOOT_DEV=$boot_dev
+        IMPORT_SCRIPT="1"
+        export TARGET SUITE BLOCKDEV ROOT_DEV BOOT_DEV IMPORT_SCRIPT
+        # Install grub since we're not deploying via qemu-img
+        ${CUSTOMIZE_DIR}/grub
+    fi
 
 # execute cleanups
 cleanup
