@@ -32,27 +32,27 @@ AC_PROG_LN_S
 AC_PROG_AWK
 AC_PROG_MKDIR_P
 
-AC_PATH_PROG(DUMP, [dump])
+AC_PATH_PROG(DUMP, [dump], [], [$PATH:/usr/sbin:/sbin])
 if test -z "$DUMP" ; then
   AC_MSG_ERROR([dump not found in $PATH])
 fi
 
-AC_PATH_PROG(LOSETUP, [losetup])
+AC_PATH_PROG(LOSETUP, [losetup], [], [$PATH:/usr/sbin:/sbin])
 if test -z "$LOSETUP" ; then
   AC_MSG_ERROR([losetup not found in $PATH])
 fi
 
-AC_PATH_PROG(KPARTX, [kpartx])
+AC_PATH_PROG(KPARTX, [kpartx], [], [$PATH:/usr/sbin:/sbin])
 if test -z "$KPARTX" ; then
   AC_MSG_ERROR([kpartx not found in $PATH])
 fi
 
-AC_PATH_PROG(SFDISK, [sfdisk])
+AC_PATH_PROG(SFDISK, [sfdisk], [], [$PATH:/usr/sbin:/sbin])
 if test -z "$SFDISK" ; then
   AC_MSG_ERROR([sfdisk not found in $PATH])
 fi
 
-AC_PATH_PROG(QEMU_IMG, [qemu-img])
+AC_PATH_PROG(QEMU_IMG, [qemu-img], [], [$PATH:/usr/sbin:/sbin])
 if test -z "$QEMU_IMG" ; then
   AC_MSG_ERROR([qemu-img not found in $PATH])
 fi
