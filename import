@@ -81,6 +81,7 @@ else
         # Install grub since we're not deploying via qemu-img
         ${CUSTOMIZE_DIR}/grub
     fi
+fi
 
 # execute cleanups
 cleanup
