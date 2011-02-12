@@ -207,6 +207,8 @@ mkfs_disk0() {
         # Format swap
         mkswap -f $swap_dev
     fi
+    # During reinstalls, ext4 needs a little time after a mkfs so add it here
+    sleep 2
 }
 
 mount_disk0() {
