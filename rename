@@ -72,7 +72,7 @@ esac
 
 if [ "$OLD_HNAME" = "$old_name" \
         -o "${OLD_HNAME}.$(echo $old_name | cut -d . -f 2,3)" \
-        = "$old_name"] ; then
+        = "$old_name" ] ; then
     case "${OS_TYPE}" in
         debian|suse)
             echo $instance > $HNAME
