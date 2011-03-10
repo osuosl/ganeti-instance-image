@@ -25,14 +25,18 @@ set -e
 
 debug set -x
 
-if [ -e ${TARGET}/etc/debian_version ] ; then
-    echo "Debian/Ubuntu create keys at install time, skipping"
-    exit 0
-fi
-
 HOST_KEY="/etc/ssh/ssh_host_key"
 RSA_KEY="/etc/ssh/ssh_host_rsa_key"
 DSA_KEY="/etc/ssh/ssh_host_dsa_key"
+
+if [ -e ${TARGET}/etc/debian_version ] ; then
+    echo "Debian/Ubuntu: replace existing ssh keys"
+    [ -f "${TARGET}/${RSA_KEY}" ] && rm -f ${TARGET}/${RSA_KEY} && \
+        ssh-keygen -t rsa -q -N '' -f ${TARGET}/${RSA_KEY}
+    [ -f "${TARGET}/${DSA_KEY}" ] && rm -f ${TARGET}/${DSA_KEY} && \
+        ssh-keygen -t dsa -q -N '' -f ${TARGET}/${DSA_KEY}
+    exit 0
+fi
 
 for key in $HOST_KEY $RSA_KEY $DSA_KEY ; do
     if [ -f "${TARGET}/${key}" ] ; then
