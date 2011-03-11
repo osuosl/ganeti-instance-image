@@ -1,3 +1,10 @@
+ganeti-instance-image (0.4-1+gitaf758a63) lenny-backports; urgency=low
+
+  * git revision af758a63c8776e0dc0f310f296cdc181fa31b011. 
+  * fixes for FTBFS
+
+ -- hoonet local system user <hoouser@hpedebsv19.hpe.hoonet.org>  Mon, 20 Dec 2010 09:34:15 +0100
+
 ganeti-instance-image (0.4-1) unstable; urgency=low
 
   * Initial release

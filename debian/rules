@@ -6,7 +6,10 @@
 
 
 config.status: configure
+
+configure:
 	dh_testdir
+	./autogen.sh
 	./configure $(CROSS) --prefix=/usr --localstatedir=/var --sysconfdir=/etc
 
 build: build-stamp
@@ -28,6 +31,7 @@ clean:
 	# Add here commands to clean up after the build process.
 	[ ! -f Makefile ] || $(MAKE) distclean
 	rm -f config.sub config.guess
+	rm -rf aclocal.m4 autotools configure Makefile.in
 
 	dh_clean 
 
@@ -53,7 +57,7 @@ binary-arch: build install
 	dh_installchangelogs ChangeLog
 	dh_installdocs
 	dh_installexamples
-#	dh_install
+	dh_install
 #	dh_installmenu
 #	dh_installdebconf	
 #	dh_installlogrotate

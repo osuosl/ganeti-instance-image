@@ -2,15 +2,16 @@ Source: ganeti-instance-image
 Section: admin
 Priority: extra
 Maintainer: Ed Lim <Edward.Lim@oregonstate.edu>
-Build-Depends: debhelper (>= 7), autotools-dev
+Build-Depends: debhelper (>= 7), autotools-dev, automake, dump, 
+ kpartx, qemu (>= 0.9)
 Standards-Version: 3.7.3
 Homepage: http://code.osuosl.org/projects/ganeti-image
 Vcs-Browser: http://git.osuosl.org/?p=ganeti-instance-image.git
 Vcs-Git: git://git.osuosl.org/ganeti-instance-image.git
 
 Package: ganeti-instance-image
-Architecture: any
-Depends: ${misc:Depends}, dump, kpartx
+Architecture: all
+Depends: ${misc:Depends}, dump, kpartx, qemu (>= 0.9)
 Conflicts: ganeti (<< 1.2.7)
 Enhances: ganeti
 Description: image based instance OS defintion for ganeti
