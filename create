@@ -70,8 +70,15 @@ if [ "$CDINSTALL" = "no" ] ; then
     if [ "${IMAGE_TYPE}" = "tarball" -o "${IMAGE_TYPE}" = "dump" ] ; then
         mkfs_disk0
         root_uuid="$($VOL_ID $root_dev)"
-        [ -n "$boot_dev" ] && boot_uuid="$($VOL_ID $boot_dev)"
-        [ -n "$swap_dev" ] && swap_uuid="$($VOL_ID $swap_dev)"
+        [ -z "$root_uuid" ] && echo "root_uuid not set" && exit 1
+        if [ -n "$boot_dev" ] ; then
+            boot_uuid="$($VOL_ID $boot_dev)"
+            [ -z "$boot_uuid" ] && echo "boot_uuid not set" && exit 1
+        fi
+        if [ -n "$swap_dev" ] ; then
+            swap_uuid="$($VOL_ID $swap_dev)"
+            [ -z "$swap_uuid" ] && echo "swap_uuid not set" && exit 1
+        fi
     fi
 
     TARGET=`mktemp -d` || exit 1
