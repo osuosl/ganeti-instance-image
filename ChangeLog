@@ -1,3 +1,11 @@
+2011-03-25  Lance Albertson <lance@osuosl.org>
+    * Released 0.5
+    * Fixed rename
+    * Fixed Debian/Redhat package files
+    * CDINSTALL no set to "no" by default
+    * Fixed hostname setting
+    * New hook for dyanmic DNS
+
 2010-05-07  Lance Albertson <lance@osuosl.org>
 	* Released 0.4
 	* Add partial grub2 support
