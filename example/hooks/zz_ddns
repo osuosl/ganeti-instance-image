@@ -1,0 +1,82 @@
+#!/bin/bash
+
+# Copyright (C) 2011 Oregon State University
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301, USA.
+#
+# This is an example script that configures your DHCP clients to set "send
+# host-name" so that Dynamic DNS work properly after installation.
+
+set -e
+
+. common.sh
+
+debug set -x
+
+FQDN="${INSTANCE_NAME}"
+SHORT_NAME="$(echo ${INSTANCE_NAME} | cut -d . -f 1)"
+
+if [ -z "${TARGET}" -o ! -d "${TARGET}" ] ; then
+    log_error "Missing target directory"
+    exit 1
+fi
+
+
+# Functions
+debian_setup() {
+    local dhclient_conf=""
+    if [ -f "${TARGET}/etc/dhcp/dhclient.conf" ] ; then
+        dhclient_conf="${TARGET}/etc/dhcp/dhclient.conf"
+    elif [ -f "${TARGET}/etc/dhcp3/dhclient.conf" ] ; then
+        dhclient_conf="${TARGET}/etc/dhcp3/dhclient.conf"
+    else
+        log_error "Missing dhclient.conf file"
+        exit 1
+    fi
+
+    if [ -n "${FQDN}" ] ; then
+        echo "send host-name ${SHORT_NAME};" >> ${TARGET}/etc/dhcp/dhclient.conf
+    fi
+}
+
+redhat_setup() {
+    if [ ! -f "${TARGET}/etc/sysconfig/network-scripts/ifcfg-eth0" ] ; then
+        log_error "Missing ifcfg-eth0 file"
+        exit 1
+    fi
+    if [ -n "${FQDN}" ] ; then
+        echo "DHCP_HOSTNAME=${SHORT_NAME}" >> ${TARGET}/etc/sysconfig/network-scripts/ifcfg-eth0
+    fi
+}
+
+gentoo_setup() {
+    echo "no action needed for ddns"
+}
+
+suse_setup() {
+    echo "untested for suse"
+}
+
+# Main
+get_os_type $TARGET
+
+if [ "${NIC_COUNT}" -gt 0 -a -n "${OS_TYPE}" ] ; then
+    ${OS_TYPE}_setup
+else
+    log_error "Unsupported OS_TYPE"
+fi
+
+exit 0
