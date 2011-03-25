@@ -70,8 +70,8 @@ if [ "$CDINSTALL" = "no" ] ; then
     if [ "${IMAGE_TYPE}" = "tarball" -o "${IMAGE_TYPE}" = "dump" ] ; then
         mkfs_disk0
         root_uuid="$($VOL_ID $root_dev)"
-        [ -n "$boot_dev" ] && boot_uuid="$($VOL_ID $boot_dev)"
-        [ -n "$swap_dev" ] && swap_uuid="$($VOL_ID $swap_dev)"
+        [ -n "$boot_dev" ] && sleep 1 && boot_uuid="$($VOL_ID $boot_dev)"
+        [ -n "$swap_dev" ] && sleep 1 && swap_uuid="$($VOL_ID $swap_dev)"
     fi
 
     TARGET=`mktemp -d` || exit 1
