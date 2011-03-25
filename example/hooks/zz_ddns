@@ -48,7 +48,7 @@ debian_setup() {
     fi
 
     if [ -n "${FQDN}" ] ; then
-        echo "send host-name ${SHORT_NAME};" >> ${TARGET}/etc/dhcp/dhclient.conf
+        echo "send host-name ${SHORT_NAME};" >> ${dhclient_conf}
     fi
 }
 
