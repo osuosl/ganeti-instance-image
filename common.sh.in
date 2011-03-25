@@ -164,7 +164,7 @@ format_disk0() {
         # 1 - 100MB /boot, bootable
         # 2 - Size of Memory, swap
         # 3 - Rest
-        $sfdisk_cmd <<EOF
+        $sfdisk_cmd > /dev/null <<EOF
 ,100,L,*
 ,${SWAP_SIZE},S
 ,,L
@@ -173,7 +173,7 @@ EOF
         # Create two partitions:
         # 1 - 100MB /boot, bootable
         # 2 - Rest
-        $sfdisk_cmd <<EOF
+        $sfdisk_cmd > /dev/null <<EOF
 ,100,L,*
 ,,L
 EOF
@@ -181,14 +181,14 @@ EOF
         # Create two partitions:
         # 1 - Size of Memory, swap
         # 2 - Rest
-        $sfdisk_cmd <<EOF
+        $sfdisk_cmd > /dev/null <<EOF
 ,$SWAP_SIZE,S
 ,,L
 EOF
     elif [  "${SWAP}" = "no" -a -n "${KERNEL_PATH}" ] ; then
         # Create two partitions:
         # 1 - Whole
-        $sfdisk_cmd <<EOF
+        $sfdisk_cmd > /dev/null <<EOF
 ,,L
 EOF
     fi
@@ -197,15 +197,15 @@ EOF
 mkfs_disk0() {
     local mkfs="mkfs.${FILESYSTEM}"
     # Format /
-    $mkfs -Fq -L / $root_dev
+    $mkfs -Fq -L / $root_dev > /dev/null
     # Format /boot
     if [ -n "${boot_dev}" ] ; then
-        $mkfs -Fq -L /boot $boot_dev
+        $mkfs -Fq -L /boot $boot_dev > /dev/null
     fi
     # Format swap
     if [ -n "${swap_dev}" ] ; then
         # Format swap
-        mkswap -f $swap_dev
+        mkswap -f $swap_dev > /dev/null
     fi
     # During reinstalls, ext4 needs a little time after a mkfs so add it here
     sleep 2

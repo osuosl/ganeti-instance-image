@@ -96,7 +96,7 @@ if [ "${IMAGE_TYPE}" != "qemu" ] && \
     if [ -e "${boot_dir}/menu.lst" ] ; then
         # install grub to the block device
         chroot ${TARGET} grub --batch --no-floppy \
-            --device-map=/boot/grub/device.map <<EOF
+            --device-map=/boot/grub/device.map > /dev/null <<EOF
 root (hd0,0)
 setup (hd0)
 quit
@@ -131,7 +131,7 @@ EOF
         sed -ie 's/.*GRUB_HIDDEN_TIMEOUT_QUIET=.*/GRUB_HIDDEN_TIMEOUT_QUIET=false/' ${TARGET}/etc/default/grub
         # install grub2 MBR
         chroot ${TARGET} grub-setup --force --device-map=/boot/grub/device.map \
-            --directory=/boot/grub --root-device="(hd0,1)" "(hd0)"
+            --directory=/boot/grub --root-device="(hd0,1)" "(hd0)" > /dev/null
     fi
 fi
 
