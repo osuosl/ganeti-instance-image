@@ -1,5 +1,6 @@
 2011-03-25  Lance Albertson <lance@osuosl.org>
     * Released 0.5
+    * Moved hooks directory to match upstream
     * Fixed rename
     * Fixed Debian/Redhat package files
     * CDINSTALL no set to "no" by default
