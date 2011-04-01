@@ -1,17 +1,17 @@
 Source: ganeti-instance-image
 Section: admin
 Priority: extra
-Maintainer: Ed Lim <Edward.Lim@oregonstate.edu>
+Maintainer: Lance Albertson <lance@osuosl.org>
 Build-Depends: debhelper (>= 7), autotools-dev, automake, dump, 
- kpartx, qemu (>= 0.9)
+ kpartx, qemu (>= 0.11) | qemu-kvm (>= 0.11)
 Standards-Version: 3.7.3
 Homepage: http://code.osuosl.org/projects/ganeti-image
 Vcs-Browser: http://git.osuosl.org/?p=ganeti-instance-image.git
-Vcs-Git: git://git.osuosl.org/ganeti-instance-image.git
+Vcs-Git: git://git.osuosl.org/gitolite/ganeti/ganeti-instance-image.git
 
 Package: ganeti-instance-image
 Architecture: all
-Depends: ${misc:Depends}, dump, kpartx, qemu (>= 0.9)
+Depends: ${misc:Depends}, dump, kpartx, qemu (>= 0.11) | qemu-kvm (>= 0.11)
 Conflicts: ganeti (<< 1.2.7)
 Enhances: ganeti
 Description: image based instance OS defintion for ganeti
