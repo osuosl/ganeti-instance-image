@@ -1,13 +1,13 @@
 %define         instancename    image
 Name:		ganeti-instance-image
-Version:	0.4
-Release:	3%{?dist}
+Version:	0.5
+Release:	1%{?dist}
 Summary:	Guest OS definition for Ganeti based on Linux-based images
 
 Group:		System Environment/Daemons
 License:	GPLv2
 URL:		http://code.osuosl.org/projects/ganeti-image
-Source0:	http://code.osuosl.org/attachments/download/3/%{name}-%{version}.tar.gz
+Source0:	http://code.osuosl.org/attachments/download/1893/%{name}-%{version}.tar.gz
 BuildRoot:	%(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 BuildRequires:	qemu-img, dump, tar
 Requires:       qemu-img, dump, tar, ganeti
@@ -61,12 +61,15 @@ rm -rf $RPM_BUILD_ROOT
 %doc COPYING README NEWS example/hooks/*
 %config(noreplace) %{_sysconfdir}/ganeti/instance-%{instancename}/variants/default.conf
 %config(noreplace) %{_sysconfdir}/ganeti/instance-%{instancename}/variants.list
-%config(noreplace) %{_sysconfdir}/ganeti/instance-%{instancename}.d/*
+%config(noreplace) %{_sysconfdir}/ganeti/instance-%{instancename}/hooks/*
 %{_libdir}/ganeti/os/%{instancename}/*
 
 
 
 %changelog
+* Fri Apr  1 2011 Lance Albertson <lance osuosl org>
+- Version bump to 0.5
+
 * Tue Nov  9 2010 Stephen Fromm <stephenf nero net>
 - Fix handling of variants.list in /usr/lib/ganeti/os/<name>
 
