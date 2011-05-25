@@ -143,12 +143,20 @@ routes_eth0=( "default gw ${GATEWAY}" )
 EOF
     fi
 
+    chroot ${TARGET} ln -sf /etc/init.d/net.lo /etc/init.d/net.eth0
     chroot ${TARGET} rc-update add net.eth0 default
 
     if [ -n "${FQDN}" ] ; then
-        cat > ${TARGET}/etc/conf.d/hostname << EOF
+        # baselayout-2.x
+        if [ -d "${TARGET}/usr/share/openrc/" ] ; then
+            cat > ${TARGET}/etc/conf.d/hostname << EOF
+hostname="${SHORT_NAME}"
+EOF
+        else
+            cat > ${TARGET}/etc/conf.d/hostname << EOF
 HOSTNAME="${SHORT_NAME}"
 EOF
+        fi
     fi
 }
 

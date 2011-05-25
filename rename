@@ -60,9 +60,16 @@ case "${OS_TYPE}" in
         ;;
     gentoo)
         HNAME="${TARGET}/etc/conf.d/hostname"
-        OLD_HNAME="$(grep HOSTNAME ${HNAME} | \
-            sed -e 's/HOSTNAME=//' | \
-            sed -e s/\"//g)"
+        # baselayout-2.x support
+        if [ -d ${TARGET}/usr/share/openrc ] ; then
+            OLD_HNAME="$(grep hostname ${HNAME} | \
+                sed -e 's/hostname=//' | \
+                sed -e s/\"//g)"
+        else
+            OLD_HNAME="$(grep HOSTNAME ${HNAME} | \
+                sed -e 's/HOSTNAME=//' | \
+                sed -e s/\"//g)"
+        fi
         ;;
     suse)
         HNAME="${TARGET}/etc/HOSTNAME"
@@ -81,7 +88,11 @@ if [ "$OLD_HNAME" = "$old_name" \
             sed -ie "s/HOSTNAME=${OLD_HNAME}/HOSTNAME=${instance}/" $HNAME
             ;;
         gentoo)
-            sed -ie "s/HOSTNAME.*/HOSTNAME=\"${OLD_HNAME}}\"/" $HNAME
+            if [ -d ${TARGET}/usr/share/openrc ] ; then
+                sed -ie "s/hostname.*/hostname=\"${instance}\"/" $HNAME
+            else
+                sed -ie "s/HOSTNAME.*/HOSTNAME=\"${instance}\"/" $HNAME
+            fi
             ;;
     esac
 else
