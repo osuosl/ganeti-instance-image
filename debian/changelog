@@ -1,3 +1,10 @@
+ganeti-instance-image (0.5.1-1) unstable; urgency=high
+  * Bugfix release
+  * Ticket #4785 - blkid sometimes didn't return a value
+  * Ticket #5685 - baselayout-2.x support for gentoo guests
+
+ -- Lance Albertson <lance@osuosl.org>  Fri, 25 May 2011 14:18:35 -0700
+
 ganeti-instance-image (0.5-1) unstable; urgency=low
   * Version bump
 

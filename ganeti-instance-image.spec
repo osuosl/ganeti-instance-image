@@ -1,6 +1,6 @@
 %define         instancename    image
 Name:		ganeti-instance-image
-Version:	0.5
+Version:	0.5.1
 Release:	1%{?dist}
 Summary:	Guest OS definition for Ganeti based on Linux-based images
 
@@ -67,6 +67,11 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Wed May 25 2011 Lance Albertson <lance osuosl org>
+- Bugfix release
+- Ticket #4785 - blkid sometimes didn't return a value
+- Ticket #5685 - baselayout-2.x support for gentoo guests
+
 * Fri Apr  1 2011 Lance Albertson <lance osuosl org>
 - Version bump to 0.5
 

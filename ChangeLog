@@ -1,3 +1,8 @@
+2011-05-25  Lance Albertson <lance@osuosl.org>
+    * Bugfix release
+    * Ticket #4785 - blkid sometimes didn't return a value
+    * Ticket #5685 - baselayout-2.x support for gentoo guests
+
 2011-03-25  Lance Albertson <lance@osuosl.org>
     * Released 0.5
     * Moved hooks directory to match upstream
