@@ -390,8 +390,8 @@ SCRIPT_NAME=$(basename $0)
 KERNEL_PATH="$INSTANCE_HV_kernel_path"
 
 if [ -f /sbin/blkid -a -x /sbin/blkid ]; then
-    VOL_ID="/sbin/blkid -o value -s UUID"
-    VOL_TYPE="/sbin/blkid -o value -s TYPE"
+    VOL_ID="/sbin/blkid -c /dev/null -o value -s UUID"
+    VOL_TYPE="/sbin/blkid -c /dev/null -o value -s TYPE"
 else
     for dir in /lib/udev /sbin; do
         if [ -f $dir/vol_id -a -x $dir/vol_id ]; then
