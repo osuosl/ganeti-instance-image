@@ -31,8 +31,7 @@ debootstrap.
 %configure \
     --prefix=%{_prefix} \
     --sysconfdir=%{_sysconfdir} \
-    --localstatedir=%{_localstatedir} \
-    --with-os-dir=%{_libdir}/ganeti/os
+    --localstatedir=%{_localstatedir}
 make %{?_smp_mflags}
 
 
@@ -46,7 +45,7 @@ rm -rf $RPM_BUILD_ROOT/%{_datadir}/doc/%{name}
 # Workaround issue #92 http://code.google.com/p/ganeti/issues/detail?id=92
 # The install scripts create a symlink using the fully qualified path
 # that includes the build root path.
-pushd $RPM_BUILD_ROOT%{_libdir}/ganeti/os/%{instancename}
+pushd $RPM_BUILD_ROOT%{_datadir}/ganeti/os/%{instancename}
 rm -f variants.list
 ln -s ../../../../..%{_sysconfdir}/ganeti/instance-%{instancename}/variants.list variants.list
 popd
@@ -62,13 +61,14 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/ganeti/instance-%{instancename}/variants/default.conf
 %config(noreplace) %{_sysconfdir}/ganeti/instance-%{instancename}/variants.list
 %config(noreplace) %{_sysconfdir}/ganeti/instance-%{instancename}/hooks/*
-%{_libdir}/ganeti/os/%{instancename}/*
+%{_datadir}/ganeti/os/%{instancename}/*
 
 
 
 %changelog
 * Thu May 26 2011 Stephen Fromm <stephenf nero net>
 - Fix dependencies and Source0 URL.
+- Default to %datadir for os-dir.  Eliminates the arch problem with %libdir
 
 * Wed May 25 2011 Lance Albertson <lance osuosl org>
 - Bugfix release
