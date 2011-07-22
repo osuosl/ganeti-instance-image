@@ -15,20 +15,25 @@ OS_API_VERSION="15"
 
 # do stuff
 output="$(gnt-instance activate-disks $INSTANCE_NAME)"
+CLEANUP+=("gnt-instance deactivate-disks $INSTANCE_NAME")
 
 DISK_0_PATH="${output/*disk\/0\:/}"
 
-. /usr/share/ganeti/os/image/common.sh
+. @osdir@/@osname@/common.sh
+
+if [ -n "$2" ] ; then
+    IMAGE_DIR=$2
+fi
 
 filesystem_dev=$(map_disk0 $blockdev)
+CLEANUP+=("unmap_disk0 $blockdev")
 root_dev=$(map_partition $filesystem_dev root)
 boot_dev=$(map_partition $filesystem_dev boot)
 
-target="/tmp/${INSTANCE_NAME}_root"
-mkdir -p $target
+if [ -n "$boot_dev" ] ; then
+    echo "Creating dump from $INSTANCE_NAME for boot at ${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}-boot.dump"
+    dump -0 -q -z9 -f ${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}-boot.dump $boot_dev
+fi
 
-# mount filesystems
-mount_disk0 $target
-echo "$INSTANCE_NAME is now mounted at $target"
-
-CLEANUP=( )
+echo "Creating dump from $INSTANCE_NAME for root at ${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}-root.dump"
+dump -0 -q -z9 -f ${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}-root.dump $root_dev

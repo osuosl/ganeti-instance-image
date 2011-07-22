@@ -20,7 +20,7 @@ output="$(gnt-instance activate-disks $INSTANCE_NAME)"
 DISK_0_PATH="${output/*disk\/0\:/}"
 filesystem_dev="${DISK_0_PATH/\/dev\//}"
 
-. /usr/share/ganeti/os/image/common.sh
+. @osdir@/@osname@/common.sh
 
 target="/tmp/${INSTANCE_NAME}_root"
 

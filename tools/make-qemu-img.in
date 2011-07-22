@@ -19,7 +19,7 @@ CLEANUP+=("gnt-instance deactivate-disks $INSTANCE_NAME")
 
 DISK_0_PATH="${output/*disk\/0\:/}"
 
-. /usr/share/ganeti/os/image/common.sh
+. @osdir@/@osname@/common.sh
 
 if [ -n "$2" ] ; then
     IMAGE_DIR=$2
