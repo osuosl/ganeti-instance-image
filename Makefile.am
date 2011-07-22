@@ -8,28 +8,46 @@ networksdir=${sysconfdir}/ganeti/instance-image/networks
 overlaysdir=${sysconfdir}/ganeti/instance-image/overlays
 toolsdir=$(OS_DIR)/$(osname)/tools
 
-dist_os_SCRIPTS = create import export rename
-dist_tools_SCRIPTS = tools/*
-dist_os_DATA = ganeti_api_version
-dist_config_DATA = variants.list
+dist_os_SCRIPTS = ${srcdir}/create ${srcdir}/import ${srcdir}/export ${srcdir}/rename
+dist_tools_SCRIPTS = ${srcdir}/tools/*
+dist_os_DATA = ${srcdir}/ganeti_api_version
+dist_config_DATA = ${srcdir}/variants.list
 os_DATA = common.sh
 
-dist_custom_DATA = example/hooks/*
+dist_custom_DATA = ${srcdir}/example/hooks/*
 
-dist_doc_DATA = COPYING NEWS README.markdown
+dist_doc_DATA = ${srcdir}/COPYING ${srcdir}/NEWS ${srcdir}/README.markdown
 
 EXTRA_DIST = common.sh.in defaults
 
-common.sh: common.sh.in 
+edit = sed \
+	   -e 's|@sysconfdir[@]|$(sysconfdir)|g' \
+	   -e 's|@localstatedir[@]|$(localstatedir)|g' \
+	   -e 's|@osdir[@]|$(OS_DIR)|g' \
+	   -e 's|@osname[@]|$(osname)|g' \
+	   -e 's|@AWK[@]|$(AWK)|g' \
+	   -e 's|@MKDIR_P[@]|$(MKDIR_P)|g' \
+	   -e 's|@DUMP[@]|$(DUMP)|g' \
+	   -e 's|@LOSETUP[@]|$(LOSETUP)|g' \
+	   -e 's|@KPARTX[@]|$(KPARTX)|g' \
+	   -e 's|@SFDISK[@]|$(SFDISK)|g' \
+	   -e 's|@QEMU_IMG[@]|$(QEMU_IMG)|g'
+
+common.sh: $(srcdir)/common.sh.in Makefile
+	rm -f $@ $@.tmp
+	srcdir=''; \
+		   test -f ./$@.in || srcdir=$(srcdir)/; \
+		   $(edit) $${srcdir}$@.in >$@.tmp
+	mv $@.tmp $@
 
 install-exec-local:
-	@mkdir_p@ "$(DESTDIR)$(osdir)"
+	@mkdir_p@ "$(DESTDIR)$(OS_DIR)/$(osname)"
 	@mkdir_p@ "$(DESTDIR)$(variantsdir)"
 	@mkdir_p@ "$(DESTDIR)$(networksdir)/subnets"
 	@mkdir_p@ "$(DESTDIR)$(networksdir)/instances"
 	@mkdir_p@ "$(DESTDIR)$(overlaysdir)"
 	@mkdir_p@ "$(DESTDIR)$(localstatedir)/cache/ganeti-instance-image"
 	touch "$(DESTDIR)$(variantsdir)/default.conf"
-	ln -s $(DESTDIR)$(configdir)/variants.list $(DESTDIR)$(osdir)/variants.list
+	ln -fs $(DESTDIR)$(configdir)/variants.list $(DESTDIR)$(OS_DIR)/$(osname)/variants.list
 
 CLEANFILES = common.sh

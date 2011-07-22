@@ -10,7 +10,7 @@ AM_INIT_AUTOMAKE([1.9 foreign tar-ustar -Wall -Wno-portability])
 AC_ARG_WITH([os-dir],
   [AS_HELP_STRING([--with-os-dir=DIR],
     [top-level OS directory under which to install]
-    [ (default is $datadir/ganeti/os)]
+    [ [DATADIR/ganeti/os]]
   )],
   [os_dir="$withval"],
   [os_dir="$datadir/ganeti/os"])
@@ -20,7 +20,7 @@ AC_SUBST(OS_DIR, $os_dir)
 AC_ARG_WITH([default-dir],
   [AS_HELP_STRING([--with-default-dir=DIR],
     [top-level default config directory under which to install]
-    [ (default is $sysconfdir/default)]
+    [ [SYSCONFDIR/default]]
   )],
   [default_dir="$withval"],
   [default_dir="$sysconfdir/default"])
@@ -59,7 +59,6 @@ fi
 
 AC_CONFIG_FILES([
     Makefile
-    common.sh
 ])
 
 AC_OUTPUT
