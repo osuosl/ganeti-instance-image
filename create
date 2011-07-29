@@ -29,6 +29,9 @@ elif [ "$IMAGE_TYPE" = "qemu" ] ; then
     IMAGE_FILE="${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}.img"
 elif [ "$IMAGE_TYPE" = "dump" ] ; then
     IMAGE_FILE="${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}-root.dump"
+    # Workaround for restore's non-unique /tmp/rstdir* and /tmp/rstmode*
+    export TMPDIR=$(mktemp -d /tmp/${INSTANCE_NAME}_XXXXXXXX)
+    CLEANUP+=("rmdir --ignore-fail-on-non-empty $TMPDIR")
 fi
 
 if [ "$CDINSTALL" = "no" ] ; then
