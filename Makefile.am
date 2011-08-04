@@ -34,10 +34,15 @@ edit = sed \
 	   -e 's|@SFDISK[@]|$(SFDISK)|g' \
 	   -e 's|@QEMU_IMG[@]|$(QEMU_IMG)|g'
 
-tools_builddir:
-	@mkdir_p@ tools
+common.sh: Makefile
+	rm -f $@ $@.tmp
+	srcdir=''; \
+		   test -f ./$@.in || srcdir=$(srcdir)/; \
+		   $(edit) $${srcdir}$@.in >$@.tmp
+	mv $@.tmp $@
 
-$(tools_SCRIPTS) common.sh: Makefile
+$(tools_SCRIPTS): Makefile
+	@mkdir_p@ tools
 	rm -f $@ $@.tmp
 	srcdir=''; \
 		   test -f ./$@.in || srcdir=$(srcdir)/; \
@@ -45,10 +50,10 @@ $(tools_SCRIPTS) common.sh: Makefile
 	mv $@.tmp $@
 
 common.sh: $(srcdir)/common.sh.in
-tools/make-dump: $(srcdir)/tools/make-dump.in tools_builddir
-tools/make-qemu-img: $(srcdir)/tools/make-qemu-img.in tools_builddir
-tools/mount-disks: $(srcdir)/tools/mount-disks.in tools_builddir
-tools/umount-disks: $(srcdir)/tools/umount-disks.in tools_builddir
+tools/make-dump: $(srcdir)/tools/make-dump.in
+tools/make-qemu-img: $(srcdir)/tools/make-qemu-img.in
+tools/mount-disks: $(srcdir)/tools/mount-disks.in
+tools/umount-disks: $(srcdir)/tools/umount-disks.in
 
 install-exec-local:
 	@mkdir_p@ "$(DESTDIR)$(OS_DIR)/$(osname)"
