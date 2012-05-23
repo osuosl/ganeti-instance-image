@@ -1,0 +1,101 @@
+#!/bin/bash
+
+# Copyright (C) 2012 Oregon State University
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301, USA.
+
+set -e
+
+[ $GANETI_DEBUG ] && set -x
+IMAGE_DIR=
+INSTANCE_NAME=
+IMAGE_NAME=
+ARCH=
+HOSTNAME="$(hostname)"
+
+run_help() {
+    echo "Usage: $0 [-d PATH] [-n NAME] [-a ARCH] -i INSTANCE"
+    echo
+    echo "Create an image tarball of a ganeti instance."
+    echo
+    echo "-d PATH       Path of where to put the tarball"
+    echo "-i INSTANCE   Name of the instance"
+    echo "-n NAME       Name of the tarball image"
+    echo "-a ARCH       Architecture of the image"
+    echo
+    echo "This utility must be used on the master node. All optional args will"
+    echo "have defaults if you do not set them."
+    exit 0
+}
+
+while getopts "hd:i:a:n:" opt ; do
+    case $opt in
+        d)
+            IMAGE_DIR="$OPTARG"
+            ;;
+        i)
+            INSTANCE_NAME="$OPTARG"
+            ;;
+        n)
+            IMAGE_NAME="$OPTARG"
+            ;;
+        a)
+            ARCH="$OPTARG"
+            ;;
+        h)
+            run_help
+            ;;
+        *)
+            ;;
+    esac
+done
+
+#[ -z "$IMAGE_DIR" ] && echo "Error: Image path not set" && exit 1
+[ -z "$INSTANCE_NAME" ] && echo "Error: Instance name not set" && exit 1
+
+# Am I master?
+if [ "$(gnt-cluster getmaster)" != "${HOSTNAME}" ] ; then
+    echo "ERROR: Command must be run from master node"
+    exit 1
+fi
+
+# Gather some information
+info=($(gnt-instance list -o os,hypervisor,disk.count --no-headers --separator=' ' $INSTANCE_NAME))
+OS_VARIANT="${info[0]/*+/}"
+HYPERVISOR="${info[1]}"
+DISK_COUNT="${info[2]}"
+OS_API_VERSION="15"
+
+# Activate disks and capture output
+ad_output=($(gnt-instance activate-disks $INSTANCE_NAME | sed -e 's/\:/ /g'))
+
+# Get node/disk path
+NODE="${ad_output[0]}"
+DISK_0_PATH="${ad_output[2]}"
+
+export OS_VARIANT HYPERVISOR DISK_COUNT OS_API_VERSION DISK_0_PATH
+
+echo "Creating tgz from $INSTANCE_NAME in ${IMAGE_DIR} from node $NODE"
+
+if [ "$NODE" == "$HOSTNAME" ] ; then
+    /usr/share/ganeti/os/image/tools/make-tgz-image -i $INSTANCE_NAME \
+        -m $IMAGE_DIR -n $IMAGE_NAME -a $ARCH
+else
+    ssh $NODE /usr/share/ganeti/os/image/tools/make-tgz-image \
+        -i $INSTANCE_NAME -m $IMAGE_DIR -n $IMAGE_NAME -a $ARCH
+fi
+
+gnt-instance deactivate-disks $INSTANCE_NAME

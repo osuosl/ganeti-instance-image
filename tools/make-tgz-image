@@ -1,0 +1,106 @@
+#!/bin/bash
+
+# Copyright (C) 2012 Oregon State University
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301, USA.
+
+set -e
+
+[ $GANETI_DEBUG ] && set -x
+IMAGE_DIR2=
+INSTANCE_NAME=
+IMAGE_NAME2=
+ARCH2=
+
+run_help() {
+    echo "Usage: $0 -n NAME -m IMAGE_DIR -a ARCH -i INSTANCE_NAME"
+    echo
+    echo "Create an image tarball of a ganeti instance."
+    echo
+    echo "-m IMAGE_DIR      Path of where to put the tarball"
+    echo "-i INSTANCE_NAME  Name of the instance"
+    echo "-n IMAGE_NAME     Name of the tarball image"
+    echo "-a ARCH           Architecture of the image"
+    echo
+    echo "This is a helper utility for the ganeti-image script"
+    exit 0
+}
+
+while getopts ":hi:a:n:m:" opt ; do
+    case $opt in
+        m)
+            IMAGE_DIR2="$OPTARG"
+            ;;
+        i)
+            INSTANCE_NAME="$OPTARG"
+            ;;
+        n)
+            IMAGE_NAME2="$OPTARG"
+            ;;
+        a)
+            ARCH2="$OPTARG"
+            ;;
+        h)
+            run_help
+            ;;
+        *)
+            ;;
+    esac
+done
+
+. /usr/share/ganeti/os/image/common.sh
+
+# Set overrides
+[ -n "$IMAGE_DIR2" ]        && IMAGE_DIR=$IMAGE_DIR2
+[ -n "$IMAGE_NAME2" ]       && IMAGE_NAME=$IMAGE_NAME2
+[ -n "$ARCH2" ]             && ARCH=$ARCH2
+
+# Sanity checks
+[ -z "$IMAGE_DIR" ]     && echo "Error: IMAGE_DIR not set" && exit 1
+[ -z "$INSTANCE_NAME" ] && echo "Error: INSTANCE_NAME not set" && exit 1
+[ -z "$IMAGE_NAME" ]    && echo "Error: IMAGE_NAME not set" && exit 1
+[ -z "$ARCH" ]          && echo "Error: ARCH not set" && exit 1
+[ -z "$OS_VARIANT" ]    && echo "Error: OS_VARIANT not set" && exit 1
+[ -z "$HYPERVISOR" ]    && echo "Error: HYPERVISOR not set" && exit 1
+[ -z "$DISK_COUNT" ]    && echo "Error: DISK_COUNT not set" && exit 1
+[ -z "$OS_API_VERSION" ] && echo "Error: OS_API_VERSION not set" && exit 1
+[ -z "$DISK_0_PATH" ]   && echo "Error: DISK_0_PATH not set" && exit 1
+[ ! -d $IMAGE_DIR ]       && echo "Error: $IMAGE_DIR not found" && exit 1
+
+# Setup partitions w/ kpartx
+filesystem_dev=$(map_disk0 $blockdev)
+CLEANUP+=("unmap_disk0 $blockdev")
+root_dev=$(map_partition $filesystem_dev root)
+boot_dev=$(map_partition $filesystem_dev boot)
+
+# Make temp dir for mounting
+TARGET=`mktemp -d` || exit 1
+CLEANUP+=("rmdir $TARGET")
+
+# Mount filesystems
+mount_disk0 $TARGET
+
+OLDPWD=$PWD
+cd $TARGET
+
+# tar all the things ! \o/
+if [ -x /usr/bin/pigz ] ; then
+    tar -I pigz --numeric-owner -cpf ${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}.tar.gz .
+else
+    tar --numeric-owner -zcpf ${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}.tar.gz .
+fi
+
+cd $OLDPWD
