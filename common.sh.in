@@ -159,6 +159,14 @@ get_os_release() {
 }
 
 format_disk0() {
+    if [ "${USE_PARTED}" = "yes" ]; then
+        format_disk0_parted "$1"
+    else
+        format_disk0_sfdisk "$1"
+    fi
+}
+
+format_disk0_sfdisk() {
     local sfdisk_cmd="$SFDISK -uM -H 255 -S 63 --quiet --Linux --DOS $1"
     if [ "${SWAP}" = "yes" ] && [ -z "$SWAP_SIZE" ] ; then
         log_error "SWAP_SIZE not set however SWAP is enabled"
@@ -196,6 +204,42 @@ EOF
         $sfdisk_cmd > /dev/null <<EOF
 ,,L,*
 EOF
+    fi
+}
+
+format_disk0_parted() {
+    local parted_cmd="parted $1 --script --"
+    if [  "${SWAP}" = "yes" -a -z "${KERNEL_PATH}" ] ; then
+        # Create three partitions:
+        # 1 - $BOOT_SIZE /boot, bootable
+        # 2 - Size of Memory, swap
+        # 3 - Rest
+        $parted_cmd mklabel msdos
+        $parted_cmd mkpart primary 0% ${BOOT_SIZE}M
+        $parted_cmd mkpart primary ${BOOT_SIZE}M $((${BOOT_SIZE}+$SWAP_SIZE))M
+        $parted_cmd mkpart primary $((${BOOT_SIZE}+$SWAP_SIZE))M 100%
+        $parted_cmd set 1 boot on
+
+    elif [  "${SWAP}" = "no" -a -z "${KERNEL_PATH}" ] ; then
+        # Create two partitions:
+        # 1 - $BOOT_SIZE /boot, bootable
+        # 2 - Rest
+        $parted_cmd mklabel msdos
+        $parted_cmd mkpart primary 0% ${BOOT_SIZE}M
+        $parted_cmd mkpart primary ${BOOT_SIZE}M 100%
+        $parted_cmd set 1 boot on
+    elif [  "${SWAP}" = "yes" -a -n "${KERNEL_PATH}" ] ; then
+        # Create two partitions:
+        # 1 - Size of Memory, swap
+        # 2 - Rest
+        $parted_cmd mklabel msdos
+        $parted_cmd mkpart primary 0% ${SWAP_SIZE}M
+        $parted_cmd mkpart primary ${SWAP_SIZE}M 100%
+    elif [  "${SWAP}" = "no" -a -n "${KERNEL_PATH}" ] ; then
+        # Create two partitions:
+        # 1 - Whole
+        $parted_cmd mklabel msdos
+        $parted_cmd mkpart primary 0% 100%
     fi
 }
 
@@ -400,6 +444,7 @@ fi
 : ${EXPORT_DIR:="/tmp"}
 : ${IMAGE_DIR:="@localstatedir@/cache/ganeti-instance-image"}
 : ${IMAGE_DEBUG:="no"}
+: ${USE_PARTED:="no"}
 
 SCRIPT_NAME=$(basename $0)
 KERNEL_PATH="$INSTANCE_HV_kernel_path"
