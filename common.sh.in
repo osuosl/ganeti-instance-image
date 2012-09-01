@@ -24,6 +24,7 @@ KPARTX="@KPARTX@"
 SFDISK="@SFDISK@"
 QEMU_IMG="@QEMU_IMG@"
 MKDIR_P="@MKDIR_P@"
+INSTANCE_MEM=
 
 CLEANUP=( )
 
@@ -159,6 +160,10 @@ get_os_release() {
 
 format_disk0() {
     local sfdisk_cmd="$SFDISK -uM -H 255 -S 63 --quiet --Linux --DOS $1"
+    if [ "${SWAP}" = "yes" ] && [ -z "$SWAP_SIZE" ] ; then
+        log_error "SWAP_SIZE not set however SWAP is enabled"
+        exit 1
+    fi
     if [  "${SWAP}" = "yes" -a -z "${KERNEL_PATH}" ] ; then
         # Create three partitions:
         # 1 - 100MB /boot, bootable
@@ -364,14 +369,16 @@ if [ -f "$DEFAULT_FILE" ]; then
     . "$DEFAULT_FILE"
 fi
 
-# note: we don't set a default mirror since debian and ubuntu have
-# different defaults, and it's better to use the default
+# Variable name change from 2.5 to 2.6
+if [ -n "$INSTANCE_BE_memory" ] ; then
+    INSTANCE_MEM="$INSTANCE_BE_memory"
+else
+    INSTANCE_MEM="$INSTANCE_BE_maxmem"
+fi
 
-# only if the user want to specify a mirror in the defaults file we
-# will use it, this declaration is to make sure the variable is set
 : ${CDINSTALL:="no"}
 : ${SWAP:="yes"}
-: ${SWAP_SIZE:="${INSTANCE_BE_memory}"}
+: ${SWAP_SIZE:="${INSTANCE_MEM}"}
 : ${FILESYSTEM:="ext3"}
 : ${KERNEL_ARGS=""}
 : ${OVERLAY=""}
