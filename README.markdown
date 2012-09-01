@@ -185,10 +185,9 @@ numbers will go up by one. For example:
 
 The naming convention that is used is the following:
 
-tarball:    `$IMAGE_NAME-$ARCH.tar.gz`
-dump:       `$IMAGE_NAME-$ARCH-boot.dump`
-            `$IMAGE_NAME-$ARCH-root.dump`
-qemu-img:   `$IMAGE_NAME-$ARCH.img`
+* tarball:    `$IMAGE_NAME-$ARCH.tar.gz`
+* dump:       `$IMAGE_NAME-$ARCH-boot.dump` `$IMAGE_NAME-$ARCH-root.dump`
+* qemu-img:   `$IMAGE_NAME-$ARCH.img`
 
 ### Useful Scripts
 
@@ -306,4 +305,4 @@ needed into it. Treat the directory as the root of the filesystem. Set `OVERLAY`
 for the variant as the name of the directory. This directory needs to exist on
 all nodes in order to work.
 
-# vi: set tw=80 ft=markdown :
+vi: set tw=80 ft=markdown :
