@@ -13,6 +13,11 @@
 # Make sure you have enough disk space for the swap partition!
 # SWAP_SIZE=""
 
+# BOOT_SIZE: Set the size of the /boot partition (in MB)
+# If left empty, it will use the default setting of 100MB as the size of the
+# /boot volume.
+# BOOT_SIZE=""
+
 # FILESYSTEM: Set which filesystem to format the disks as. Currently only
 # supports ext3 or ext4. Default is ext3.
 # FILESYSTEM="ext3"

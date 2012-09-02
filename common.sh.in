@@ -166,20 +166,20 @@ format_disk0() {
     fi
     if [  "${SWAP}" = "yes" -a -z "${KERNEL_PATH}" ] ; then
         # Create three partitions:
-        # 1 - 100MB /boot, bootable
+        # 1 - $BOOT_SIZE /boot, bootable
         # 2 - Size of Memory, swap
         # 3 - Rest
         $sfdisk_cmd > /dev/null <<EOF
-,100,L,*
+,${BOOT_SIZE},L,*
 ,${SWAP_SIZE},S
 ,,L
 EOF
     elif [  "${SWAP}" = "no" -a -z "${KERNEL_PATH}" ] ; then
         # Create two partitions:
-        # 1 - 100MB /boot, bootable
+        # 1 - $BOOT_SIZE /boot, bootable
         # 2 - Rest
         $sfdisk_cmd > /dev/null <<EOF
-,100,L,*
+,${BOOT_SIZE},L,*
 ,,L
 EOF
     elif [  "${SWAP}" = "yes" -a -n "${KERNEL_PATH}" ] ; then
@@ -385,6 +385,7 @@ fi
 : ${CDINSTALL:="no"}
 : ${SWAP:="yes"}
 : ${SWAP_SIZE:="${INSTANCE_MEM}"}
+: ${BOOT_SIZE:="100"}
 : ${FILESYSTEM:="ext3"}
 : ${KERNEL_ARGS=""}
 : ${OVERLAY=""}
