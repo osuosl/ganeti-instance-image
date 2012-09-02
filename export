@@ -38,7 +38,7 @@ if [ ! "${NOMOUNT}" = "yes" ] ; then
     boot_dev=$(map_partition $filesystem_dev boot)
 fi
 
-TARGET=`mktemp -d` || exit 1
+TARGET=`mktemp -d --tmpdir=${EXPORT_DIR}` || exit 1
 CLEANUP+=("rmdir $TARGET")
 
 if [ "${NOMOUNT}" = "yes" ] ; then

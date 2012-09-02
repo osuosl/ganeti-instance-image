@@ -50,6 +50,10 @@
 # configs such as resolv.conf.
 # OVERLAY=""
 
+# EXPORT_DIR: directory used when exporting an instance
+# (default is: /tmp)
+# EXPORT_DIR="/tmp"
+
 # ARCH: Define the ARCH of the image to use
 # Use either x86 or x86_64
 # ARCH=""
