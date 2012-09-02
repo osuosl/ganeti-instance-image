@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (C) 2010 Oregon State University
+# Copyright (C) 2010, 2011, 2012 Oregon State University
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -94,8 +94,9 @@ if [ "${IMAGE_TYPE}" != "qemu" ] && \
     add_devicemap
 
     if [ -e "${boot_dir}/menu.lst" ] ; then
+        local grub="$(chroot ${TARGET} which grub)"
         # install grub to the block device
-        chroot ${TARGET} grub --batch --no-floppy \
+        chroot ${TARGET} ${grub} --batch --no-floppy \
             --device-map=/boot/grub/device.map > /dev/null <<EOF
 root (hd0,0)
 setup (hd0)
@@ -115,6 +116,8 @@ EOF
     elif [ -e "${boot_dir}/grub.cfg" -a -e "${TARGET}/etc/default/grub" ] ; then
         echo "grub2 support is partially supported"
         echo "please run update-grub after the instance is online"
+
+        local grub_setup="$(chroot ${TARGET} which grub-setup)"
         # check to see if grub is using UUID's and replace if so
         if [ -n "$(grep 'root=UUID' ${boot_dir}/grub.cfg)" ] ; then
             root_uuid="$($VOL_ID $ROOT_DEV)"
@@ -130,7 +133,7 @@ EOF
         sed -ie 's/.*GRUB_HIDDEN_TIMEOUT=.*/GRUB_HIDDEN_TIMEOUT=5/' ${TARGET}/etc/default/grub
         sed -ie 's/.*GRUB_HIDDEN_TIMEOUT_QUIET=.*/GRUB_HIDDEN_TIMEOUT_QUIET=false/' ${TARGET}/etc/default/grub
         # install grub2 MBR
-        chroot ${TARGET} grub-setup --force --device-map=/boot/grub/device.map \
+        chroot ${TARGET} ${grub_setup} --force --device-map=/boot/grub/device.map \
             --directory=/boot/grub --root-device="(hd0,1)" "(hd0)" > /dev/null
     fi
 fi
