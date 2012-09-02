@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (C) 2010 Oregon State University
+# Copyright (C) 2010, 2011, 2012 Oregon State University
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -85,6 +85,8 @@ if [ "$CDINSTALL" = "no" ] ; then
         tar pzxf $IMAGE_FILE -C $TARGET
     elif [ "${IMAGE_TYPE}" = "dump" ] ; then
         root_dump="${IMAGE_FILE}"
+        # cleanup prior runs
+        rm -rf /tmp/rst*
         ( cd ${TARGET}; restore -r -y -f ${root_dump} > /dev/null )
 
         if [ -n "${boot_dev}" ] ; then
