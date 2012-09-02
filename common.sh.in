@@ -201,11 +201,17 @@ EOF
 
 mkfs_disk0() {
     local mkfs="mkfs.${FILESYSTEM}"
+    local mkfs_opts=
+    if [ "${FILESYSTEM}" = "xfs" ] ; then
+        mkfs_opts="-fq"
+    else
+        mkfs_opts="-Fq"
+    fi
     # Format /
-    $mkfs -Fq -L / $root_dev > /dev/null
+    $mkfs $mkfs_opts -L / $root_dev > /dev/null
     # Format /boot
     if [ -n "${boot_dev}" ] ; then
-        $mkfs -Fq -L /boot $boot_dev > /dev/null
+        $mkfs $mkfs_opts -L /boot $boot_dev > /dev/null
     fi
     # Format swap
     if [ -n "${swap_dev}" ] ; then
