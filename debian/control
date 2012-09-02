@@ -11,7 +11,7 @@ Vcs-Git: git://git.osuosl.org/gitolite/ganeti/ganeti-instance-image.git
 
 Package: ganeti-instance-image
 Architecture: all
-Depends: ${misc:Depends}, dump, kpartx, qemu (>= 0.11) | qemu-kvm (>= 0.11)
+Depends: ${misc:Depends}, dump, gawk, kpartx, qemu (>= 0.11) | qemu-kvm (>= 0.11)
 Conflicts: ganeti (<< 1.2.7)
 Enhances: ganeti
 Description: image based instance OS defintion for ganeti
