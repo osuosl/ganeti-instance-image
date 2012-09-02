@@ -89,12 +89,14 @@ EOF
 }
 
 if [ "${IMAGE_TYPE}" != "qemu" ] && \
-   [ -z "${INSTANCE_HV_kernel_path}" -o "${IMPORT_SCRIPT}" = "1" ] ; then
+   [ -z "${INSTANCE_HV_kernel_path}" -o \
+    "${INSTANCE_HV_kernel_path}" = "/bin/false" -o \
+    "${IMPORT_SCRIPT}" = "1" ] ; then
     setup_disk_devs
     add_devicemap
 
     if [ -e "${boot_dir}/menu.lst" ] ; then
-        local grub="$(chroot ${TARGET} which grub)"
+        grub="$(chroot ${TARGET} which grub)"
         # install grub to the block device
         chroot ${TARGET} ${grub} --batch --no-floppy \
             --device-map=/boot/grub/device.map > /dev/null <<EOF
@@ -117,7 +119,7 @@ EOF
         echo "grub2 support is partially supported"
         echo "please run update-grub after the instance is online"
 
-        local grub_setup="$(chroot ${TARGET} which grub-setup)"
+        grub_setup="$(chroot ${TARGET} which grub-setup)"
         # check to see if grub is using UUID's and replace if so
         if [ -n "$(grep 'root=UUID' ${boot_dir}/grub.cfg)" ] ; then
             root_uuid="$($VOL_ID $ROOT_DEV)"

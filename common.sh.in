@@ -188,13 +188,13 @@ EOF
         # 2 - Rest
         $sfdisk_cmd > /dev/null <<EOF
 ,$SWAP_SIZE,S
-,,L
+,,L,*
 EOF
     elif [  "${SWAP}" = "no" -a -n "${KERNEL_PATH}" ] ; then
         # Create two partitions:
         # 1 - Whole
         $sfdisk_cmd > /dev/null <<EOF
-,,L
+,,L,*
 EOF
     fi
 }
