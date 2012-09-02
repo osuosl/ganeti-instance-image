@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (C) 2010 Oregon State University
+# Copyright (C) 2010, 2011, 2012 Oregon State University
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -95,6 +95,12 @@ if [ "$OLD_HNAME" = "$old_name" \
             fi
             ;;
     esac
+
+    if [ -x ${CUSTOMIZE_DIR}/zz_ddns ] ; then
+        TARGET=$TARGET
+        export TARGET
+        ${CUSTOMIZE_DIR}/zz_ddns -r
+    fi
 else
     log_error "Cannot rename from $old_name to $instance:"
     log_error "Instance has a different hostname ($OLD_HNAME)"
