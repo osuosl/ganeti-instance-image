@@ -16,7 +16,7 @@ os_DATA = common.sh
 
 dist_custom_DATA = example/hooks/*
 
-dist_doc_DATA = COPYING NEWS README
+dist_doc_DATA = COPYING NEWS README.markdown
 
 EXTRA_DIST = common.sh.in defaults
 
