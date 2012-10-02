@@ -22,6 +22,7 @@ DUMP="@DUMP@"
 LOSETUP="@LOSETUP@"
 KPARTX="@KPARTX@"
 SFDISK="@SFDISK@"
+PARTED="@PARTED@"
 QEMU_IMG="@QEMU_IMG@"
 MKDIR_P="@MKDIR_P@"
 INSTANCE_MEM=
@@ -159,9 +160,9 @@ get_os_release() {
 }
 
 format_disk0() {
-    if [ "${USE_PARTED}" = "yes" ]; then
+    if [ "${FDISK}" = "parted" ]; then
         format_disk0_parted "$1"
-    else
+    elif [ "${FDISK}" = "sfdisk" ]; then
         format_disk0_sfdisk "$1"
     fi
 }
@@ -208,7 +209,7 @@ EOF
 }
 
 format_disk0_parted() {
-    local parted_cmd="parted $1 --script --"
+    local parted_cmd="${PARTED} $1 --script --"
     if [  "${SWAP}" = "yes" -a -z "${KERNEL_PATH}" ] ; then
         # Create three partitions:
         # 1 - $BOOT_SIZE /boot, bootable
@@ -444,7 +445,7 @@ fi
 : ${EXPORT_DIR:="/tmp"}
 : ${IMAGE_DIR:="@localstatedir@/cache/ganeti-instance-image"}
 : ${IMAGE_DEBUG:="no"}
-: ${USE_PARTED:="no"}
+: ${FDISK:="sfdisk"}
 
 SCRIPT_NAME=$(basename $0)
 KERNEL_PATH="$INSTANCE_HV_kernel_path"

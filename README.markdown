@@ -54,6 +54,8 @@ The following settings will be examined in this file:
                 of instance memory)
 * `FILESYSTEM`: Set which filesystem to format the disks as. Currently only
                 supports ext3 or ext4. (default: ext3)
+* `FDISK`:      Select either "parted" or "sfdisk" as the fdisk program to use
+                when creating partitions. (default: sfdisk)
 * `KERNEL_ARGS`: Add additional kernel boot parameters to an instance. This
                 currently only works on booting a kernel from inside.
 * `IMAGE_NAME`: Name for the image to use. Generally they will have names similar

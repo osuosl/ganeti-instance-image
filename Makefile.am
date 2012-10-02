@@ -32,6 +32,7 @@ edit = sed \
 	   -e 's|@LOSETUP[@]|$(LOSETUP)|g' \
 	   -e 's|@KPARTX[@]|$(KPARTX)|g' \
 	   -e 's|@SFDISK[@]|$(SFDISK)|g' \
+	   -e 's|@PARTED[@]|$(PARTED)|g' \
 	   -e 's|@QEMU_IMG[@]|$(QEMU_IMG)|g'
 
 common.sh: Makefile
