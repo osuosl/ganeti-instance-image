@@ -11,6 +11,10 @@
 
 # built scripts
 /common.sh
+tools/make-dump
+tools/make-qemu-img
+tools/mount-disks
+tools/umount-disks
 
 # archives
 /ganeti-instance-image-*.tar.gz
