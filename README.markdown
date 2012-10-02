@@ -274,10 +274,13 @@ Subnets:
 
 Create a file in `/etc/ganeti/instance-image/networks/subnets` that has a useful
 name such as `vlan42`. This file will describe subnet routing information such
-as the netmask and gateway. The following is an example:
+as the netmask, gateway, and dns. The following is an example:
 
-      NETMASK=255.255.255.0
-      GATEWAY=192.168.1.1
+      NETMASK="255.255.255.0"
+      GATEWAY="192.168.1.1"
+      DNS_DOMAIN="example.org"
+      DNS_SEARCH="example.org example.net"
+      DNS_SERVERS="8.8.8.8 4.4.4.4"
 
 Instance:
 

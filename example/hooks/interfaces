@@ -51,6 +51,21 @@ if [ -f "${NETWORKS_DIR}/instances/${FQDN}" ] ; then
     fi
 fi
 
+resolvconf() {
+    nl=$'\n'
+    if [ -n "${DNS_SERVERS}" ] && [ -n "${DNS_SEARCH}" ] && [ -n "${DNS_DOMAIN}" ]; then
+        for server in $DNS_SERVERS ; do
+            nameservers="nameserver ${server}${nl}${nameservers}"
+        done
+
+        cat > ${TARGET}/etc/resolv.conf << EOF
+${nameservers}
+domain ${DNS_DOMAIN}
+search ${DNS_SEARCH}
+EOF
+    fi
+}
+
 # Functions
 debian_setup() {
     if [ ! -d "${TARGET}/etc/network" ] ; then
@@ -83,8 +98,15 @@ iface eth0 inet static
     address ${ADDRESS}
     netmask ${NETMASK}
     gateway ${GATEWAY}
+EOF
+        if [ -n "${DNS_SERVERS}" ] && [ -n "${DNS_SEARCH}" ] && [ -n "${DNS_DOMAIN}" ]; then
+            cat >> ${TARGET}/etc/network/interfaces << EOF
+    dns-nameservers ${DNS_SERVERS}
+    dns-domain ${DNS_DOMAIN}
+    dns-search ${DNS_SEARCH}
 
 EOF
+        fi
     fi
 
     if [ -n "${FQDN}" ] ; then
@@ -125,6 +147,8 @@ NETWORKING=yes
 GATEWAY=${GATEWAY}
 EOF
     fi
+
+    resolvconf
 }
 
 gentoo_setup() {
@@ -142,6 +166,8 @@ config_eth0=( "${ADDRESS} netmask ${NETMASK}" )
 routes_eth0=( "default gw ${GATEWAY}" )
 EOF
     fi
+
+    resolvconf
 
     chroot ${TARGET} ln -sf /etc/init.d/net.lo /etc/init.d/net.eth0
     chroot ${TARGET} rc-update add net.eth0 default
@@ -173,6 +199,8 @@ EOF
     if [ -n "${FQDN}" ] ; then
         echo "${FQDN}" > ${TARGET}/etc/HOSTNAME
     fi
+
+    resolvconf
 }
 
 # Main
