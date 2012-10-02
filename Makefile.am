@@ -25,7 +25,7 @@ edit = sed \
 	   -e 's|@localstatedir[@]|$(localstatedir)|g' \
 	   -e 's|@osdir[@]|$(OS_DIR)|g' \
 	   -e 's|@osname[@]|$(osname)|g' \
-	   -e 's|@defaultdir[@]|$(defaultdir)|g' \
+	   -e 's|@defaultdir[@]|$(DEFAULT_DIR)|g' \
 	   -e 's|@AWK[@]|$(AWK)|g' \
 	   -e 's|@MKDIR_P[@]|$(MKDIR_P)|g' \
 	   -e 's|@DUMP[@]|$(DUMP)|g' \
