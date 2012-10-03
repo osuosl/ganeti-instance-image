@@ -61,7 +61,7 @@ while getopts ":hi:a:n:m:" opt ; do
     esac
 done
 
-. /usr/share/ganeti/os/image/common.sh
+. @osdir@/@osname@/common.sh
 
 # Set overrides
 [ -n "$IMAGE_DIR2" ]        && IMAGE_DIR=$IMAGE_DIR2

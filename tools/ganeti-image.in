@@ -91,10 +91,10 @@ export OS_VARIANT HYPERVISOR DISK_COUNT OS_API_VERSION DISK_0_PATH
 echo "Creating tgz from $INSTANCE_NAME in ${IMAGE_DIR} from node $NODE"
 
 if [ "$NODE" == "$HOSTNAME" ] ; then
-    /usr/share/ganeti/os/image/tools/make-tgz-image -i $INSTANCE_NAME \
+    @osdir@/@osname@/tools/make-tgz-image -i $INSTANCE_NAME \
         -m $IMAGE_DIR -n $IMAGE_NAME -a $ARCH
 else
-    ssh $NODE /usr/share/ganeti/os/image/tools/make-tgz-image \
+    ssh $NODE @osdir@/@osname@/tools/make-tgz-image \
         -i $INSTANCE_NAME -m $IMAGE_DIR -n $IMAGE_NAME -a $ARCH
 fi
 

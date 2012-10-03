@@ -12,7 +12,7 @@ dist_os_SCRIPTS = ${srcdir}/create ${srcdir}/import ${srcdir}/export ${srcdir}/r
 dist_os_DATA = ${srcdir}/ganeti_api_version
 dist_config_DATA = ${srcdir}/variants.list
 os_DATA = common.sh
-tools_SCRIPTS = tools/make-dump tools/make-qemu-img tools/mount-disks tools/umount-disks
+tools_SCRIPTS = tools/ganeti-image tools/make-tgz-image tools/make-dump tools/make-qemu-img tools/mount-disks tools/umount-disks
 
 dist_custom_DATA = ${srcdir}/example/hooks/*
 
@@ -51,8 +51,10 @@ $(tools_SCRIPTS): Makefile
 	mv $@.tmp $@
 
 common.sh: $(srcdir)/common.sh.in
+tools/ganeti-image: $(srcdir)/tools/ganeti-image.in
 tools/make-dump: $(srcdir)/tools/make-dump.in
 tools/make-qemu-img: $(srcdir)/tools/make-qemu-img.in
+tools/make-tgz-image: $(srcdir)/tools/make-tgz-image.in
 tools/mount-disks: $(srcdir)/tools/mount-disks.in
 tools/umount-disks: $(srcdir)/tools/umount-disks.in
 
