@@ -202,14 +202,26 @@ master node::
 
 This will mount or umount an instance to `/tmp/${instance_name}_root`
 
-    make-dump $instance_name [ $IMAGE_DIR ]
+A utility script named `ganeti-image` will enable you to quickly create an image
+of the operating system from the master node. It will execute a script on the
+remote host if the instance resides on a remote host. Below is the help output.
 
-Create dump images for the given OS variant. You can override the default
-`$IMAGE_DIR` setting by giving it as a second argument.
+    ganeti-image [-d PATH] [-n NAME] [-a ARCH] -t TYPE -i INSTANCE
 
-    make-qemu-img $instance_name [ $IMAGE_DIR ]
+    Create an image of a ganeti instance using either a tarball, dump, or qemu
+    image..
 
-Create an qemu image for the given OS variant.
+    -t TYPE       Type of image, either: tarball, dump, or qemu-img
+    -d PATH       Path of where to put the image
+    -i INSTANCE   Name of the instance
+    -n NAME       Name of the image
+    -a ARCH       Architecture of the image
+
+    This utility must be used on the master node. All optional args will
+    have defaults if you do not set them.
+
+The previous image scripts are now deprecated and will be removed in a future
+release.
 
 ## Customization of the instance
 
