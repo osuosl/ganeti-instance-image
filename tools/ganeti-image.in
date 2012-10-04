@@ -27,13 +27,14 @@ ARCH=
 HOSTNAME="$(hostname)"
 
 run_help() {
-    echo "Usage: $0 [-d PATH] [-n NAME] [-a ARCH] -i INSTANCE"
+    echo "Usage: $0 [-d PATH] [-n NAME] [-a ARCH] -t TYPE -i INSTANCE"
     echo
-    echo "Create an image tarball of a ganeti instance."
+    echo "Create an image of a ganeti instance using either a tarball, dump, or qemu image.."
     echo
-    echo "-d PATH       Path of where to put the tarball"
+    echo "-t TYPE       Type of image, either: tarball, dump, or qemu-img"
+    echo "-d PATH       Path of where to put the image"
     echo "-i INSTANCE   Name of the instance"
-    echo "-n NAME       Name of the tarball image"
+    echo "-n NAME       Name of the image"
     echo "-a ARCH       Architecture of the image"
     echo
     echo "This utility must be used on the master node. All optional args will"
@@ -41,19 +42,22 @@ run_help() {
     exit 0
 }
 
-while getopts "hd:i:a:n:" opt ; do
+while getopts "hd:i:a:n:t:" opt ; do
     case $opt in
+        t)
+            TYPE="$OPTARG"
+            ;;
         d)
-            IMAGE_DIR="$OPTARG"
+            IMAGE_DIR="-m $OPTARG"
             ;;
         i)
             INSTANCE_NAME="$OPTARG"
             ;;
         n)
-            IMAGE_NAME="$OPTARG"
+            IMAGE_NAME="-n $OPTARG"
             ;;
         a)
-            ARCH="$OPTARG"
+            ARCH="-a $OPTARG"
             ;;
         h)
             run_help
@@ -65,6 +69,16 @@ done
 
 #[ -z "$IMAGE_DIR" ] && echo "Error: Image path not set" && exit 1
 [ -z "$INSTANCE_NAME" ] && echo "Error: Instance name not set" && exit 1
+[ -z "$TYPE" ] && echo "Error: Image type not set" && exit 1
+
+incorrect_type=1
+for i in tarball dump qemu-img ; do
+    if [ "$i" == $TYPE ] ; then
+        incorrect_type=0
+    fi
+done
+
+[ "$incorrect_type" == "1" ] && echo "Error: Incorrect type set" && exit 1
 
 # Am I master?
 if [ "$(gnt-cluster getmaster)" != "${HOSTNAME}" ] ; then
@@ -73,10 +87,11 @@ if [ "$(gnt-cluster getmaster)" != "${HOSTNAME}" ] ; then
 fi
 
 # Gather some information
-info=($(gnt-instance list -o os,hypervisor,disk.count --no-headers --separator=' ' $INSTANCE_NAME))
+info=($(gnt-instance list -o os,hypervisor,disk.count,hv/kernel_path --no-headers --separator=' ' $INSTANCE_NAME))
 OS_VARIANT="${info[0]/*+/}"
 HYPERVISOR="${info[1]}"
 DISK_COUNT="${info[2]}"
+INSTANCE_HV_kernel_path="${info[3]}"
 OS_API_VERSION="15"
 
 # Activate disks and capture output
@@ -86,16 +101,17 @@ ad_output=($(gnt-instance activate-disks $INSTANCE_NAME | sed -e 's/\:/ /g'))
 NODE="${ad_output[0]}"
 DISK_0_PATH="${ad_output[2]}"
 
-export OS_VARIANT HYPERVISOR DISK_COUNT OS_API_VERSION DISK_0_PATH
+export OS_VARIANT HYPERVISOR DISK_COUNT OS_API_VERSION DISK_0_PATH \
+    INSTANCE_HV_kernel_path
 
-echo "Creating tgz from $INSTANCE_NAME in ${IMAGE_DIR} from node $NODE"
+echo "Creating image with type $TYPE from $INSTANCE_NAME in ${IMAGE_DIR} from node $NODE"
 
 if [ "$NODE" == "$HOSTNAME" ] ; then
-    @osdir@/@osname@/tools/make-tgz-image -i $INSTANCE_NAME \
-        -m $IMAGE_DIR -n $IMAGE_NAME -a $ARCH
+    @osdir@/@osname@/tools/make-image -i $INSTANCE_NAME \
+        $IMAGE_DIR $IMAGE_NAME $ARCH -t $TYPE
 else
-    ssh $NODE @osdir@/@osname@/tools/make-tgz-image \
-        -i $INSTANCE_NAME -m $IMAGE_DIR -n $IMAGE_NAME -a $ARCH
+    ssh $NODE @osdir@/@osname@/tools/make-image \
+        -i $INSTANCE_NAME $IMAGE_DIR $IMAGE_NAME $ARCH -t $TYPE
 fi
 
 gnt-instance deactivate-disks $INSTANCE_NAME

@@ -26,10 +26,11 @@ IMAGE_NAME2=
 ARCH2=
 
 run_help() {
-    echo "Usage: $0 -n NAME -m IMAGE_DIR -a ARCH -i INSTANCE_NAME"
+    echo "Usage: $0 -n NAME -m IMAGE_DIR -a ARCH -i INSTANCE_NAME -t TYPE"
     echo
     echo "Create an image tarball of a ganeti instance."
     echo
+    echo "-t TYPE           Image type, either: tarball, dump, or qemu-img"
     echo "-m IMAGE_DIR      Path of where to put the tarball"
     echo "-i INSTANCE_NAME  Name of the instance"
     echo "-n IMAGE_NAME     Name of the tarball image"
@@ -39,8 +40,11 @@ run_help() {
     exit 0
 }
 
-while getopts ":hi:a:n:m:" opt ; do
+while getopts ":hi:a:n:m:t:" opt ; do
     case $opt in
+        t)
+            TYPE="$OPTARG"
+            ;;
         m)
             IMAGE_DIR2="$OPTARG"
             ;;
@@ -70,7 +74,10 @@ done
 
 # Sanity checks
 [ -z "$IMAGE_DIR" ]     && echo "Error: IMAGE_DIR not set" && exit 1
+[ -z "$TYPE" ]          && echo "Error: Image type not set" && exit 1
 [ -z "$INSTANCE_NAME" ] && echo "Error: INSTANCE_NAME not set" && exit 1
+[ -z "$INSTANCE_HV_kernel_path" ] && \
+    echo "Error: INSTANCE_HV_kernel_path not set" && exit 1
 [ -z "$IMAGE_NAME" ]    && echo "Error: IMAGE_NAME not set" && exit 1
 [ -z "$ARCH" ]          && echo "Error: ARCH not set" && exit 1
 [ -z "$OS_VARIANT" ]    && echo "Error: OS_VARIANT not set" && exit 1
@@ -86,21 +93,41 @@ CLEANUP+=("unmap_disk0 $blockdev")
 root_dev=$(map_partition $filesystem_dev root)
 boot_dev=$(map_partition $filesystem_dev boot)
 
-# Make temp dir for mounting
-TARGET=`mktemp -d` || exit 1
-CLEANUP+=("rmdir $TARGET")
+case $TYPE in
+    tarball)
+        # Make temp dir for mounting
+        TARGET=`mktemp -d` || exit 1
+        CLEANUP+=("rmdir $TARGET")
 
-# Mount filesystems
-mount_disk0 $TARGET
+        # Mount filesystems
+        mount_disk0 $TARGET
 
-OLDPWD=$PWD
-cd $TARGET
+        OLDPWD=$PWD
+        cd $TARGET
 
-# tar all the things ! \o/
-if [ -x /usr/bin/pigz ] ; then
-    tar -I pigz --numeric-owner -cpf ${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}.tar.gz .
-else
-    tar --numeric-owner -zcpf ${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}.tar.gz .
-fi
+        echo "Creating tarball from $INSTANCE_NAME to ${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}.tar.gz"
+        if [ -x /usr/bin/pigz ] ; then
+            tar -I /usr/bin/pigz --numeric-owner -cpf ${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}.tar.gz .
+        else
+            tar --numeric-owner -zcpf ${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}.tar.gz .
+        fi
+        ;;
+    dump)
+        if [ -n "$boot_dev" ] ; then
+            echo "Creating dump from $INSTANCE_NAME for boot at ${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}-boot.dump"
+            $DUMP -0 -q -z9 -f ${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}-boot.dump $boot_dev 2> /dev/null
+        fi
+
+        echo "Creating dump from $INSTANCE_NAME for root at ${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}-root.dump"
+        $DUMP -0 -q -z9 -f ${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}-root.dump $root_dev
+        ;;
+    qemu-img)
+        echo "Creating qemu-img image from $INSTANCE_NAME to ${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}.img"
+        $QEMU_IMG convert -O qcow2 $DISK_0_PATH ${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}.img
+        ;;
+    *)
+        echo "Command $TYPE not supported!"
+        ;;
+esac
 
 cd $OLDPWD

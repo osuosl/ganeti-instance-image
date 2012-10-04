@@ -13,8 +13,8 @@
 /common.sh
 tools/ganeti-image
 tools/make-dump
+tools/make-image
 tools/make-qemu-img
-tools/make-tgz-image
 tools/mount-disks
 tools/umount-disks
 
