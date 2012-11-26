@@ -32,12 +32,12 @@ if [ -z "${TARGET}" -o ! -d "${TARGET}" ] ; then
 fi
 
 if [ -n "${OVERLAY}" ] ; then
-    local overlay="${OVERLAYS_DIR}/${OVERLAY}"
+    overlay="${OVERLAYS_DIR}/${OVERLAY}"
     if [ ! -d "${overlay}" ] ; then
         log_error "${overlay} not found"
     fi
     # copy overlay files into target instance
-    cp -a ${overlay} ${TARGET}
+    cp -a ${overlay}/* ${TARGET}
 fi
 
 exit 0
