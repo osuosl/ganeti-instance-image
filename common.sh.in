@@ -169,10 +169,6 @@ format_disk0() {
 
 format_disk0_sfdisk() {
     local sfdisk_cmd="$SFDISK -uM -H 255 -S 63 --quiet --Linux --DOS $1"
-    if [ "${SWAP}" = "yes" ] && [ -z "$SWAP_SIZE" ] ; then
-        log_error "SWAP_SIZE not set however SWAP is enabled"
-        exit 1
-    fi
     if [  "${SWAP}" = "yes" -a -z "${KERNEL_PATH}" ] ; then
         # Create three partitions:
         # 1 - $BOOT_SIZE /boot, bootable
