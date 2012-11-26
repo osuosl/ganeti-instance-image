@@ -48,7 +48,7 @@ if [ "$CDINSTALL" = "no" ] ; then
     if [ "${SWAP}" = "yes" ] && [ -z "$SWAP_SIZE" ] ; then
         log_error "SWAP_SIZE not set however SWAP is enabled"
         exit 1
-    elif [ "${SWAP_SIZE}" > "${DISK_SIZE}" ] ; then
+    elif [ "${SWAP_SIZE}" -gt "${DISK_SIZE}" ] ; then
         log_error "SWAP_SIZE larger than system disk size: "
         log_error "  ${SWAP_SIZE}MB swap > ${DISK_SIZE}MB system disk"
         exit 1
