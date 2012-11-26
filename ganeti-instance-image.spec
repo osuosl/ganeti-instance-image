@@ -1,7 +1,7 @@
 %define         instancename    image
 Name:		ganeti-instance-image
-Version:	0.5.1
-Release:	2%{?dist}
+Version:	0.6
+Release:	1%{?dist}
 Summary:	Guest OS definition for Ganeti based on Linux-based images
 
 Group:		System Environment/Daemons

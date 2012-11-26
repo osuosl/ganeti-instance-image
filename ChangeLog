@@ -1,39 +1,68 @@
+2012-11-25  Lance Albertson <lance@osuosl.org>
+  * Released 0.6
+  * Major features added:
+    * Complete refactor of image creation scripts (ganeti-image)
+    * Configurable boot directory size
+    * Add optional support for parted instead of sfdisk
+  * Ticket bug/feature fixes:
+    * #3873 - Fix renaming for DDNS
+    * #4143 - make-dump looks for common.sh in a wrong place
+    * #5907 - Add gawk as debian dependency
+    * #5955 - Updates for ganeti-instance-image.spec
+    * #5967 - Restore leaving files in /tmp causes creation/import to fail
+    * #7095 - Autotools building system does not work correctly
+    * #7101 - The presence of `lsb_release' is not detected properly in
+              common.sh
+    * #7113 - Race conditions in restore's usage
+    * #7515 - Add centos serial console support for redhat, too
+    * #7815 - partitioning when KERNEL_PATH should set bootable flag
+    * #8673 - Exporting to /tmp fails if the image is larger than the free
+              space
+    * #9231 - Make size of /boot configurable
+    * #10473 - Package signing key not available
+    * #10509 - Find grub/grub-setup paths correctly
+    * #10923 - Fix resolv.conf for Ubuntu 12.04
+    * #11871 - Fix mkfs.xfs 
+    * #11973 - Add parted support
+    * #12435 - Add warning if swap size is larger than system disk size
+    * #12441 - Bug in instance-image, overlay code
+
 2011-05-25  Lance Albertson <lance@osuosl.org>
-    * Bugfix release
-    * Ticket #4785 - blkid sometimes didn't return a value
-    * Ticket #5685 - baselayout-2.x support for gentoo guests
+  * Bugfix release
+  * Ticket #4785 - blkid sometimes didn't return a value
+  * Ticket #5685 - baselayout-2.x support for gentoo guests
 
 2011-03-25  Lance Albertson <lance@osuosl.org>
-    * Released 0.5
-    * Moved hooks directory to match upstream
-    * Fixed rename
-    * Fixed Debian/Redhat package files
-    * CDINSTALL no set to "no" by default
-    * Fixed hostname setting
-    * New hook for dyanmic DNS
+  * Released 0.5
+  * Moved hooks directory to match upstream
+  * Fixed rename
+  * Fixed Debian/Redhat package files
+  * CDINSTALL no set to "no" by default
+  * Fixed hostname setting
+  * New hook for dyanmic DNS
 
 2010-05-07  Lance Albertson <lance@osuosl.org>
-	* Released 0.4
-	* Add partial grub2 support
-	* Switch default image type to dump
-	* Added feature to add optional kernel parameters
+  * Released 0.4
+  * Add partial grub2 support
+  * Switch default image type to dump
+  * Added feature to add optional kernel parameters
 
 2010-04-12  Lance Albertson <lance@osuosl.org>
-    * Released 0.3.1 (bugfix)
-    * Fix logic for exports so that it works properly now
-	* Run sync prior to umounting to avoid nasty hanging ext4 bug
+  * Released 0.3.1 (bugfix)
+  * Fix logic for exports so that it works properly now
+  * Run sync prior to umounting to avoid nasty hanging ext4 bug
 
 2010-04-02  Lance Albertson <lance@osuosl.org>
-	* Released 0.3
-	* Added feature to set static IPs for instances (see README)
-	* Moved variants.list to $sysconfigdir/instance-image/variants.list and
-	  created a symlink to the old location. See issue 92 on the Ganeti issue
-	  tracker for more background information.
+  * Released 0.3
+  * Added feature to set static IPs for instances (see README)
+  * Moved variants.list to $sysconfigdir/instance-image/variants.list and
+    created a symlink to the old location. See issue 92 on the Ganeti issue
+    tracker for more background information.
 
 2010-03-30	Lance Albertson <lance@osuosl.org>
-	* Released 0.2
-	* Added feature to set which filesystem to use (ext3 or ext4)
-	* Added feature to manually set the size of the swap partition
+  * Released 0.2
+  * Added feature to set which filesystem to use (ext3 or ext4)
+  * Added feature to manually set the size of the swap partition
 
 2010-03-11	Lance Albertson <lance@osuosl.org>
-	* Initial release of 0.1
+  * Initial release of 0.1
