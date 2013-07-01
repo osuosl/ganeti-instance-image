@@ -47,6 +47,10 @@ if test -z "$KPARTX" ; then
   AC_MSG_ERROR([kpartx not found in $PATH])
 fi
 
+if $KPARTX | grep -q '\-s sync mode'; then
+    KPARTX="$KPARTX -s"
+fi
+
 AC_PATH_PROG(SFDISK, [sfdisk], [], [$PATH:/usr/sbin:/sbin])
 if test -z "$SFDISK" ; then
   AC_MSG_ERROR([sfdisk not found in $PATH])
