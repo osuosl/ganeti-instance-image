@@ -18,7 +18,9 @@ dist_custom_DATA = ${srcdir}/example/hooks/*
 
 dist_doc_DATA = ${srcdir}/COPYING ${srcdir}/NEWS ${srcdir}/README.markdown
 
-EXTRA_DIST = common.sh.in defaults
+EXTRA_DIST = common.sh.in defaults tools/ganeti-image.in tools/make-image.in \
+	tools/make-dump.in tools/make-qemu-img.in tools/mount-disks.in \
+	tools/umount-disks.in
 
 edit = sed \
 	   -e 's|@sysconfdir[@]|$(sysconfdir)|g' \
