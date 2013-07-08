@@ -7,7 +7,7 @@ Summary:	Guest OS definition for Ganeti based on Linux-based images
 Group:		System Environment/Daemons
 License:	GPLv2
 URL:		http://code.osuosl.org/projects/ganeti-image
-Source0:	http://code.osuosl.org/attachments/download/2163/%{name}-%{version}.tar.gz
+Source0:	http://code.osuosl.org/attachments/download/3273/%{name}-%{version}.tar.gz
 BuildRoot:	%(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 BuildRequires:	qemu-img, dump, tar, kpartx
 Requires:       qemu-img, dump, tar, kpartx, ganeti
