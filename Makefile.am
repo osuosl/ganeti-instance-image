@@ -16,7 +16,7 @@ tools_SCRIPTS = tools/ganeti-image tools/make-image tools/make-dump tools/make-q
 
 dist_custom_DATA = ${srcdir}/example/hooks/*
 
-dist_doc_DATA = ${srcdir}/COPYING ${srcdir}/NEWS ${srcdir}/README.markdown
+dist_doc_DATA = ${srcdir}/COPYING ${srcdir}/NEWS ${srcdir}/README.markdown ${srcdir}/ganeti-instance-image.spec ${srcdir}/debian
 
 EXTRA_DIST = common.sh.in defaults tools/ganeti-image.in tools/make-image.in \
 	tools/make-dump.in tools/make-qemu-img.in tools/mount-disks.in \
