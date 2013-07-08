@@ -18,12 +18,11 @@ tools_SCRIPTS = tools/ganeti-image tools/make-image tools/make-dump \
 
 dist_custom_DATA = ${srcdir}/example/hooks/*
 
-dist_doc_DATA = ${srcdir}/COPYING ${srcdir}/NEWS ${srcdir}/README.markdown \
-	${srcdir}/ganeti-instance-image.spec ${srcdir}/debian
+dist_doc_DATA = ${srcdir}/COPYING ${srcdir}/NEWS ${srcdir}/README.markdown
 
 EXTRA_DIST = common.sh.in defaults tools/ganeti-image.in tools/make-image.in \
 	tools/make-dump.in tools/make-qemu-img.in tools/mount-disks.in \
-	tools/umount-disks.in
+	tools/umount-disks.in ganeti-instance-image.spec debian
 
 edit = sed \
 	   -e 's|@sysconfdir[@]|$(sysconfdir)|g' \
@@ -72,5 +71,9 @@ install-exec-local:
 	@mkdir_p@ "$(DESTDIR)$(localstatedir)/cache/ganeti-instance-image"
 	touch "$(DESTDIR)$(variantsdir)/default.conf"
 	ln -fs $(DESTDIR)$(configdir)/variants.list $(DESTDIR)$(OS_DIR)/$(osname)/variants.list
+
+distclean-local:
+	rm -rf build-stamp debian/files debian/*.log debian/ganeti-instance-image/ \
+		debian/ganeti-instance-image.substvars
 
 CLEANFILES = $(os_DATA) $(tools_SCRIPTS)
