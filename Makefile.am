@@ -8,15 +8,18 @@ networksdir=${sysconfdir}/ganeti/instance-image/networks
 overlaysdir=${sysconfdir}/ganeti/instance-image/overlays
 toolsdir=$(OS_DIR)/$(osname)/tools
 
-dist_os_SCRIPTS = ${srcdir}/create ${srcdir}/import ${srcdir}/export ${srcdir}/rename
+dist_os_SCRIPTS = ${srcdir}/create ${srcdir}/import ${srcdir}/export \
+	${srcdir}/rename
 dist_os_DATA = ${srcdir}/ganeti_api_version
 dist_config_DATA = ${srcdir}/variants.list
 os_DATA = common.sh
-tools_SCRIPTS = tools/ganeti-image tools/make-image tools/make-dump tools/make-qemu-img tools/mount-disks tools/umount-disks
+tools_SCRIPTS = tools/ganeti-image tools/make-image tools/make-dump \
+	tools/make-qemu-img tools/mount-disks tools/umount-disks
 
 dist_custom_DATA = ${srcdir}/example/hooks/*
 
-dist_doc_DATA = ${srcdir}/COPYING ${srcdir}/NEWS ${srcdir}/README.markdown ${srcdir}/ganeti-instance-image.spec ${srcdir}/debian
+dist_doc_DATA = ${srcdir}/COPYING ${srcdir}/NEWS ${srcdir}/README.markdown \
+	${srcdir}/ganeti-instance-image.spec ${srcdir}/debian
 
 EXTRA_DIST = common.sh.in defaults tools/ganeti-image.in tools/make-image.in \
 	tools/make-dump.in tools/make-qemu-img.in tools/mount-disks.in \
