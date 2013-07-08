@@ -66,6 +66,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Jul 08 2013 Lance Albertson <lance osuosl org>
+- Version bump to 0.6
+
 * Thu May 26 2011 Stephen Fromm <stephenf nero net>
 - Fix dependencies and Source0 URL.
 - Default to %datadir for os-dir.  Eliminates the arch problem with %libdir
