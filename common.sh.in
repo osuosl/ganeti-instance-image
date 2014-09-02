@@ -100,6 +100,16 @@ get_api10_arguments() {
   old_name=$OLD_INSTANCE_NAME
 }
 
+get_api20_parameters() {
+  if [ -z "$OSP_IMG_ID" -o -z "$OSP_IMG_FORMAT" ]; then
+    log_error "Missing OS API Parameter:"
+    log_error "(OSP_IMG_ID or OSP_IMG_FORMAT)"
+    exit 1
+  fi
+  IMG_ID=$OSP_IMG_ID
+  IMG_FORMAT=$OSP_IMG_FORMAT
+}
+
 get_os_type() {
     target=$1
     if [ -z "${target}" ] ; then
@@ -471,6 +481,10 @@ if [ -z "$OS_API_VERSION" -o "$OS_API_VERSION" = "5" ]; then
   get_api5_arguments $GETOPT_RESULT
 elif [ "$OS_API_VERSION" = "10" -o "$OS_API_VERSION" = "15" ]; then
   get_api10_arguments
+elif [ "$OS_API_VERSION" = "20" ]; then
+  get_api10_arguments
+  get_api20_parameters
+  IMAGE_NAME=$IMG_ID
 else
   log_error "Unknown OS API VERSION $OS_API_VERSION"
   exit 1
