@@ -108,6 +108,7 @@ get_api20_parameters() {
   fi
   IMG_ID=$OSP_IMG_ID
   IMG_FORMAT=$OSP_IMG_FORMAT
+  IMG_SSH_KEY_URL=$OSP_IMG_SSH_KEY_URL
 }
 
 get_os_type() {
