@@ -410,6 +410,25 @@ setup_console() {
     esac
 }
 
+filesystem_check() {
+    local target=$1
+    if [ -z "$target" ] ; then
+        log_error "target not set for filesystem_check"
+        exit 1
+    fi
+
+    get_os $target
+
+    case "${OPERATING_SYSTEM}" in
+       fedora|centos|redhat)
+        # we have to force a filesystem relabeling for SELinux after messing
+        # around with the filesystem in fedora
+        echo "Enforce an automatic relabeling in the initial boot process..."
+        touch $target/.autorelabel
+       ;;
+    esac
+}
+
 cleanup() {
   if [ ${#CLEANUP[*]} -gt 0 ]; then
     LAST_ELEMENT=$((${#CLEANUP[*]}-1))

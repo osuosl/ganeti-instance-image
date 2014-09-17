@@ -119,6 +119,8 @@ if [ "$CDINSTALL" = "no" ] ; then
         setup_console $TARGET
     fi
 
+    filesystem_check $TARGET
+
     RUN_PARTS=`which run-parts`
 
     if [ -n "$RUN_PARTS" -a -n "$CUSTOMIZE_DIR" -a -d "$CUSTOMIZE_DIR" ]; then
