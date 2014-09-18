@@ -9,9 +9,9 @@ overlaysdir=${sysconfdir}/ganeti/instance-image/overlays
 toolsdir=$(OS_DIR)/$(osname)/tools
 
 dist_os_SCRIPTS = ${srcdir}/create ${srcdir}/import ${srcdir}/export \
-	${srcdir}/rename
+	${srcdir}/rename ${srcdir}/verify
 dist_os_DATA = ${srcdir}/ganeti_api_version
-dist_config_DATA = ${srcdir}/variants.list
+dist_config_DATA = ${srcdir}/variants.list ${srcdir}/parameters.list 
 os_DATA = common.sh
 tools_SCRIPTS = tools/ganeti-image tools/make-image tools/make-dump \
 	tools/make-qemu-img tools/mount-disks tools/umount-disks
@@ -37,7 +37,9 @@ edit = sed \
 	   -e 's|@KPARTX[@]|$(KPARTX)|g' \
 	   -e 's|@SFDISK[@]|$(SFDISK)|g' \
 	   -e 's|@PARTED[@]|$(PARTED)|g' \
-	   -e 's|@QEMU_IMG[@]|$(QEMU_IMG)|g'
+	   -e 's|@QEMU_IMG[@]|$(QEMU_IMG)|g' \
+	   -e 's|@CURL[@]|$(CURL)|g' \
+	   -e 's|@SHA1SUM[@]|$(SHA1SUM)|g'
 
 common.sh: Makefile
 	rm -f $@ $@.tmp
