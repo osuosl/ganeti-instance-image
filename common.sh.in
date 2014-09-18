@@ -26,6 +26,8 @@ PARTED="@PARTED@"
 QEMU_IMG="@QEMU_IMG@"
 MKDIR_P="@MKDIR_P@"
 INSTANCE_MEM=
+CURL="@CURL@"
+SHA1SUM="@SHA1SUM@"
 
 CLEANUP=( )
 
@@ -442,6 +444,10 @@ fi
 : ${IMAGE_DIR:="@localstatedir@/cache/ganeti-instance-image"}
 : ${IMAGE_DEBUG:="no"}
 : ${FDISK:="sfdisk"}
+: ${CACHE_DIR:="@localstatedir@/cache/ganeti-instance-image"}
+: ${IMAGE_URL:=""}
+: ${IMG_VERIFY:="yes"}
+: ${IMG_CLEANUP:="no"}
 
 SCRIPT_NAME=$(basename $0)
 KERNEL_PATH="$INSTANCE_HV_kernel_path"
