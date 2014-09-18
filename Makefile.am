@@ -37,7 +37,9 @@ edit = sed \
 	   -e 's|@KPARTX[@]|$(KPARTX)|g' \
 	   -e 's|@SFDISK[@]|$(SFDISK)|g' \
 	   -e 's|@PARTED[@]|$(PARTED)|g' \
-	   -e 's|@QEMU_IMG[@]|$(QEMU_IMG)|g'
+	   -e 's|@QEMU_IMG[@]|$(QEMU_IMG)|g' \
+	   -e 's|@CURL[@]|$(CURL)|g' \
+	   -e 's|@SHA1SUM[@]|$(SHA1SUM)|g'
 
 common.sh: Makefile
 	rm -f $@ $@.tmp
