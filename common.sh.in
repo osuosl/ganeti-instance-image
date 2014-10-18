@@ -428,8 +428,8 @@ fi
 : ${SWAP_SIZE:="${INSTANCE_MEM}"}
 : ${BOOT_SIZE:="100"}
 : ${FILESYSTEM:="ext3"}
-: ${KERNEL_ARGS=""}
-: ${OVERLAY=""}
+: ${KERNEL_ARGS:=""}
+: ${OVERLAY:=""}
 : ${IMAGE_NAME:=""}
 : ${IMAGE_TYPE:="dump"}
 : ${NOMOUNT:="no"}
