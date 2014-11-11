@@ -17,7 +17,7 @@ OS_API_VERSION="15"
 # do stuff
 output="$(gnt-instance activate-disks $INSTANCE_NAME)"
 
-DISK_0_PATH="${output/*disk\/0\:/}"
+DISK_0_PATH="`printf '%s' "$output" | sed -n -e '/disk\/0:/! b; s/^.*disk\/0://; p'`"
 filesystem_dev="${DISK_0_PATH/\/dev\//}"
 
 . @osdir@/@osname@/common.sh
