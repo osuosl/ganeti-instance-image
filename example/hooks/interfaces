@@ -67,6 +67,27 @@ EOF
 }
 
 # Functions
+
+systemd_setup() {
+    host_name="$1"
+    # Update systemd's view of hostname
+    echo "${host_name}" >${TARGET}/etc/hostname
+    # Clear previous machine-id
+    echo -n >${TARGET}/etc/machine-id
+    # Bind mount /dev to get temporary use of /dev/urandom
+    mount --bind /dev ${TARGET}/dev
+    CLEANUP+=("umount ${TARGET}/dev")
+    # Set new machine-id (this works because it writes direct to file)
+    chroot ${TARGET} systemd-machine-id-setup >/dev/null 2>&1
+    umount ${TARGET}/dev
+    pop_cleanup
+    # Update machine-info
+    cat <<EOF >${TARGET}/etc/machine-info
+PRETTY_HOSTNAME="${host_name}"
+CHASSIS="vm"
+EOF
+}
+
 debian_setup() {
     if [ ! -d "${TARGET}/etc/network" ] ; then
         log_error "Missing target network directory"
@@ -110,7 +131,11 @@ EOF
     fi
 
     if [ -n "${FQDN}" ] ; then
-        echo "${SHORT_NAME}" > ${TARGET}/etc/hostname
+        if [ -d ${TARGET}/etc/systemd ]; then
+            systemd_setup "${SHORT_NAME}"
+        else
+            echo "${SHORT_NAME}" > ${TARGET}/etc/hostname
+        fi
     fi
 }
 
@@ -141,6 +166,9 @@ NETWORKING=yes
 HOSTNAME=${FQDN}
 GATEWAY=${GATEWAY}
 EOF
+        if [ -d ${TARGET}/etc/systemd ]; then
+            systemd_setup "${FQDN}"
+        fi
     else
         cat > ${TARGET}/etc/sysconfig/network << EOF
 NETWORKING=yes
@@ -197,7 +225,11 @@ STARTMODE='auto'
 NAME='Ethernet Card 0'
 EOF
     if [ -n "${FQDN}" ] ; then
-        echo "${FQDN}" > ${TARGET}/etc/HOSTNAME
+        if [ -d ${TARGET}/etc/systemd ]; then
+            systemd_setup "${FQDN}"
+        else
+            echo "${FQDN}" > ${TARGET}/etc/HOSTNAME
+        fi
     fi
 
     resolvconf

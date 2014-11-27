@@ -29,6 +29,14 @@ INSTANCE_MEM=
 
 CLEANUP=( )
 
+pop_cleanup() {
+    if [ ${#CLEANUP[@]} -eq 1 ]; then
+        CLEANUP=( )
+    else
+        CLEANUP=("${CLEANUP[0]}" "${CLEANUP[@]:2}")
+    fi
+}
+
 log_error() {
   echo "$@" >&2
 }
@@ -377,6 +385,11 @@ setup_console() {
         sed -re 's/^exec.*/exec \/sbin\/getty -L 115200 ttyS0 vt102/' \
             > ${target}/etc/init/ttyS0.conf
         sed -ie 's/tty1/ttyS0/g' ${target}/etc/init/ttyS0.conf
+        return
+    fi
+    # systemd is on this system, so do this instead
+    if [ -d ${target}/etc/systemd ]; then
+        chroot ${target} systemctl enable serial-getty@ttyS0.service >/dev/null 2>&1
         return
     fi
     get_os $target
