@@ -397,6 +397,9 @@ setup_console() {
             echo "No support for your OS in instance-image, skipping..."
             ;;
     esac
+    if [ -f ${target}/etc/securetty ] && ! grep -q '^ttyS0$' ${target}/etc/securetty; then
+        printf '\n\n# Added by ganeti-instance-image\nttyS0\n' >> ${target}/etc/securetty
+    fi
 }
 
 cleanup() {
