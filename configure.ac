@@ -66,6 +66,16 @@ if test -z "$QEMU_IMG" ; then
   AC_MSG_ERROR([qemu-img not found in $PATH])
 fi
 
+AC_PATH_PROG(BLOCKDEV_CMD, [blockdev], [], [$PATH:/usr/sbin:/sbin])
+if test -z "$BLOCKDEV_CMD" ; then
+  AC_MSG_ERROR([blockdev not found in $PATH])
+fi
+
+AC_PATH_PROG(BLKID, [blkid], [], [$PATH:/usr/sbin:/sbin])
+if test -z "$BLKID" ; then
+  AC_MSG_ERROR([blkid not found in $PATH])
+fi
+
 AC_CONFIG_FILES([
     Makefile
 ])

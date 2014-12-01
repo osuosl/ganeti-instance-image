@@ -1,0 +1,132 @@
+#!/bin/bash
+
+# Copyright (C) 2014 GRNET S.A.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301, USA.
+#
+
+set -e
+
+. ../hooks/common.sh
+
+debug set -x
+
+if [ "${IMAGE_TYPE}" = 'qemu' ]; then
+
+    if which partprobe >/dev/null 2>&1; then
+        PARTPROBE="`which partprobe`"
+    else
+        PARTPROBE="${BLOCKDEV_CMD} --rereadpt"
+    fi
+
+    # Set disk based on type of hypervisor
+    disk=""
+    if [ "${HYPERVISOR}" = "kvm" ] ; then
+        disk="vda"
+    else
+        disk="xda"
+    fi
+
+    # Get destination disk size in 512-byte sectors
+    device_size=`${BLOCKDEV_CMD} --getsz ${BLOCKDEV}`
+
+    # Get list of assigned partition sizes in table
+    sfdisk_sizes="`
+        # sfdisk -d seems to always output in 512-byte sectors regardless of -uX
+        # (using -uS here anyway in case someone else's sfdisk has a different default)
+        ${SFDISK} -L -uS -d ${BLOCKDEV} 2>/dev/null | \
+          sed -n -e '/^$/,$! b; /^$/ d; s:^.*size= *\([0-9]\+\),.*$:\1:; p' | \
+          tr '\n' ' '
+    `"
+
+    # Calculate total size used by partitions
+    used_size=0
+    for part_size in ${sfdisk_sizes}; do
+        used_size=`expr ${used_size} + ${part_size}`
+    done
+
+    # Abort if device too small
+    if [ ${device_size} -lt ${used_size} ]; then
+        printf 'Device size (%d sectors) is less than size used by partitions (%d sectors). Aborting.\n' "${device_size}" "${used_size}" >&2
+        cleanup
+        trap - EXIT
+        exit 1
+    fi
+
+    # If device too big
+    if [ ${device_size} -gt ${used_size} ]; then
+
+        # Get root (final) partition number
+        if [ "${SWAP}" = "yes" ] && [ -z "${KERNEL_PATH}" ] ; then
+            part_num=3
+        elif [ "${SWAP}" = "no" ] && [ -z "${KERNEL_PATH}" ] || [ "${SWAP}" = "yes" ] && [ -n "${KERNEL_PATH}" ] ; then
+            part_num=2
+        elif [ "${SWAP}" = "no" ] && [ -n "${KERNEL_PATH}" ] ; then
+            part_num=1
+        fi
+
+        # Expand final partition
+        ${SFDISK} -L -d ${BLOCKDEV} 2>/dev/null | \
+          {
+              counter=0
+              while IFS= read -r sfdiskline; do
+                  if [ 0 -eq $counter ]; then
+                      if [ -z "$sfdiskline" ]; then
+                          counter=1
+                      fi
+                      printf '%s\n' "$sfdiskline"
+                  else
+                      if [ $part_num -eq $counter ]; then
+                          printf '%s\n' "$sfdiskline" | \
+                              sed -e 's/size= *[0-9]\+,/size=,/'
+                      else
+                          printf '%s\n' "$sfdiskline"
+                      fi
+                      counter=`expr $counter + 1`
+                  fi
+              done
+          } | ${SFDISK} -L ${BLOCKDEV} 2>/dev/null
+
+        # Update awareness of new device size
+        new_device_size=`${BLOCKDEV_CMD} --getsz ${BLOCKDEV}`
+        new_device_table="$(
+            dmsetup table ${BLOCKDEV} | \
+                sed -e 's/^\([^ \t]\+[ \t]\+\)[^ \t]\+\([ \t]\)$/\1'"${new_device_size}"'\2/'
+        )"
+        trap 'set +e; cleanup' EXIT # not pretty, but the alternative would be too complex
+        dmsetup suspend ${BLOCKDEV}
+        dmsetup reload ${BLOCKDEV} --table "$new_device_table"
+        dmsetup resume ${BLOCKDEV}
+        trap cleanup EXIT # ..back to normal
+
+        filesystem_dev=$(map_disk0 ${BLOCKDEV})
+        CLEANUP+=("unmap_disk0 ${BLOCKDEV}")
+        ROOT_DEV=$(map_partition $filesystem_dev root)
+
+        # Expand filesystem on final partition
+        #TODO: equivalent commandlines for btrfs, xfs, zfs, ntfs, etc...
+        case `${BLKID} -p -u filesystem -s TYPE -o value ${ROOT_DEV}` in
+            ext2|ext3|ext4)
+                resize2fs -f ${ROOT_DEV} >/dev/null 2>&1
+                ;;
+        esac
+
+    fi
+fi
+
+cleanup
+trap - EXIT
+exit 0

@@ -26,6 +26,8 @@ PARTED="@PARTED@"
 QEMU_IMG="@QEMU_IMG@"
 MKDIR_P="@MKDIR_P@"
 INSTANCE_MEM=
+BLOCKDEV_CMD="@BLOCKDEV_CMD@"
+BLKID="@BLKID@"
 
 CLEANUP=( )
 
@@ -435,6 +437,7 @@ fi
 : ${NOMOUNT:="no"}
 : ${ARCH:=""}
 : ${CUSTOMIZE_DIR:="@sysconfdir@/ganeti/instance-image/hooks"}
+: ${PRE_CUSTOMIZE_DIR:="@sysconfdir@/ganeti/instance-image/pre-hooks"}
 : ${VARIANTS_DIR:="@sysconfdir@/ganeti/instance-image/variants"}
 : ${NETWORKS_DIR:="@sysconfdir@/ganeti/instance-image/networks"}
 : ${OVERLAYS_DIR:="@sysconfdir@/ganeti/instance-image/overlays"}
@@ -446,23 +449,8 @@ fi
 SCRIPT_NAME=$(basename $0)
 KERNEL_PATH="$INSTANCE_HV_kernel_path"
 
-if [ -f /sbin/blkid -a -x /sbin/blkid ]; then
-    VOL_ID="/sbin/blkid -c /dev/null -o value -s UUID"
-    VOL_TYPE="/sbin/blkid -c /dev/null -o value -s TYPE"
-else
-    for dir in /lib/udev /sbin; do
-        if [ -f $dir/vol_id -a -x $dir/vol_id ]; then
-            VOL_ID="$dir/vol_id -u"
-            VOL_TYPE="$dir/vol_id -t"
-        fi
-    done
-fi
-
-if [ -z "$VOL_ID" ]; then
-    log_error "vol_id or blkid not found, please install udev or util-linux"
-    exit 1
-fi
-
+VOL_ID="${BLKID} -c /dev/null -o value -s UUID"
+VOL_TYPE="${BLKID} -c /dev/null -o value -s TYPE"
 
 if [ -z "$OS_API_VERSION" -o "$OS_API_VERSION" = "5" ]; then
   OS_API_VERSION=5

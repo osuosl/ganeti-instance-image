@@ -43,7 +43,7 @@ if [ "$CDINSTALL" = "no" ] ; then
       CLEANUP+=("$LOSETUP -d $blockdev")
     fi
 
-    DISK_SIZE="$(expr `blockdev --getsize64 $blockdev` / 1048576)"
+    DISK_SIZE="$(expr `${BLOCKDEV_CMD} --getsize64 $blockdev` / 1048576)"
 
     if [ "${SWAP}" = "yes" ] && [ -z "$SWAP_SIZE" ] ; then
         log_error "SWAP_SIZE not set however SWAP is enabled"
@@ -73,6 +73,14 @@ if [ "$CDINSTALL" = "no" ] ; then
     if [ "${NOMOUNT}" = "yes" ] ; then
       cleanup
       exit 0
+    fi
+
+    RUN_PARTS=`which run-parts`
+
+    if [ -n "$RUN_PARTS" -a -n "$PRE_CUSTOMIZE_DIR" -a -d "$PRE_CUSTOMIZE_DIR" ]; then
+        BLOCKDEV=$blockdev
+        export TARGET SUITE BLOCKDEV IMAGE_TYPE
+        $RUN_PARTS $PRE_CUSTOMIZE_DIR
     fi
 
     filesystem_dev=$(map_disk0 $blockdev)
@@ -118,8 +126,6 @@ if [ "$CDINSTALL" = "no" ] ; then
     if [ "${INSTANCE_HV_serial_console}" = "True" ] ; then
         setup_console $TARGET
     fi
-
-    RUN_PARTS=`which run-parts`
 
     if [ -n "$RUN_PARTS" -a -n "$CUSTOMIZE_DIR" -a -d "$CUSTOMIZE_DIR" ]; then
       TARGET=$TARGET
