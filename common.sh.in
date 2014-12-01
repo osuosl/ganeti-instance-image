@@ -34,7 +34,7 @@ log_error() {
 }
 
 debug() {
-    [ "$IMAGE_DEBUG" == "1" -o "$IMAGE_DEBUG" == "yes" ] &&  $@ || :
+    [ "$IMAGE_DEBUG" == "1" -o "$IMAGE_DEBUG" == "yes" ] && "$@" || :
 }
 
 get_api5_arguments() {
@@ -192,11 +192,11 @@ EOF
         # 1 - Size of Memory, swap
         # 2 - Rest
         $sfdisk_cmd > /dev/null <<EOF
-,$SWAP_SIZE,S
+,${SWAP_SIZE},S
 ,,L,*
 EOF
     elif [  "${SWAP}" = "no" -a -n "${KERNEL_PATH}" ] ; then
-        # Create two partitions:
+        # Create one partition:
         # 1 - Whole
         $sfdisk_cmd > /dev/null <<EOF
 ,,L,*
@@ -233,7 +233,7 @@ format_disk0_parted() {
         $parted_cmd mkpart primary 0% ${SWAP_SIZE}M
         $parted_cmd mkpart primary ${SWAP_SIZE}M 100%
     elif [  "${SWAP}" = "no" -a -n "${KERNEL_PATH}" ] ; then
-        # Create two partitions:
+        # Create one partition:
         # 1 - Whole
         $parted_cmd mklabel msdos
         $parted_cmd mkpart primary 0% 100%
@@ -318,6 +318,10 @@ map_partition() {
 
 unmap_disk0() {
   $KPARTX -d -p- $1
+}
+
+update_map_disk0() {
+  $KPARTX -u -p- $1
 }
 
 setup_fstab() {
