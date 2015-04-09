@@ -15,14 +15,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.network :private_network, type: 'dhcp'
   config.vm.provision :chef_solo do |chef|
     chef.json = {
-      ganeti: {
+      :"ganeti" => {
         :"master-node" => true,
-        cluster: {
+        :"cluster" => {
           :"master-netdev" => 'lo',
           :"extra-opts" => '--vg-name ganeti',
           :"nic" => {
-            mode: 'routed',
-            link: '100'
+            :"mode" => 'routed',
+            :"link" => '100'
           },
           :"name" => 'ganeti.local'
         }
