@@ -1,6 +1,7 @@
 AllCops:
   Include:
     - '**/Berksfile'
+    - '**/Vagrantfile'
     - '**/Cheffile'
   Exclude:
     - '**/metadata.rb'
