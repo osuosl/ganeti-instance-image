@@ -7,12 +7,10 @@ Vagrant.require_version '>= 1.7.0'
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.hostname = 'instance-image'
-  if Vagrant.has_plugin?('vagrant-omnibus')
-    config.omnibus.chef_version = 'latest'
-  end
-  if Vagrant.has_plugin?('vagrant-berkshelf')
-    config.berkshelf.enabled = true
-  end
+  config.omnibus.chef_version = 'latest' if
+    Vagrant.has_plugin?('vagrant-omnibus')
+  config.berkshelf.enabled = true if
+    Vagrant.has_plugin?('vagrant-berkshelf')
   config.vm.box = 'chef/centos-6.6'
   config.vm.network :private_network, type: 'dhcp'
   config.vm.provision :chef_solo do |chef|
