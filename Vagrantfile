@@ -31,6 +31,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     chef.run_list = %w(
       recipe[instance-image-devel]
       recipe[ganeti]
+      recipe[instance-image-devel::install]
     )
   end
 end
