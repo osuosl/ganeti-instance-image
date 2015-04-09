@@ -22,18 +22,18 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         cluster: {
           :"master-netdev" => 'lo',
           :"extra-opts" => '--vg-name ganeti',
-          nic: {
+          :"nic" => {
             mode: 'routed',
             link: '100'
           },
-          name: 'ganeti.local'
+          :"name" => 'ganeti.local'
         }
       }
     }
-    chef.run_list = [
-      'recipe[instance-image-devel]',
-      'recipe[ganeti::_test]',
-      'recipe[ganeti]'
-    ]
+    chef.run_list = %w(
+      recipe[instance-image-devel]
+      recipe[ganeti::_test]
+      recipe[ganeti]
+    )
   end
 end
