@@ -4,8 +4,7 @@ include_recipe 'build-essential'
   automake
   dump
   kpartx
-  parted
-  ).each do |p|
+  parted).each do |p|
   package p
 end
 
