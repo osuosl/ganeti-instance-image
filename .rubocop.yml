@@ -5,3 +5,9 @@ AllCops:
     - '**/Cheffile'
   Exclude:
     - '**/metadata.rb'
+
+# We're using rocket style since our attributes have dashes in them. Let's not
+# worry about it with rubocop for now.
+Style/HashSyntax:
+  Exclude:
+    - '**/Vagrantfile'
