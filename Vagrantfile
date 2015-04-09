@@ -20,6 +20,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         :"cluster" => {
           :"master-netdev" => 'lo',
           :"extra-opts" => '--vg-name ganeti',
+          :"disk-templates" => %w(plain),
           :"nic" => {
             :"mode" => 'routed',
             :"link" => '100'
