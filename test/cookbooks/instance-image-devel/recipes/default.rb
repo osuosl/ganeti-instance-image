@@ -16,3 +16,15 @@ execute 'create ganeti volume group' do
   action :run
   not_if 'vgs ganeti'
 end
+
+hostsfile_entry '192.168.125.10' do
+  hostname 'ganeti.local'
+  action :create
+end
+
+hostsfile_entry node['network']['interfaces']['eth0']['addresses'].keys[1] do
+  hostname node['fqdn']
+  aliases [node['hostname']]
+  unique true
+  action :create
+end
