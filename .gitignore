@@ -24,6 +24,9 @@ tools/umount-disks
 # vim
 *.swp
 
+# redhat
+*.rpm
+
 # debian
 build-stamp
 debian/files
