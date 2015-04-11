@@ -33,6 +33,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       recipe[instance-image-devel]
       recipe[ganeti]
       recipe[instance-image-devel::install]
+      recipe[instance-image-devel::variants]
     )
   end
 end
