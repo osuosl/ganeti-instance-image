@@ -10,7 +10,7 @@ URL:		http://code.osuosl.org/projects/ganeti-image
 Source0:	http://ftp.osuosl.org/pub/osl/ganeti-instance-image/%{name}-%{version}.tar.gz
 BuildRoot:	%(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 BuildRequires:	qemu-img, dump, tar, kpartx
-Requires:       qemu-img, dump, tar, kpartx, ganeti
+Requires:       qemu-img, dump, tar, kpartx, curl, ganeti
 BuildArch:      noarch
 
 %description
@@ -46,8 +46,9 @@ rm -rf $RPM_BUILD_ROOT/%{_datadir}/doc/%{name}
 # The install scripts create a symlink using the fully qualified path
 # that includes the build root path.
 pushd $RPM_BUILD_ROOT%{_datadir}/ganeti/os/%{instancename}
-rm -f variants.list
+rm -f variants.list parameters.list
 ln -s ../../../../..%{_sysconfdir}/ganeti/instance-%{instancename}/variants.list variants.list
+ln -s ../../../../..%{_sysconfdir}/ganeti/instance-%{instancename}/parameters.list parameters.list
 popd
 
 
@@ -60,6 +61,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc COPYING README.markdown NEWS example/hooks/*
 %config(noreplace) %{_sysconfdir}/ganeti/instance-%{instancename}/variants/default.conf
 %config(noreplace) %{_sysconfdir}/ganeti/instance-%{instancename}/variants.list
+%config(noreplace) %{_sysconfdir}/ganeti/instance-%{instancename}/parameters.list
 %config(noreplace) %{_sysconfdir}/ganeti/instance-%{instancename}/hooks/*
 %{_datadir}/ganeti/os/%{instancename}/*
 
