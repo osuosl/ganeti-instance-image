@@ -29,6 +29,10 @@ case "$IMAGE_TYPE" in
     ;;
   qemu)
     IMG_EXT=".img"
+  raw)
+    IMG_EXT=".raw"
+  qcow2)
+    IMG_EXT=".qcow2"
   dump)
     IMG_EXT="-root.dump"
     ;;
