@@ -42,9 +42,10 @@ if [ ! -z "$IMAGE_URL" ] ; then
         || (log_error "Failed to find the checksum file"; exit 1)
         $SHA1SUM -c "${IMAGE_NAME}-${ARCH}${IMG_EXT}.sig" >/dev/null \
         || (log_error "Image doesn't match checksum!"; exit 1)
+        CLEANUP+=("rm ${CACHE_DIR}/${IMAGE_NAME}-${ARCH}${IMG_EXT}.sig")
     fi
     if [ $IMG_CLEANUP="yes" ]; then
-        CLEANUP+=("rm ${CACHE_DIR}/${IMAGE_NAME}-${ARCH}${IMG_EXT} ${CACHE_DIR}/${IMAGE_NAME}-${ARCH}${IMG_EXT}.sig")
+        CLEANUP+=("rm ${CACHE_DIR}/${IMAGE_NAME}-${ARCH}${IMG_EXT}")
     fi
     IMAGE_FILE="${CACHE_DIR}/${IMAGE_NAME}-${ARCH}${IMG_EXT}"
     cd $OLDPWD
