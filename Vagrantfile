@@ -19,7 +19,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         :"master-node" => true,
         :"cluster" => {
           :"master-netdev" => 'lo',
-          :"extra-opts" => '--vg-name ganeti',
+          :"extra-opts" => '--vg-name ganeti -H kvm:kernel_path=""',
           :"disk-templates" => %w(plain),
           :"nic" => {
             :"mode" => 'routed',
