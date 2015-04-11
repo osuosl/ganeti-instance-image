@@ -23,13 +23,16 @@ set -e
 
 debug set -x
 
-if [ "$IMAGE_TYPE" = "tarball" ] ; then
+case "$IMAGE_TYPE" in
+  tarball)
     IMG_EXT=".tar.gz"
-elif [ "$IMAGE_TYPE" = "qemu" ] ; then
+    ;;
+  qemu)
     IMG_EXT=".img"
-elif [ "$IMAGE_TYPE" = "dump" ] ; then
+  dump)
     IMG_EXT="-root.dump"
-fi
+    ;;
+esac
 
 if [ ! -z "$IMAGE_URL" ] ; then
     cd ${CACHE_DIR}
