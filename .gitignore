@@ -24,9 +24,16 @@ tools/umount-disks
 # vim
 *.swp
 
+# redhat
+*.rpm
+
 # debian
 build-stamp
 debian/files
 debian/*.log
 debian/ganeti-instance-image/
 debian/ganeti-instance-image.substvars
+
+# Vagrant/Chef
+Berksfile.lock
+.vagrant/
