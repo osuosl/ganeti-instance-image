@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ "$OSP_IMG_FORMAT" !=  "tarball" ] && [ "OSP_IMG_FORMAT" !=  "qemu" ] && [ "OSP_IMG_FORMAT" != "dump" ]; then
+    echo "Wrong image format. Supported formats are: qemu, tarball, dump." 1>&2
+    exit 1
+fi
+
+exit 0

@@ -66,6 +66,16 @@ if test -z "$QEMU_IMG" ; then
   AC_MSG_ERROR([qemu-img not found in $PATH])
 fi
 
+AC_PATH_PROG(CURL, [curl], [], [$PATH:/usr/bin:/bin])
+if test -z "$CURL" ; then
+  AC_MSG_ERROR([curl not found in $PATH])
+fi
+
+AC_PATH_PROG(SHA1SUM, [sha1sum], [], [$PATH:/usr/bin:/bin])
+if test -z "$SHA1SUM" ; then
+  AC_MSG_ERROR([sha1sum not found in $PATH])
+fi
+
 AC_CONFIG_FILES([
     Makefile
 ])

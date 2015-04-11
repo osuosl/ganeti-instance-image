@@ -1,0 +1,23 @@
+#!/bin/bash
+
+#
+# Copyright (C) 2011 Greek Research and Technology Network
+#
+
+set -e
+
+. common.sh
+
+debug set -x
+
+trap cleanup EXIT
+
+if [ -n "${IMG_SSH_KEY_URL}" ]; then
+       mkdir -p ${TARGET}/root/.ssh
+       wget -q -O "${TARGET}/root/.ssh/authorized_keys" "${IMG_SSH_KEY_URL}"
+       echo "Succesfully injected ssh key"
+fi
+
+trap - EXIT
+exit 0
+

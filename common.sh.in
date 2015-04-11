@@ -26,6 +26,8 @@ PARTED="@PARTED@"
 QEMU_IMG="@QEMU_IMG@"
 MKDIR_P="@MKDIR_P@"
 INSTANCE_MEM=
+CURL="@CURL@"
+SHA1SUM="@SHA1SUM@"
 
 CLEANUP=( )
 
@@ -98,6 +100,17 @@ get_api10_arguments() {
     log_error "Missing OS API Variable OLD_INSTANCE_NAME"
   fi
   old_name=$OLD_INSTANCE_NAME
+}
+
+get_api20_parameters() {
+  if [ -z "$OSP_IMG_ID" -o -z "$OSP_IMG_FORMAT" ]; then
+    log_error "Missing OS API Parameter:"
+    log_error "(OSP_IMG_ID or OSP_IMG_FORMAT)"
+    exit 1
+  fi
+  IMG_ID=$OSP_IMG_ID
+  IMG_FORMAT=$OSP_IMG_FORMAT
+  IMG_SSH_KEY_URL=$OSP_IMG_SSH_KEY_URL
 }
 
 get_os_type() {
@@ -399,6 +412,25 @@ setup_console() {
     esac
 }
 
+filesystem_check() {
+    local target=$1
+    if [ -z "$target" ] ; then
+        log_error "target not set for filesystem_check"
+        exit 1
+    fi
+
+    get_os $target
+
+    case "${OPERATING_SYSTEM}" in
+       fedora|centos|redhat)
+        # we have to force a filesystem relabeling for SELinux after messing
+        # around with the filesystem in fedora
+        echo "Enforce an automatic relabeling in the initial boot process..."
+        touch $target/.autorelabel
+       ;;
+    esac
+}
+
 cleanup() {
   if [ ${#CLEANUP[*]} -gt 0 ]; then
     LAST_ELEMENT=$((${#CLEANUP[*]}-1))
@@ -442,6 +474,10 @@ fi
 : ${IMAGE_DIR:="@localstatedir@/cache/ganeti-instance-image"}
 : ${IMAGE_DEBUG:="no"}
 : ${FDISK:="sfdisk"}
+: ${CACHE_DIR:="@localstatedir@/cache/ganeti-instance-image"}
+: ${IMAGE_URL:=""}
+: ${IMG_VERIFY:="yes"}
+: ${IMG_CLEANUP:="no"}
 
 SCRIPT_NAME=$(basename $0)
 KERNEL_PATH="$INSTANCE_HV_kernel_path"
@@ -471,6 +507,10 @@ if [ -z "$OS_API_VERSION" -o "$OS_API_VERSION" = "5" ]; then
   get_api5_arguments $GETOPT_RESULT
 elif [ "$OS_API_VERSION" = "10" -o "$OS_API_VERSION" = "15" ]; then
   get_api10_arguments
+elif [ "$OS_API_VERSION" = "20" ]; then
+  get_api10_arguments
+  get_api20_parameters
+  IMAGE_NAME=$IMG_ID
 else
   log_error "Unknown OS API VERSION $OS_API_VERSION"
   exit 1

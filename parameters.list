@@ -1,0 +1,3 @@
+img_id The id of the image to be installed (the id will be the image's file name prefix)
+img_format The format of the image to be installed
+img_ssh_key_url The root ssh key to be injected into the image
