@@ -71,6 +71,7 @@ install-exec-local:
 	@mkdir_p@ "$(DESTDIR)$(localstatedir)/cache/ganeti-instance-image"
 	touch "$(DESTDIR)$(variantsdir)/default.conf"
 	ln -fs $(DESTDIR)$(configdir)/variants.list $(DESTDIR)$(OS_DIR)/$(osname)/variants.list
+	ln -fs $(DESTDIR)$(configdir)/parameters.list $(DESTDIR)$(OS_DIR)/$(osname)/parameters.list
 
 distclean-local:
 	rm -rf build-stamp debian/files debian/*.log debian/ganeti-instance-image/ \
