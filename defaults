@@ -65,3 +65,22 @@
 
 # IMAGE_DEBUG: turn on debugging output for the scripts
 # IMAGE_DEBUG=0
+
+# IMAGE_URL: a remote (HTTP) location for the images.
+# A checksum (in SHA1 form) file with an appended .sig extention is required
+# to be present there for checking the image intergrity.
+# If not set, it falls back to  IMAGE_DIR.
+# IMAGE_URL=""
+
+# CACHE_DIR: directory where the downloaded images will be saved
+# ( default is @localstatedir@/cache/ganeti-instance-image )
+# CACHE_DIR=""
+
+# IMAGE_VERIFY: Check the image signature
+# if set to yes then a file <imagename>.sig must be on the IMAGE_URL
+# and contain the sha1sum value of the image
+# IMAGE_VERIFY="yes"
+
+# IMG_CLEANUP: whether to remove the downloaded image after the installation
+# finishes. If set to no manual cleanup of images is needed.
+# IMAGE_CLEANUP="no"

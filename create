@@ -24,11 +24,36 @@ set -e
 debug set -x
 
 if [ "$IMAGE_TYPE" = "tarball" ] ; then
-    IMAGE_FILE="${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}.tar.gz"
+    IMG_EXT=".tar.gz"
 elif [ "$IMAGE_TYPE" = "qemu" ] ; then
-    IMAGE_FILE="${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}.img"
+    IMG_EXT=".img"
 elif [ "$IMAGE_TYPE" = "dump" ] ; then
-    IMAGE_FILE="${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}-root.dump"
+    IMG_EXT="-root.dump"
+fi
+
+if [ ! -z "$IMAGE_URL" ] ; then
+    cd ${CACHE_DIR}
+    if [ ! -e ${CACHE_DIR}/${IMAGE_NAME}-${ARCH}${IMG_EXT} ]; then
+        $CURL -O "${IMAGE_URL}/${IMAGE_NAME}-${ARCH}${IMG_EXT}" 2>/dev/null\
+        || (log_error "Failed to find the image on ${IMAGE_URL}"; exit 1)
+    fi
+    if [ "$IMAGE_VERIFY" = "yes" ]; then
+        $CURL -O "${IMAGE_URL}/${IMAGE_NAME}-${ARCH}${IMG_EXT}.sig" 2>/dev/null\
+        || (log_error "Failed to find the checksum file"; exit 1)
+        $SHA1SUM -c "${IMAGE_NAME}-${ARCH}${IMG_EXT}.sig" >/dev/null \
+        || (log_error "Image doesn't match checksum!"; exit 1)
+        CLEANUP+=("rm ${CACHE_DIR}/${IMAGE_NAME}-${ARCH}${IMG_EXT}.sig")
+    fi
+    if [ $IMAGE_CLEANUP="yes" ]; then
+        CLEANUP+=("rm ${CACHE_DIR}/${IMAGE_NAME}-${ARCH}${IMG_EXT}")
+    fi
+    IMAGE_FILE="${CACHE_DIR}/${IMAGE_NAME}-${ARCH}${IMG_EXT}"
+    cd $OLDPWD
+else
+    IMAGE_FILE="${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}${IMG_EXT}"
+fi
+
+if [ "$IMAGE_TYPE" = "dump" ] ; then
     # Workaround for restore's non-unique /tmp/rstdir* and /tmp/rstmode*
     export TMPDIR=$(mktemp -d /tmp/${INSTANCE_NAME}_XXXXXXXX)
     CLEANUP+=("rmdir --ignore-fail-on-non-empty $TMPDIR")
