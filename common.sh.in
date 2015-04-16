@@ -446,8 +446,8 @@ fi
 : ${FDISK:="sfdisk"}
 : ${CACHE_DIR:="@localstatedir@/cache/ganeti-instance-image"}
 : ${IMAGE_URL:=""}
-: ${IMG_VERIFY:="yes"}
-: ${IMG_CLEANUP:="no"}
+: ${IMAGE_VERIFY:="yes"}
+: ${IMAGE_CLEANUP:="no"}
 
 SCRIPT_NAME=$(basename $0)
 KERNEL_PATH="$INSTANCE_HV_kernel_path"

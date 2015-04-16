@@ -76,11 +76,11 @@
 # ( default is @localstatedir@/cache/ganeti-instance-image )
 # CACHE_DIR=""
 
-# IMG_VERIFY: Check the image signature
+# IMAGE_VERIFY: Check the image signature
 # if set to yes then a file <imagename>.sig must be on the IMAGE_URL
 # and contain the sha1sum value of the image
-# IMG_VERIFY="yes"
+# IMAGE_VERIFY="yes"
 
 # IMG_CLEANUP: whether to remove the downloaded image after the installation
 # finishes. If set to no manual cleanup of images is needed.
-# IMG_CLEANUP="yes"
+# IMAGE_CLEANUP="yes"
