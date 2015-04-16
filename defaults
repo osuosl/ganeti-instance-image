@@ -83,4 +83,4 @@
 
 # IMG_CLEANUP: whether to remove the downloaded image after the installation
 # finishes. If set to no manual cleanup of images is needed.
-# IMAGE_CLEANUP="yes"
+# IMAGE_CLEANUP="no"
