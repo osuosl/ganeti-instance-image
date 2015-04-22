@@ -164,7 +164,8 @@ if [ "$CDINSTALL" = "no" ] ; then
       BLOCKDEV=$blockdev
       ROOT_DEV=$root_dev
       BOOT_DEV=$boot_dev
-      export TARGET SUITE BLOCKDEV ROOT_DEV BOOT_DEV IMAGE_TYPE
+      IMG_SSH_KEY_URL="$IMG_SSH_KEY_URL"
+      export TARGET SUITE BLOCKDEV ROOT_DEV BOOT_DEV IMAGE_TYPE IMG_SSH_KEY_URL
       $RUN_PARTS $CUSTOMIZE_DIR
     fi
 fi
