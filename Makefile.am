@@ -9,7 +9,7 @@ overlaysdir=${sysconfdir}/ganeti/instance-image/overlays
 toolsdir=$(OS_DIR)/$(osname)/tools
 
 dist_os_SCRIPTS = ${srcdir}/create ${srcdir}/import ${srcdir}/export \
-	${srcdir}/rename
+	${srcdir}/rename ${srcdir}/cloud_init.rb
 dist_os_DATA = ${srcdir}/ganeti_api_version
 dist_config_DATA = ${srcdir}/variants.list
 os_DATA = common.sh
