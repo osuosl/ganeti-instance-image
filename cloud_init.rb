@@ -41,6 +41,8 @@ if manage_resolv_conf
       'timeout' => 1
     }
   }
+else
+  manage_conf = false
 end
 
 init_modules =
