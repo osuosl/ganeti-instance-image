@@ -19,7 +19,7 @@
 
 require 'yaml'
 
-host = ENV['INSTANCE_NAME']
+host = ENV['INSTANCE_NAME'] || ''
 user = ENV['CINIT_USER']
 ssh_key = ENV['CINIT_SSH_KEY']
 disable_root = ENV['CINIT_DISABLE_ROOT'] == 'yes' ? 1 : 0
