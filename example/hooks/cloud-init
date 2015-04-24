@@ -35,8 +35,8 @@ if [ -z "${TARGET}" -o ! -d "${TARGET}" ] ; then
 fi
 
 # Need to export these out to the ruby script can read it
-export CINIT_USER CINIT_SSH_KEY
-export CINIT_MANAGE_RESOLV_CONF
+export CINIT_USER CINIT_SSH_KEY CINIT_SSH_PWAUTH
+export CINIT_MANAGE_RESOLV_CONF CINIT_DISABLE_ROOT
 export DNS_SERVERS DNS_SEARCH
 
 # Write out config as a yaml file
