@@ -25,7 +25,7 @@ ssh_key = ENV['CINIT_SSH_KEY']
 manage_resolv_conf = ENV['CINIT_MANAGE_RESOLV_CONF']
 name_servers = ENV['DNS_SERVERS']
 search_domains = ENV['DNS_SEARCH']
-domain = host.split('.').last(2).join('.')
+domain = host.split('.').drop(1).join('.')
 resolv_conf = nil
 
 if manage_resolv_conf == 'yes'
