@@ -22,6 +22,8 @@ require 'yaml'
 host = ENV['INSTANCE_NAME']
 user = ENV['CINIT_USER']
 ssh_key = ENV['CINIT_SSH_KEY']
+disable_root = ENV['CINIT_DISABLE_ROOT'] == 'yes' ? 1 : 0
+ssh_pwauth = ENV['CINIT_SSH_PWAUTH'] == 'yes' ? 1 : 0
 manage_resolv_conf = ENV['CINIT_MANAGE_RESOLV_CONF']
 name_servers = ENV['DNS_SERVERS']
 search_domains = ENV['DNS_SEARCH']
@@ -61,8 +63,8 @@ config = {
   'hostname' => host.sub(/\..*$/, ''),
   'fqdn' => host,
   'instance-id' => host,
-  'disable_root' => 0,
-  'ssh_pwauth' => 0,
+  'disable_root' => disable_root,
+  'ssh_pwauth' => ssh_pwauth,
   'datasource_list' => %w(None),
   'manage-resolv-conf' => manage_conf,
   'manage_resolv_conf' => manage_conf,
