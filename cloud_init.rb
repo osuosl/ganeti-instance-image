@@ -24,13 +24,13 @@ user = ENV['CINIT_USER']
 ssh_key = ENV['CINIT_SSH_KEY']
 disable_root = ENV['CINIT_DISABLE_ROOT'] == 'yes' ? 1 : 0
 ssh_pwauth = ENV['CINIT_SSH_PWAUTH'] == 'yes' ? 1 : 0
-manage_resolv_conf = ENV['CINIT_MANAGE_RESOLV_CONF']
+manage_resolv_conf = ENV['CINIT_MANAGE_RESOLV_CONF'] == 'yes' ? true : false
 name_servers = ENV['DNS_SERVERS']
 search_domains = ENV['DNS_SEARCH']
 domain = host.split('.').drop(1).join('.')
 resolv_conf = nil
 
-if manage_resolv_conf == 'yes'
+if manage_resolv_conf
   manage_conf = true
   resolv_conf = {
     'nameservers' => name_servers.split(' '),
