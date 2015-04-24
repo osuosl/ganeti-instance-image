@@ -40,6 +40,11 @@ export CINIT_MANAGE_RESOLV_CONF
 export DNS_SERVERS DNS_SEARCH
 
 # Write out config as a yaml file
-./cloud_init.rb > ${TARGET}/${cinit_cfg}
+if [ -d ${TARGET}/etc/cloud/cloud.cfg.d ] ; then
+  ./cloud_init.rb > ${TARGET}/${cinit_cfg}
+else
+  log_error "cloud-init is not installed"
+  exit 1
+fi
 
 exit 0
