@@ -33,8 +33,8 @@ resolv_conf = nil
 if manage_resolv_conf
   manage_conf = true
   resolv_conf = {
-    'nameservers' => name_servers.split(' '),
-    'searchdomains' => search_domains.split(' '),
+    'nameservers' => name_servers.split,
+    'searchdomains' => search_domains.split,
     'domain' => domain,
     'options' => {
       'rotate' => true,
