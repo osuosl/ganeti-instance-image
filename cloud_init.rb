@@ -19,69 +19,73 @@
 
 require 'yaml'
 
-host = ENV['INSTANCE_NAME'] || ''
-user = ENV['CINIT_USER']
-ssh_key = ENV['CINIT_SSH_KEY']
-disable_root = ENV['CINIT_DISABLE_ROOT'] == 'yes' ? 1 : 0
-ssh_pwauth = ENV['CINIT_SSH_PWAUTH'] == 'yes' ? 1 : 0
-manage_resolv_conf = ENV['CINIT_MANAGE_RESOLV_CONF'] == 'yes' ? true : false
-name_servers = ENV['DNS_SERVERS']
-search_domains = ENV['DNS_SEARCH']
-domain = host.split('.').drop(1).join('.')
-resolv_conf = nil
+def cloud_init
+  host = ENV['INSTANCE_NAME'] || ''
+  user = ENV['CINIT_USER']
+  ssh_key = ENV['CINIT_SSH_KEY']
+  disable_root = ENV['CINIT_DISABLE_ROOT'] == 'yes' ? 1 : 0
+  ssh_pwauth = ENV['CINIT_SSH_PWAUTH'] == 'yes' ? 1 : 0
+  manage_resolv_conf = ENV['CINIT_MANAGE_RESOLV_CONF'] == 'yes' ? true : false
+  name_servers = ENV['DNS_SERVERS']
+  search_domains = ENV['DNS_SEARCH']
+  domain = host.split('.').drop(1).join('.')
+  resolv_conf = nil
 
-if manage_resolv_conf
-  manage_conf = true
-  resolv_conf = {
-    'nameservers' => name_servers.split,
-    'searchdomains' => search_domains.split,
-    'domain' => domain,
-    'options' => {
-      'rotate' => true,
-      'timeout' => 1
+  if manage_resolv_conf
+    manage_conf = true
+    resolv_conf = {
+      'nameservers' => name_servers.split,
+      'searchdomains' => search_domains.split,
+      'domain' => domain,
+      'options' => {
+        'rotate' => true,
+        'timeout' => 1
+      }
     }
+  else
+    manage_conf = false
+  end
+
+  init_modules =
+    %w(
+      migrator
+      bootcmd
+      write-files
+      growpart
+      resizefs
+      set_hostname
+      update_hostname
+      update_etc_hosts
+      resolv_conf
+      rsyslog
+      users-groups
+      ssh
+    )
+
+  config = {
+    'hostname' => host.sub(/\..*$/, ''),
+    'fqdn' => host,
+    'instance-id' => host,
+    'disable_root' => disable_root,
+    'ssh_pwauth' => ssh_pwauth,
+    'datasource_list' => %w(None),
+    'manage-resolv-conf' => manage_conf,
+    'manage_resolv_conf' => manage_conf,
+    'cloud_init_modules' => init_modules,
+    'users' => [
+      'name' => user,
+      'primary-group' => user,
+      'groups' => %w(wheel adm systemd-journal),
+      'sudo' => ['ALL=(ALL) NOPASSWD:ALL'],
+      'shell' => '/bin/bash',
+      'lock_passwd' => true,
+      'ssh-authorized-keys' => [ssh_key]
+    ],
+    'groups' => [user],
+    'resolv_conf' => resolv_conf
   }
-else
-  manage_conf = false
+
+  config.to_yaml
 end
 
-init_modules =
-  %w(
-    migrator
-    bootcmd
-    write-files
-    growpart
-    resizefs
-    set_hostname
-    update_hostname
-    update_etc_hosts
-    resolv_conf
-    rsyslog
-    users-groups
-    ssh
-  )
-
-config = {
-  'hostname' => host.sub(/\..*$/, ''),
-  'fqdn' => host,
-  'instance-id' => host,
-  'disable_root' => disable_root,
-  'ssh_pwauth' => ssh_pwauth,
-  'datasource_list' => %w(None),
-  'manage-resolv-conf' => manage_conf,
-  'manage_resolv_conf' => manage_conf,
-  'cloud_init_modules' => init_modules,
-  'users' => [
-    'name' => user,
-    'primary-group' => user,
-    'groups' => %w(wheel adm systemd-journal),
-    'sudo' => ['ALL=(ALL) NOPASSWD:ALL'],
-    'shell' => '/bin/bash',
-    'lock_passwd' => true,
-    'ssh-authorized-keys' => [ssh_key]
-  ],
-  'groups' => [user],
-  'resolv_conf' => resolv_conf
-}
-
-puts config.to_yaml
+puts cloud_init
