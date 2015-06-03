@@ -1,3 +1,9 @@
+ganeti-instance-image (0.7-beta1) UNRELEASED; urgency=medium
+
+  * Release beta version
+
+ -- Lance Albertson <lance@osuosl.org>  Tue, 02 Jun 2015 20:56:22 -0700
+
 ganeti-instance-image (0.6-1) unstable; urgency=high
   * Version bump, bug fixes and new features
 
