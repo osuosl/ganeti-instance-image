@@ -1,8 +1,7 @@
 source 'https://supermarket.chef.io'
 
 cookbook 'ganeti',
-         github: 'osuosl-cookbooks/ganeti',
-         branch: 'ramereth/rubocop-cleanup'
+         github: 'osuosl-cookbooks/ganeti'
 cookbook 'ganeti-instance-image',
          github: 'osuosl-cookbooks/ganeti-instance-image',
          branch: 'ramereth/initial'
