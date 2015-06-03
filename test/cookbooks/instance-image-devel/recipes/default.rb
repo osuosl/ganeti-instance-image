@@ -2,6 +2,7 @@ include_recipe 'build-essential'
 
 %w(
   automake
+  curl
   dump
   kpartx
   parted
