@@ -12,7 +12,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.berkshelf.enabled = true if
     Vagrant.has_plugin?('vagrant-berkshelf')
   config.vm.box = 'chef/centos-6.6'
-  config.vm.network :private_network, type: 'dhcp'
+  config.vm.network :private_network, ip: '192.168.10.100'
   config.vm.provision :chef_solo do |chef|
     chef.json = {
       :"ganeti" => {
