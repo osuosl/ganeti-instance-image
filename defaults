@@ -54,6 +54,10 @@
 # (default is: /tmp)
 # EXPORT_DIR="/tmp"
 
+# IMPORT_DIR: directory used when importing an instance
+# (default is: /tmp)
+# IMPORT_DIR="/tmp"
+
 # ARCH: Define the ARCH of the image to use
 # Use either x86 or x86_64
 # ARCH=""
