@@ -1,42 +1,33 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-VAGRANTFILE_API_VERSION = '2'
+VAGRANTFILE_API_VERSION = '2'.freeze
 
 Vagrant.require_version '>= 1.7.0'
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  %w(centos-6.6 debian-7.7 ubuntu-12.04 ubuntu-14.04).each do |os|
+  %w(
+    centos-6.9
+    centos-7.3
+    debian-8.8
+    debian-9.0
+    ubuntu-12.04
+    ubuntu-14.04
+    ubuntu-16.04
+  ).each do |os|
     config.vm.define os do |node|
-      config.vm.hostname = "instance-image"
-      config.omnibus.chef_version = 'latest' if
-        Vagrant.has_plugin?('vagrant-omnibus')
-      config.berkshelf.enabled = true if
-        Vagrant.has_plugin?('vagrant-berkshelf')
-      config.vm.box = "chef/#{os}"
-      config.vm.network :private_network, ip: '192.168.10.100'
-      config.vm.provision :chef_solo do |chef|
-        chef.json = {
-          :"ganeti" => {
-            :"master-node" => true,
-            :"cluster" => {
-              :"master-netdev" => 'lo',
-              :"extra-opts" => '--vg-name ganeti -H kvm:kernel_path=""',
-              :"disk-templates" => %w(plain),
-              :"nic" => {
-                :"mode" => 'routed',
-                :"link" => '100'
-              },
-              :"name" => 'ganeti.local'
-            }
-          }
-        }
+      node.vm.hostname = 'instance-image.localdomain'
+      node.vm.box = "bento/#{os}"
+      node.vm.network :private_network, ip: '192.168.10.11'
+      node.vm.provision :chef_solo do |chef|
+        chef.version = '12.18.31'
+        chef.cookbooks_path = 'cookbooks'
         chef.run_list = %w(
           recipe[apt]
           recipe[instance-image-devel]
-          recipe[ganeti]
           recipe[instance-image-devel::install]
           recipe[instance-image-devel::variants]
+          recipe[instance-image-devel::instance_add]
         )
       end
     end

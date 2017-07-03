@@ -9,3 +9,10 @@ execute 'install instance-image' do
   EOF
   action :run
 end
+
+include_recipe 'ganeti::instance_image'
+
+delete_resource(:yum_repository, 'ganeti-instance-image')
+delete_resource(:apt_repository, 'ganeti-instance-image')
+delete_resource(:yum_package, 'ganeti-instance-image')
+delete_resource(:apt_package, 'ganeti-instance-image')

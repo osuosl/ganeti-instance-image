@@ -1,13 +1,28 @@
 AllCops:
   Include:
     - '**/Berksfile'
-    - '**/Vagrantfile'
     - '**/Cheffile'
   Exclude:
-    - '**/metadata.rb'
+    - 'metadata.rb'
+    - 'cookbooks/**/*'
 
-# We're using rocket style since our attributes have dashes in them. Let's not
-# worry about it with rubocop for now.
-Style/HashSyntax:
-  Exclude:
-    - '**/Vagrantfile'
+Style/NumericLiteralPrefix:
+  EnforcedOctalStyle: zero_only
+
+Metrics/LineLength:
+  Max: 120
+
+Metrics/AbcSize:
+  Max: 30
+
+Metrics/MethodLength:
+  Max: 100
+
+Style/IfUnlessModifier:
+  MaxLineLength: 120
+
+Style/WhileUntilModifier:
+  MaxLineLength: 120
+
+Metrics/BlockLength:
+  Enabled: false
