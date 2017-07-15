@@ -1,13 +1,13 @@
 %define         instancename    image
 Name:		ganeti-instance-image
-Version:	0.7
-Release:	beta1%{?dist}
+Version:	0.7.0
+Release:	1%{?dist}
 Summary:	Guest OS definition for Ganeti based on Linux-based images
 
 Group:		System Environment/Daemons
 License:	GPLv2
 URL:		http://code.osuosl.org/projects/ganeti-image
-Source0:	http://ftp.osuosl.org/pub/osl/ganeti-instance-image/%{name}-%{version}-beta1.tar.gz
+Source0:	http://ftp.osuosl.org/pub/osl/ganeti-instance-image/%{name}-%{version}.tar.gz
 BuildRoot:	%(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 BuildRequires:	qemu-img, dump, tar, kpartx, curl
 Requires:       qemu-img, dump, tar, kpartx, curl, ganeti
@@ -24,7 +24,7 @@ debootstrap.
 
 
 %prep
-%setup -q -n %{name}-%{version}-beta1
+%setup -q
 
 
 %build
@@ -65,6 +65,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Jul 14 2017 Lance Albertson <lance osuosl org>
+- Version bump to 0.7.0
+
 * Tue Jun 02 2015 Lance Albertson <lance osuosl org>
 - Version bump to 0.7beta1
 - Vagrant+Chef development environment
