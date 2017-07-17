@@ -54,7 +54,7 @@ if [ ! -z "$IMAGE_URL" ] ; then
         || (log_error "Image doesn't match checksum!"; exit 1)
         CLEANUP+=("rm ${CACHE_DIR}/${IMAGE_NAME}-${ARCH}${IMG_EXT}.sig")
     fi
-    if [ $IMAGE_CLEANUP="yes" ]; then
+    if [ "$IMAGE_CLEANUP" = "yes" ]; then
         CLEANUP+=("rm ${CACHE_DIR}/${IMAGE_NAME}-${ARCH}${IMG_EXT}")
     fi
     IMAGE_FILE="${CACHE_DIR}/${IMAGE_NAME}-${ARCH}${IMG_EXT}"
