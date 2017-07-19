@@ -19,7 +19,7 @@ tools/mount-disks
 tools/umount-disks
 
 # archives
-/ganeti-instance-image-*.tar.gz
+ganeti-instance-image*.tar.gz
 
 # vim
 *.swp
@@ -28,6 +28,9 @@ tools/umount-disks
 *.rpm
 
 # debian
+*.dsc
+*.deb
+*.changes
 build-stamp
 debian/files
 debian/*.log
@@ -37,3 +40,4 @@ debian/ganeti-instance-image.substvars
 # Vagrant/Chef
 Berksfile.lock
 .vagrant/
+cookbooks/
