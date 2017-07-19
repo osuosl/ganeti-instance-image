@@ -1,4 +1,10 @@
-2017-07-014 Lance Albertson <lance@osuosl.org>
+2017-07-19 Lance Albertson <lance@osuosl.org>
+  * Released 0.7.1
+  * Fixes include:
+    - Properly set variable checks for IMAGE_CLEANUP (#27)
+    - Vagrant environment fixes (#28)
+
+2017-07-14 Lance Albertson <lance@osuosl.org>
   * Released 0.7.0
 
 2015-06-02  Lance Albertson <lance@osuosl.org>

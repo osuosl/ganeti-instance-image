@@ -1,6 +1,6 @@
 %define         instancename    image
 Name:		ganeti-instance-image
-Version:	0.7.0
+Version:	0.7.1
 Release:	1%{?dist}
 Summary:	Guest OS definition for Ganeti based on Linux-based images
 
@@ -65,6 +65,12 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Wed Jul 19 2017 Lance Albertson <lance osuosl org>
+- Released 0.7.1
+- Fixes include:
+  - Properly set variable checks for IMAGE_CLEANUP (#27)
+  - Vagrant environment fixes (#28)
+
 * Fri Jul 14 2017 Lance Albertson <lance osuosl org>
 - Version bump to 0.7.0
 
