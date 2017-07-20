@@ -1,6 +1,6 @@
 %define         instancename    image
 Name:		ganeti-instance-image
-Version:	0.7.1
+Version:	0.7.2
 Release:	1%{?dist}
 Summary:	Guest OS definition for Ganeti based on Linux-based images
 
@@ -65,6 +65,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_localstatedir}/cache/ganeti-instance-image
 
 %changelog
+* Thu Jul 20 2017 Lance Albertson <lance osuosl org>
+- Released 0.7.2
+- Fixes Include:
+  - Add /var/cache/ganeti-instance-image directory to package (#29)
+  - bug fix: can't create instance if swap=no and disk size is < memory (25)
+
 * Wed Jul 19 2017 Lance Albertson <lance osuosl org>
 - Released 0.7.1
 - Fixes include:

@@ -1,3 +1,9 @@
+2017-07-20 Lance Albertson <lance@osuosl.org>
+  * Released 0.7.2
+  * Fixes Include:
+    - Add /var/cache/ganeti-instance-image directory to package (#29)
+    - bug fix: can't create instance if swap=no and disk size is < memory (25)
+
 2017-07-19 Lance Albertson <lance@osuosl.org>
   * Released 0.7.1
   * Fixes include:
