@@ -91,7 +91,6 @@ if [ "$CDINSTALL" = "no" ] ; then
         fi
     fi
 
-
     if [ ! -f "$IMAGE_FILE" ] ; then
       log_error "Can't find image file: $IMAGE_FILE"
       exit 1
