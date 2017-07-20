@@ -62,7 +62,7 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/ganeti/instance-%{instancename}/variants.list
 %config(noreplace) %{_sysconfdir}/ganeti/instance-%{instancename}/hooks/*
 %{_datadir}/ganeti/os/%{instancename}/*
-
+%{_localstatedir}/cache/ganeti-instance-image
 
 %changelog
 * Wed Jul 19 2017 Lance Albertson <lance osuosl org>
