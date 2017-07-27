@@ -36,7 +36,7 @@ CLEANUP+=("rmdir $TARGET")
 DUMPDIR=`mktemp -d` || exit 1
 CLEANUP+=("rm -rf $DUMPDIR")
 
-if [ ! "${NOMOUNT}" = "yes" ] ; then
+if [ ! "${NOMOUNT}" = "yes" ] && [ ! "${BLOCKEXPORT}" = "yes" ] ; then
     format_disk0 $blockdev
     filesystem_dev=$(map_disk0 $blockdev)
     CLEANUP+=("unmap_disk0 $blockdev")
@@ -55,7 +55,7 @@ fi
 # import dumps from tar file
 ( cd $DUMPDIR; tar -xf - )
 
-if [ "${NOMOUNT}" = "yes" ] ; then
+if [ "${NOMOUNT}" = "yes" ] || [ "${BLOCKEXPORT}" = "yes" ] ; then
     ( $QEMU_IMG convert ${DUMPDIR}/disk.img -O host_device ${blockdev} )
 else
     # clean up any previous restore runs
