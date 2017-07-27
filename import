@@ -31,9 +31,9 @@ if [ ! -b $blockdev ]; then
     CLEANUP+=("$LOSETUP -d $blockdev")
 fi
 
-TARGET=`mktemp -d` || exit 1
+TARGET=`mktemp -d --tmpdir=${IMPORT_DIR}` || exit 1
 CLEANUP+=("rmdir $TARGET")
-DUMPDIR=`mktemp -d` || exit 1
+DUMPDIR=`mktemp -d --tmpdir=${IMPORT_DIR}` || exit 1
 CLEANUP+=("rm -rf $DUMPDIR")
 
 if [ ! "${NOMOUNT}" = "yes" ] ; then
