@@ -14,5 +14,4 @@ include_recipe 'ganeti::instance_image'
 
 delete_resource(:yum_repository, 'ganeti-instance-image')
 delete_resource(:apt_repository, 'ganeti-instance-image')
-delete_resource(:yum_package, 'ganeti-instance-image')
-delete_resource(:apt_package, 'ganeti-instance-image')
+delete_resource(:package, 'ganeti-instance-image')

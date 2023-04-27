@@ -68,7 +68,6 @@ def cloud_init
     'instance-id' => host,
     'disable_root' => disable_root,
     'ssh_pwauth' => ssh_pwauth,
-    'datasource_list' => %w(None),
     'manage-resolv-conf' => manage_conf,
     'manage_resolv_conf' => manage_conf,
     'cloud_init_modules' => init_modules,
