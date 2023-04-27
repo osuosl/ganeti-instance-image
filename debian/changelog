@@ -1,3 +1,11 @@
+ganeti-instance-image (0.7.3) unstable; urgency=medium
+
+  * Released 0.7.3
+  * Fixes Include:
+    - Remove datasource_list from generated cloud-init config (#31)
+
+ -- Lance Albertson <lance@osuosl.org>  Thu, 27 Apr 2023 16:18:02 -0700
+
 ganeti-instance-image (0.7.2) unstable; urgency=medium
 
   * Released 0.7.2

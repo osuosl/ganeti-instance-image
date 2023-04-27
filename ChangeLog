@@ -1,3 +1,7 @@
+2023-04-27 Lance Albertson <lance@osuosl.org>
+  * Released 0.7.3
+  * Fixes Include:
+    - Remove datasource_list from generated cloud-init config (#31)
 2017-07-20 Lance Albertson <lance@osuosl.org>
   * Released 0.7.2
   * Fixes Include:

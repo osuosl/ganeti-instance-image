@@ -1,6 +1,6 @@
 %define         instancename    image
 Name:		ganeti-instance-image
-Version:	0.7.2
+Version:	0.7.3
 Release:	1%{?dist}
 Summary:	Guest OS definition for Ganeti based on Linux-based images
 
@@ -65,6 +65,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_localstatedir}/cache/ganeti-instance-image
 
 %changelog
+* Thu Apr 27 2032 Lance Albertson <lance osuosl org>
+- Released 0.7.3
+- Fixes Include:
+  - Remove datasource_list from generated cloud-init config (#31)
+
 * Thu Jul 20 2017 Lance Albertson <lance osuosl org>
 - Released 0.7.2
 - Fixes Include:
