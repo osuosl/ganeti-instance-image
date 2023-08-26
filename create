@@ -74,7 +74,7 @@ if [ "$CDINSTALL" = "no" ] ; then
     # This is needed for file disks.
     if [ ! -b $blockdev ]; then
       ORIGINAL_BLOCKDEV=$blockdev
-      blockdev=$($LOSETUP -sf $blockdev)
+      blockdev=$($LOSETUP --show -f $blockdev)
       CLEANUP+=("$LOSETUP -d $blockdev")
     fi
 
