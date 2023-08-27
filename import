@@ -28,7 +28,7 @@ debug set -x
 if [ ! -b $blockdev ]; then
     ORIGINAL_BLOCKDEV=$blockdev
     blockdev=$($LOSETUP --show -f $blockdev)
-    CLEANUP+=("$LOSETUP -d $blockdev")
+    CLEANUP+=("$LOSETUP -d /dev/$blockdev")
 fi
 
 TARGET=`mktemp -d` || exit 1

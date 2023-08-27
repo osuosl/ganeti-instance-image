@@ -75,7 +75,7 @@ if [ "$CDINSTALL" = "no" ] ; then
     if [ ! -b $blockdev ]; then
       ORIGINAL_BLOCKDEV=$blockdev
       blockdev=$($LOSETUP --show -f $blockdev)
-      CLEANUP+=("$LOSETUP -d $blockdev")
+      CLEANUP+=("$LOSETUP -d /dev/$blockdev")
     fi
 
     DISK_SIZE="$(expr `blockdev --getsize64 $blockdev` / 1048576)"
