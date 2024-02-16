@@ -1,0 +1,28 @@
+#!/bin/bash
+
+#
+# Copyright (C) 2011 Greek Research and Technology Network
+#
+
+set -e
+
+. common.sh
+
+debug set -x
+
+trap cleanup EXIT
+
+n=$RANDOM
+min=$(( n %= 30 ))
+
+echo "SHELL=/bin/sh" > ${TARGET}/etc/crontab
+echo "PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin" >> ${TARGET}/etc/crontab
+printf "\n" >> ${TARGET}/etc/crontab
+echo "# m h dom mon dow user  command" >> ${TARGET}/etc/crontab
+echo "$min * * * *      root    cd / && run-parts --report cron.hourly" >> ${TARGET}/etc/crontab
+echo "$((min + 7)) 6 * * *  root    test -x /usr/sbin/anacron || ( cd / && run-parts --report cron.daily )" >> ${TARGET}/etc/crontab
+echo "$((min + 13)) 6 * * 7 root    test -x /usr/sbin/anacron || ( cd / && run-parts --report cron.weekly )" >> ${TARGET}/etc/crontab
+echo "$((min + 24)) 6 1 * * root    test -x /usr/sbin/anacron || ( cd / && run-parts --report cron.monthly )" >> ${TARGET}/etc/crontab
+
+trap - EXIT
+exit 0
