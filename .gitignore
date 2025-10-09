@@ -36,6 +36,7 @@ debian/files
 debian/*.log
 debian/ganeti-instance-image/
 debian/ganeti-instance-image.substvars
+debian/.debhelper/
 
 # Vagrant/Chef
 Berksfile.lock

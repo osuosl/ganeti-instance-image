@@ -12,14 +12,207 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get -y install build-essential autoconf dump kpartx fdisk qemu-utils
+          sudo apt-get -y install build-essential autoconf dump kpartx fdisk \
+            qemu-utils
       - name: Build
         run: |
           ./autogen.sh
           ./configure
           make
           sudo make install
+      - name: Verify installation
+        run: |
+          test -d /usr/local/share/ganeti/os/image
+          test -f /usr/local/share/ganeti/os/image/create
+          test -f /usr/local/share/ganeti/os/image/import
+          test -f /usr/local/share/ganeti/os/image/export
+
+  # Call package build workflows
+  rpm-build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - os: 'almalinux:8'
+            name: 'almalinux-8'
+          - os: 'almalinux:9'
+            name: 'almalinux-9'
+    container:
+      image: ${{ matrix.os }}
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          dnf install -y --allowerasing curl
+          dnf install -y epel-release
+          dnf install -y rpm-build rpmdevtools git autoconf automake make
+          dnf builddep -y ganeti-instance-image.spec
+
+      - name: Set up RPM build environment
+        run: |
+          rpmdev-setuptree
+
+      - name: Generate configure script
+        run: |
+          ./autogen.sh
+
+      - name: Configure build
+        run: |
+          ./configure
+
+      - name: Create source tarball
+        run: |
+          make dist
+          cp ganeti-instance-image-*.tar.gz ~/rpmbuild/SOURCES/
+
+      - name: Build RPM package
+        run: |
+          rpmbuild -ba ganeti-instance-image.spec
+
+      - name: Check built packages
+        run: |
+          ls -la ~/rpmbuild/RPMS/noarch/
+          ls -la ~/rpmbuild/SRPMS/
+
+      - name: Upload RPM artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: rpm-packages-${{ matrix.name }}
+          path: |
+            ~/rpmbuild/RPMS/noarch/*.rpm
+            ~/rpmbuild/SRPMS/*.rpm
+          retention-days: 30
+
+  debian-build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - os: 'debian:12'
+            name: 'debian-12'
+          - os: 'debian:13'
+            name: 'debian-13'
+          - os: 'ubuntu:22.04'
+            name: 'ubuntu-22-04'
+          - os: 'ubuntu:24.04'
+            name: 'ubuntu-24-04'
+    container:
+      image: ${{ matrix.os }}
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          apt-get update
+          apt-get install -y build-essential devscripts debhelper \
+            autotools-dev automake git
+          # Install all build dependencies from debian/control
+          apt-get build-dep -y .
+
+      - name: Generate configure script
+        run: |
+          ./autogen.sh
+
+      - name: Configure build
+        run: |
+          ./configure
+
+      - name: Build Debian package
+        run: |
+          debuild -us -uc -b
+
+      - name: Check built packages
+        run: |
+          ls -la ../*.deb
+          ls -la ../*.changes
+
+      - name: Move built packages to workspace
+        run: |
+          mv -v ../*.deb .
+          mv -v ../*.changes .
+
+      - name: Upload Debian artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: debian-packages-${{ matrix.name }}
+          path: |
+            *.deb
+            *.changes
+          retention-days: 30
+
+  package-test:
+    needs:
+      - rpm-build
+      - debian-build
+    strategy:
+      matrix:
+        include:
+          - os: 'almalinux:8'
+            name: 'almalinux-8'
+            artifact: 'rpm-packages-almalinux-8'
+          - os: 'almalinux:9'
+            name: 'almalinux-9'
+            artifact: 'rpm-packages-almalinux-9'
+          - os: 'debian:12'
+            name: 'debian-12'
+            artifact: 'debian-packages-debian-12'
+          - os: 'debian:13'
+            name: 'debian-13'
+            artifact: 'debian-packages-debian-13'
+          - os: 'ubuntu:22.04'
+            name: 'ubuntu-22-04'
+            artifact: 'debian-packages-ubuntu-22-04'
+          - os: 'ubuntu:24.04'
+            name: 'ubuntu-24-04'
+            artifact: 'debian-packages-ubuntu-24-04'
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ matrix.os }}
+    steps:
+      - name: Download package artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: .
+      - name: Install gdebi (Debian/Ubuntu only)
+        if: startsWith(matrix.os, 'debian') || startsWith(matrix.os, 'ubuntu')
+        run: apt-get update && apt-get install -y gdebi-core
+      - name: Add Ganeti repo (EL only)
+        shell: bash
+        if: contains(matrix.os, 'almalinux')
+        run: |
+          cat <<EOF > /etc/yum.repos.d/ganeti.repo
+          [ganeti]
+          name=Integ Ganeti Packages $releasever - \$basearch
+          baseurl=https://ftp2.osuosl.org/pub/ganeti-rpm/\$releasever/\$basearch/
+          enabled=1
+          gpgcheck=1
+          gpgkey=https://ftp2.osuosl.org/pub/ganeti-rpm/RPM-GPG-KEY-integ-ganeti
+          EOF
+          rpm --import https://ftp2.osuosl.org/pub/ganeti-rpm/RPM-GPG-KEY-integ-ganeti
+      - name: Install package
+        shell: bash
+        run: |
+          case "${{ matrix.os }}" in
+            debian*)
+              gdebi -n ./*.deb
+              ;;
+            ubuntu*)
+              gdebi -n ./*.deb
+              ;;
+            almalinux*)
+              dnf install -y epel-release
+              dnf install -y RPMS/noarch/*.rpm
+              ;;
+          esac
+      - name: Verify installation
+        run: 'test -d /usr/share/ganeti/os/image'
