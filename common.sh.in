@@ -441,6 +441,7 @@ fi
 : ${NETWORKS_DIR:="@sysconfdir@/ganeti/instance-image/networks"}
 : ${OVERLAYS_DIR:="@sysconfdir@/ganeti/instance-image/overlays"}
 : ${EXPORT_DIR:="/tmp"}
+: ${IMPORT_DIR:="/tmp"}
 : ${IMAGE_DIR:="@localstatedir@/cache/ganeti-instance-image"}
 : ${IMAGE_DEBUG:="no"}
 : ${FDISK:="sfdisk"}
