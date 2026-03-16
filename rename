@@ -23,8 +23,8 @@ set -e
 
 debug set -x
 
-if [ "${NOMOUNT}" = "yes" ] ; then
-    # do nothing if NOMOUNT is enabled
+if [ "${NOMOUNT}" = "yes" ] || [ "${BLOCKEXPORT}" = "yes" ] ; then
+    # do nothing if NOMOUNT or BLOCKEXPORT are enabled
     exit 0
 fi
 

@@ -31,7 +31,7 @@ if [ ! -b $blockdev ]; then
     CLEANUP+=("$LOSETUP -d $blockdev")
 fi
 
-if [ ! "${NOMOUNT}" = "yes" ] ; then
+if [ ! "${NOMOUNT}" = "yes" ] && [ ! "${BLOCKEXPORT}" = "yes" ] ; then
     filesystem_dev=$(map_disk0 $blockdev)
     CLEANUP+=("unmap_disk0 $blockdev")
     root_dev=$(map_partition $filesystem_dev root)
@@ -41,7 +41,7 @@ fi
 TARGET=`mktemp -d --tmpdir=${EXPORT_DIR}` || exit 1
 CLEANUP+=("rmdir $TARGET")
 
-if [ "${NOMOUNT}" = "yes" ] ; then
+if [ "${NOMOUNT}" = "yes" ] || [ "${BLOCKEXPORT}" = "yes" ] ; then
     # convert block device to qcow2 image to support OS's like Windows. Use
     # qcow2 to conserve on space.
     $QEMU_IMG convert $blockdev -O qcow2 ${TARGET}/disk.img
