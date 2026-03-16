@@ -40,6 +40,13 @@
 # ( default is @localstatedir@/cache/ganeti-instance-image )
 # IMAGE_DIR=""
 
+# TARBALL_COMPRESS: compress program use to compress tar file.
+# It must accept the -d option, for decompression.
+# The argument can contain command line options.
+# Use either none, gzip, pigz, bzip2, pzip2, lbzip2, lzop, xz, p7zip
+# (default is gzip)
+# TARBALL_COMPRESS="gzip"
+
 # NOMOUNT: Do not try to mount volume (if it is not a linux partition). Accepts
 # either 'yes' or 'no'. This option is useful for installing Windows images for
 # example. ( default is no )
