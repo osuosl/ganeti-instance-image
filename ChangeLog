@@ -1,3 +1,10 @@
+2026-04-02 Lance Albertson <lance@osuosl.org>
+  * Released 0.8.0
+  * Remove support for using dump/restore (#34)
+  * Add CI for building and testing rpm/deb packages (#33)
+  * Add AlmaLinux 10 support
+  * Change default IMAGE_TYPE to qcow2
+
 2023-04-27 Lance Albertson <lance@osuosl.org>
   * Released 0.7.3
   * Fixes Include:

@@ -1,6 +1,6 @@
 %define         instancename    image
 Name:		ganeti-instance-image
-Version:	0.7.3
+Version:	0.8.0
 Release:	1%{?dist}
 Summary:	Guest OS definition for Ganeti based on Linux-based images
 
@@ -65,7 +65,14 @@ rm -rf $RPM_BUILD_ROOT
 %{_localstatedir}/cache/ganeti-instance-image
 
 %changelog
-* Thu Apr 27 2032 Lance Albertson <lance osuosl org>
+* Wed Apr 02 2026 Lance Albertson <lance osuosl org>
+- Released 0.8.0
+- Remove support for using dump/restore (#34)
+- Add CI for building and testing rpm/deb packages (#33)
+- Add AlmaLinux 10 support
+- Change default IMAGE_TYPE to qcow2
+
+* Thu Apr 27 2023 Lance Albertson <lance osuosl org>
 - Released 0.7.3
 - Fixes Include:
   - Remove datasource_list from generated cloud-init config (#31)

@@ -1,3 +1,13 @@
+ganeti-instance-image (0.8.0) unstable; urgency=medium
+
+  * Released 0.8.0
+  * Remove support for using dump/restore (#34)
+  * Add CI for building and testing rpm/deb packages (#33)
+  * Add AlmaLinux 10 support
+  * Change default IMAGE_TYPE to qcow2
+
+ -- Lance Albertson <lance@osuosl.org>  Wed, 02 Apr 2026 12:00:00 -0700
+
 ganeti-instance-image (0.7.3) unstable; urgency=medium
 
   * Released 0.7.3
