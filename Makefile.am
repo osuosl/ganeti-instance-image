@@ -76,4 +76,8 @@ distclean-local:
 	rm -rf build-stamp debian/files debian/*.log debian/ganeti-instance-image/ \
 		debian/ganeti-instance-image.substvars
 
+dist-local: dist
+	md5sum $(distdir).tar.gz > $(distdir).tar.gz.md5sum
+	sha256sum $(distdir).tar.gz > $(distdir).tar.gz.sha256sum
+
 CLEANFILES = $(os_DATA) $(tools_SCRIPTS)
