@@ -18,7 +18,6 @@
 # 02110-1301, USA.
 
 AWK="@AWK@"
-DUMP="@DUMP@"
 LOSETUP="@LOSETUP@"
 KPARTX="@KPARTX@"
 SFDISK="@SFDISK@"
@@ -433,7 +432,7 @@ fi
 : ${KERNEL_ARGS=""}
 : ${OVERLAY=""}
 : ${IMAGE_NAME:=""}
-: ${IMAGE_TYPE:="dump"}
+: ${IMAGE_TYPE:="qcow2"}
 : ${NOMOUNT:="no"}
 : ${ARCH:=""}
 : ${CUSTOMIZE_DIR:="@sysconfdir@/ganeti/instance-image/hooks"}

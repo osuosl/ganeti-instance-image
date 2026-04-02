@@ -36,9 +36,6 @@ case "$IMAGE_TYPE" in
   qcow2)
     IMG_EXT=".qcow2"
     ;;
-  dump)
-    IMG_EXT="-root.dump"
-    ;;
 esac
 
 if [ ! -z "$IMAGE_URL" ] ; then
@@ -61,12 +58,6 @@ if [ ! -z "$IMAGE_URL" ] ; then
     cd $OLDPWD
 else
     IMAGE_FILE="${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}${IMG_EXT}"
-fi
-
-if [ "$IMAGE_TYPE" = "dump" ] ; then
-    # Workaround for restore's non-unique /tmp/rstdir* and /tmp/rstmode*
-    export TMPDIR=$(mktemp -d /tmp/${INSTANCE_NAME}_XXXXXXXX)
-    CLEANUP+=("rmdir --ignore-fail-on-non-empty $TMPDIR")
 fi
 
 if [ "$CDINSTALL" = "no" ] ; then
@@ -97,7 +88,7 @@ if [ "$CDINSTALL" = "no" ] ; then
     fi
 
     case "$IMAGE_TYPE" in
-      tarball|dump)
+      tarball)
         # If the image is tarball based, then we need to manually create the
         # volumes, filesystems, etc
         # Create 3 partitions, /boot, swap, & /
@@ -121,7 +112,7 @@ if [ "$CDINSTALL" = "no" ] ; then
     boot_dev=$(map_partition $filesystem_dev boot)
     swap_dev=$(map_partition $filesystem_dev swap)
 
-    if [ "${IMAGE_TYPE}" = "tarball" -o "${IMAGE_TYPE}" = "dump" ] ; then
+    if [ "${IMAGE_TYPE}" = "tarball" ] ; then
         mkfs_disk0
         root_uuid="$($VOL_ID $root_dev)"
         [ -n "$boot_dev" ] && sleep 1 && boot_uuid="$($VOL_ID $boot_dev)"
@@ -137,21 +128,9 @@ if [ "$CDINSTALL" = "no" ] ; then
     if [ "${IMAGE_TYPE}" = "tarball" ] ; then
         # unpack image
         tar pzxf $IMAGE_FILE -C $TARGET
-    elif [ "${IMAGE_TYPE}" = "dump" ] ; then
-        root_dump="${IMAGE_FILE}"
-        ( cd ${TARGET}; restore -r -y -f ${root_dump} > /dev/null )
-
-        if [ -n "${boot_dev}" ] ; then
-            boot_dump="${IMAGE_FILE/root.dump/boot.dump}"
-            if [ ! -f "$boot_dump" ] ; then
-              log_error "Can't find image file: $boot_dump"
-              exit 1
-            fi
-            ( cd ${TARGET}/boot; restore -r -y -f ${boot_dump} > /dev/null )
-        fi
     fi
 
-    if [ "${IMAGE_TYPE}" = "tarball" -o "${IMAGE_TYPE}" = "dump" ] ; then
+    if [ "${IMAGE_TYPE}" = "tarball" ] ; then
         setup_fstab $TARGET
     fi
 

@@ -29,9 +29,9 @@ HOSTNAME="$(hostname)"
 run_help() {
     echo "Usage: $0 [-d PATH] [-n NAME] [-a ARCH] -t TYPE -i INSTANCE"
     echo
-    echo "Create an image of a ganeti instance using either a tarball, dump, or qemu image.."
+    echo "Create an image of a ganeti instance using either a tarball or qemu image.."
     echo
-    echo "-t TYPE       Type of image, either: tarball, dump, or qemu-img"
+    echo "-t TYPE       Type of image, either: tarball or qemu-img"
     echo "-d PATH       Path of where to put the image"
     echo "-i INSTANCE   Name of the instance"
     echo "-n NAME       Name of the image"
@@ -72,7 +72,7 @@ done
 [ -z "$TYPE" ] && echo "Error: Image type not set" && exit 1
 
 incorrect_type=1
-for i in tarball dump qemu-img ; do
+for i in tarball qemu-img ; do
     if [ "$i" == $TYPE ] ; then
         incorrect_type=0
     fi

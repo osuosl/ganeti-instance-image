@@ -16,7 +16,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get -y install build-essential autoconf dump kpartx fdisk \
+          sudo apt-get -y install build-essential autoconf kpartx fdisk \
             qemu-utils
       - name: Build
         run: |
@@ -41,6 +41,8 @@ jobs:
             name: 'almalinux-8'
           - os: 'almalinux:9'
             name: 'almalinux-9'
+          - os: 'almalinux:10'
+            name: 'almalinux-10'
     container:
       image: ${{ matrix.os }}
 
@@ -162,6 +164,9 @@ jobs:
           - os: 'almalinux:9'
             name: 'almalinux-9'
             artifact: 'rpm-packages-almalinux-9'
+          - os: 'almalinux:10'
+            name: 'almalinux-10'
+            artifact: 'rpm-packages-almalinux-10'
           - os: 'debian:12'
             name: 'debian-12'
             artifact: 'debian-packages-debian-12'
@@ -190,15 +195,20 @@ jobs:
         shell: bash
         if: contains(matrix.os, 'almalinux')
         run: |
+          if [[ "${{ matrix.os }}" == "almalinux:10" ]]; then
+            GPG_KEY="RPM-GPG-KEY-integ-ganeti-10"
+          else
+            GPG_KEY="RPM-GPG-KEY-integ-ganeti"
+          fi
           cat <<EOF > /etc/yum.repos.d/ganeti.repo
           [ganeti]
           name=Integ Ganeti Packages $releasever - \$basearch
           baseurl=https://ftp2.osuosl.org/pub/ganeti-rpm/\$releasever/\$basearch/
           enabled=1
           gpgcheck=1
-          gpgkey=https://ftp2.osuosl.org/pub/ganeti-rpm/RPM-GPG-KEY-integ-ganeti
+          gpgkey=https://ftp2.osuosl.org/pub/ganeti-rpm/${GPG_KEY}
           EOF
-          rpm --import https://ftp2.osuosl.org/pub/ganeti-rpm/RPM-GPG-KEY-integ-ganeti
+          rpm --import https://ftp2.osuosl.org/pub/ganeti-rpm/${GPG_KEY}
       - name: Install package
         shell: bash
         run: |

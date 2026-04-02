@@ -30,7 +30,7 @@ run_help() {
     echo
     echo "Create an image tarball of a ganeti instance."
     echo
-    echo "-t TYPE           Image type, either: tarball, dump, or qemu-img"
+    echo "-t TYPE           Image type, either: tarball or qemu-img"
     echo "-m IMAGE_DIR      Path of where to put the tarball"
     echo "-i INSTANCE_NAME  Name of the instance"
     echo "-n IMAGE_NAME     Name of the tarball image"
@@ -111,15 +111,6 @@ case $TYPE in
         else
             tar --numeric-owner -zcpf ${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}.tar.gz .
         fi
-        ;;
-    dump)
-        if [ -n "$boot_dev" ] ; then
-            echo "Creating dump from $INSTANCE_NAME for boot at ${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}-boot.dump"
-            $DUMP -0 -q -z9 -f ${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}-boot.dump $boot_dev 2> /dev/null
-        fi
-
-        echo "Creating dump from $INSTANCE_NAME for root at ${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}-root.dump"
-        $DUMP -0 -q -z9 -f ${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}-root.dump $root_dev
         ;;
     qemu-img)
         echo "Creating qemu-img image from $INSTANCE_NAME to ${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}.img"
