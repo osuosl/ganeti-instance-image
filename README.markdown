@@ -1,7 +1,7 @@
 # ganeti-instance-image
 
 This is a guest OS definition for [Ganeti](http://code.google.com/p/ganeti). It
-will install a Linux-based image using either a tarball, filesystem dump, or a
+will install a Linux-based image using either a tarball or a
 qemu-img disk image file. This definition also allows for manual creation of an
 instance by simply setting only the disks up and allowing you to boot via the
 install cd manually.  The goal of this instance is to allow fast and flexible
@@ -61,9 +61,9 @@ The following settings will be examined in this file:
 * `IMAGE_NAME`: Name for the image to use. Generally they will have names similar
                 to: centos-5.4, debian-5.0, etc. The naming is free form
                 depending on what you name the file itself.
-* `IMAGE_TYPE`: Create instance by either using a gzipped tarball, file system
-                dump, or an image created by qemu-img. Accepts either 'tarball',
-                'dump', or 'qemu'.  (default: dump).
+* `IMAGE_TYPE`: Create instance by either using a gzipped tarball or an image
+                created by qemu-img. Accepts either 'tarball' or 'qemu'.
+                (default: qcow2).
 * `IMAGE_DIR`:  Override default location for images.
                 (default: `$localstatedir/cache/ganeti-instance-image`)
 * `NOMOUNT`:    Do not try to mount volume (typically used if it is not a linux
@@ -86,10 +86,9 @@ using this OS but currently the OS interface in ganeti is limiting.
 
 ## Creation of Deployment Images
 
-There are three types that are supported for deploying images.
+There are two types that are supported for deploying images.
 
 * tarball
-* dump
 * qemu image
 
 ### Tarball
@@ -133,30 +132,6 @@ the amount of disk space used:
 Note: Older versions of qemu-img may not support the `host_device` format so
 use `raw` instead which should work in theory.
 
-### Dump
-
-The last, and most efficient type of disk image is creating filesystem dumps
-using the dump command. The advantage with using dumps is that its much faster
-to deploy using it, and it also has built-in compression. The disadvantage is
-that you need to install grub manually which might be an issue on some operating
-systems. We currently fully support grub 1 and have partial support with grub2.
-After the new instance has booted, you will need to run `update-grub` and reboot
-the VM to get the new settings. We currently cannot run `update-grub` during the
-install because of an upstream grub2 issue.
-
-You will need to create images for both the boot and root partition (if you
-include a boot partition).
-
-Create a base image for an instance just like its described in Qemu Images. Make
-sure the instance is shutdown and then issue the following commands (assuming
-the activated disk is drbd1)::
-
-    dump -0 -q -z9 -f ${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}-boot.dump \
-      /dev/mapper/drbdq-1
-
-    dump -0 -q -z9 -f ${IMAGE_DIR}/${IMAGE_NAME}-${ARCH}-root.dump \
-      /dev/mapper/drbdq-3
-
 ### Partition Layout
 
 Currently the partition layout is locked into a specific way in order to make it
@@ -188,7 +163,6 @@ numbers will go up by one. For example:
 The naming convention that is used is the following:
 
 * tarball:    `$IMAGE_NAME-$ARCH.tar.gz`
-* dump:       `$IMAGE_NAME-$ARCH-boot.dump` `$IMAGE_NAME-$ARCH-root.dump`
 * qemu-img:   `$IMAGE_NAME-$ARCH.img`
 
 ### Useful Scripts
@@ -208,10 +182,10 @@ remote host if the instance resides on a remote host. Below is the help output.
 
     ganeti-image [-d PATH] [-n NAME] [-a ARCH] -t TYPE -i INSTANCE
 
-    Create an image of a ganeti instance using either a tarball, dump, or qemu
+    Create an image of a ganeti instance using either a tarball or qemu
     image..
 
-    -t TYPE       Type of image, either: tarball, dump, or qemu-img
+    -t TYPE       Type of image, either: tarball or qemu-img
     -d PATH       Path of where to put the image
     -i INSTANCE   Name of the instance
     -n NAME       Name of the image
@@ -239,7 +213,7 @@ passes to the OS scripts:
     ROOT_DEV:   device in which the root (/) filesystem resides (the one mounted
                 in TARGET)
     BOOT_DEV:   device in which the boot (/boot) filesystem resides
-    IMAGE_TYPE: type of image being used (tarball, qemu, dump)
+    IMAGE_TYPE: type of image being used (tarball, qemu)
 
 The scripts in `CUSTOMIZE_DIR` can exit with an error code to signal an error in
 the instance creation, should they fail.

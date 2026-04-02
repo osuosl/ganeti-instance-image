@@ -9,13 +9,13 @@ License:	GPLv2
 URL:		http://code.osuosl.org/projects/ganeti-image
 Source0:	http://ftp.osuosl.org/pub/osl/ganeti-instance-image/%{name}-%{version}.tar.gz
 BuildRoot:	%(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
-BuildRequires:	qemu-img, dump, tar, kpartx, curl
-Requires:       qemu-img, dump, tar, kpartx, curl, ganeti
+BuildRequires: qemu-img, tar, kpartx, curl
+Requires:       qemu-img, tar, kpartx, curl, ganeti
 BuildArch:      noarch
 
 %description
 This is a guest OS definition for Ganeti (http://code.google.com/p/ganeti). It
-will install a Linux-based image using either a tarball, filesystem dump, or a
+will install a Linux-based image using either a tarball or a
 qemu-img disk image file. This definition also allows for manual creation of an
 instance by simply setting only the disks up and allowing you to boot via the
 install cd manually.  The goal of this instance is to allow fast and flexible

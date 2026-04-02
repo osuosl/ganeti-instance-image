@@ -16,7 +16,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get -y install build-essential autoconf dump kpartx fdisk \
+          sudo apt-get -y install build-essential autoconf kpartx fdisk \
             qemu-utils
       - name: Build
         run: |
@@ -41,6 +41,8 @@ jobs:
             name: 'almalinux-8'
           - os: 'almalinux:9'
             name: 'almalinux-9'
+          - os: 'almalinux:10'
+            name: 'almalinux-10'
     container:
       image: ${{ matrix.os }}
 
@@ -162,6 +164,9 @@ jobs:
           - os: 'almalinux:9'
             name: 'almalinux-9'
             artifact: 'rpm-packages-almalinux-9'
+          - os: 'almalinux:10'
+            name: 'almalinux-10'
+            artifact: 'rpm-packages-almalinux-10'
           - os: 'debian:12'
             name: 'debian-12'
             artifact: 'debian-packages-debian-12'

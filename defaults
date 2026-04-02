@@ -32,9 +32,9 @@
 #   centos-5.4 debian-4.0 fedora-12
 # IMAGE_NAME=""
 
-# IMAGE_TYPE: Either qemu disk images, tarball, or dump based images.
-# Use either qemu, raw, qcow2, tarball, dump (default is dump)
-# IMAGE_TYPE="dump"
+# IMAGE_TYPE: Either qemu disk images or tarball based images.
+# Use either qemu, raw, qcow2, or tarball (default is qcow2)
+# IMAGE_TYPE="qcow2"
 
 # IMAGE_DIR: directory location for disk images
 # ( default is @localstatedir@/cache/ganeti-instance-image )

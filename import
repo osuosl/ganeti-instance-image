@@ -33,8 +33,8 @@ fi
 
 TARGET=`mktemp -d` || exit 1
 CLEANUP+=("rmdir $TARGET")
-DUMPDIR=`mktemp -d` || exit 1
-CLEANUP+=("rm -rf $DUMPDIR")
+TMPDIR=`mktemp -d` || exit 1
+CLEANUP+=("rm -rf $TMPDIR")
 
 if [ ! "${NOMOUNT}" = "yes" ] ; then
     format_disk0 $blockdev
@@ -52,18 +52,14 @@ if [ ! "${NOMOUNT}" = "yes" ] ; then
     mount_disk0 $TARGET
 fi
 
-# import dumps from tar file
-( cd $DUMPDIR; tar -xf - )
+# import images from tar file
+( cd $TMPDIR; tar -xf - )
 
 if [ "${NOMOUNT}" = "yes" ] ; then
-    ( $QEMU_IMG convert ${DUMPDIR}/disk.img -O host_device ${blockdev} )
+    ( $QEMU_IMG convert ${TMPDIR}/disk.img -O host_device ${blockdev} )
 else
-    # clean up any previous restore runs
-    rm -rf /tmp/rst*
-    ( cd $TARGET ; restore -r -y -f ${DUMPDIR}/root.dump )
-    if [ -n "${boot_dev}" ] ; then
-        ( cd ${TARGET}/boot ; restore -r -y -f ${DUMPDIR}/boot.dump )
-    fi
+    # Extract tarball image
+    ( cd $TARGET ; tar -xzf ${TMPDIR}/*.tar.gz )
 
     setup_fstab $TARGET
 
