@@ -9,7 +9,7 @@ License:	GPLv2
 URL:		http://code.osuosl.org/projects/ganeti-image
 Source0:	http://ftp.osuosl.org/pub/osl/ganeti-instance-image/%{name}-%{version}.tar.gz
 BuildRoot:	%(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
-BuildRequires: qemu-img, tar, kpartx, curl
+BuildRequires: qemu-img, tar, kpartx, curl, make
 Requires:       qemu-img, tar, kpartx, curl, ganeti
 BuildArch:      noarch
 
